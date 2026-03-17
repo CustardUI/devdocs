@@ -1,0 +1,150 @@
+{
+  "config": {
+    "toggles": [
+      {
+        "toggleId": "prerequisites",
+        "label": "Prerequisites",
+        "isLocal": true,
+        "default": "peek"
+      },
+      {
+        "toggleId": "installation",
+        "label": "Installation",
+        "isLocal": true,
+        "default": "show"
+      },
+      {
+        "toggleId": "configuration",
+        "label": "Configuration",
+        "isLocal": true,
+        "default": "show"
+      },
+      {
+        "toggleId": "run-project",
+        "label": "Running the Project",
+        "isLocal": true,
+        "default": "show"
+      },
+      {
+        "toggleId": "troubleshooting-setup",
+        "label": "Troubleshooting",
+        "isLocal": true,
+        "default": "peek"
+      },
+      {
+        "toggleId": "localToggle",
+        "label": "Local Toggle Label",
+        "isLocal": true,
+        "default": "peek"
+      },
+      {
+        "toggleId": "mac",
+        "label": "MacOS",
+        "isLocal": true,
+        "description": "Show content for macOS users",
+        "default": "peek"
+      },
+      { "toggleId": "linux", "label": "Linux", "isLocal": true, "description": "Show content for Linux users" },
+      { "toggleId": "windows", "label": "Windows", "isLocal": true, "default": "show" }
+    ],
+    "tabGroups": [
+      {
+        "groupId": "os",
+        "label": "Operating System",
+        "description": "Select your operating system.",
+        "isLocal": true,
+        "default": "macos",
+        "tabs": [
+          { "tabId": "macos", "label": "macOS" },
+          { "tabId": "windows", "label": "Windows" },
+          { "tabId": "linux", "label": "Linux" }
+        ]
+      },
+      {
+        "groupId": "pkg",
+        "label": "Package Manager",
+        "description": "Select your preferred package manager.",
+        "isLocal": true,
+        "default": "npm",
+        "tabs": [
+          { "tabId": "npm", "label": "npm" },
+          { "tabId": "yarn", "label": "yarn" },
+          { "tabId": "pnpm", "label": "pnpm" }
+        ]
+      },
+      {
+        "groupId": "localTabGroup",
+        "label": "Page specific tabgroup",
+        "description": "This is a local tab group, that only appears on pages where it's used.",
+        "isLocal": true,
+        "tabs": [
+          { "tabId": "a", "label": "Alpha" },
+          { "tabId": "b", "label": "Beta" },
+          { "tabId": "c", "label": "Charlie" }
+        ]
+      },
+      {
+        "groupId": "fruit",
+        "label": "Fruit Selection",
+        "description": "Select your favorite fruit.",
+        "isLocal": true,
+        "default": "pear",
+        "placeholderId": "fruit",
+        "tabs": [
+          { "tabId": "apple", "label": "Apple", "placeholderValue": "apple" },
+          { "tabId": "orange", "label": "Orange", "placeholderValue": "orange" },
+          { "tabId": "pear", "label": "Pear", "placeholderValue": "pear" }
+        ]
+      }
+    ],
+    "placeholders": [
+      {
+        "name": "username",
+        "settingsLabel": "Your Username",
+        "settingsHint": "Enter username",
+        "defaultValue": "Guest"
+      },
+      {
+        "name": "placeholderTest",
+        "settingsLabel": "placeholderTest",
+        "settingsHint": "Enter anything",
+        "defaultValue": "placeholderTestDefaultValue",
+        "isLocal": true
+      },
+      {
+        "name": "searchQuery",
+        "settingsLabel": "Search Query",
+        "settingsHint": "Enter search query",
+        "isLocal": true
+      },
+      {
+        "name": "institutionName",
+        "defaultValue": "Generic University",
+        "adaptationPlaceholder": true
+      }
+    ]
+  },
+  "baseUrl": "/",
+  "storageKey": "cv-docs-beta",
+  "settings": {
+    "enabled": true,
+    "panel": {
+      "title": "CustardUI Settings Dialog",
+      "description": "Toggle different content sections to customize your view."
+    },
+    "icon": {
+      "position": "middle-left",
+      "color": "#814C20",
+      "backgroundColor": "#F2CA55",
+      "opacity": 0.95,
+      "scale": 1.1
+    },
+    "callout": {
+      "show": true,
+      "enablePulse": true,
+      "message": "Open the CustardUI settings to customize your view.",
+      "backgroundColor": "#F2CA55",
+      "textColor": "#2C1A0E"
+    }
+  }
+}

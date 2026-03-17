@@ -1,0 +1,457 @@
+{
+  "enableSearch": true,
+  "pages": [
+    {
+      "src": "404.md",
+      "title": "Page not found",
+      "headings": {},
+      "headingKeywords": {}
+    },
+    {
+      "src": "README.md",
+      "headings": {
+        "custom-views-library-documentation": "Custom Views Library Documentation",
+        "quick-start": "Quick Start",
+        "for-development": "For Development",
+        "for-production-build": "For Production Build",
+        "interactive-demo": "Interactive Demo",
+        "development-notes": "Development Notes"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "about.md",
+      "title": "About Page",
+      "headings": {
+        "about-page": "About Page"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/adaptations.md",
+      "title": "Author Guide - Site Adaptations",
+      "headings": {
+        "site-adaptations": "Site Adaptations",
+        "how-it-works": "How It Works",
+        "quick-start": "Quick Start",
+        "file-placement": "File Placement",
+        "adaptation-json-schema": "Adaptation JSON Schema",
+        "top-level-fields": "Top-level fields",
+        "theme": "theme",
+        "defaults": "defaults",
+        "author-controlled-placeholders-adaptationplaceholder": "Author-Controlled Placeholders (adaptationPlaceholder)",
+        "state-layering-precedence": "State Layering Precedence",
+        "per-page-activation": "Per-Page Activation",
+        "clearing-an-adaptation": "Clearing an Adaptation",
+        "example-institution-adaptation-of-this-site": "Example: Institution Adaptation of this Site"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/components/all.md",
+      "title": "Components",
+      "headings": {
+        "components": "Components"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/components/placeholders.md",
+      "title": "CustardUI - Placeholders",
+      "headings": {
+        "simple-placeholders-variable-interpolation": "Simple Placeholders (Variable Interpolation)",
+        "usage": "Usage",
+        "add-the-placeholder-configuration": "Add the Placeholder Configuration",
+        "use-the-placeholder": "Use the placeholder",
+        "inline-fallback": "Inline Fallback",
+        "conditional-syntax-fall-forward": "Conditional Syntax (Fall-Forward)",
+        "user-set-vs-any-resolved-value": "User-Set vs. Any Resolved Value",
+        "placeholder-driven-toggle-visibility": "Placeholder-Driven Toggle Visibility",
+        "html-attribute-interpolation": "HTML Attribute Interpolation",
+        "escaping-syntax": "Escaping Syntax",
+        "inline-editing-of-placeholders": "Inline Editing of Placeholders",
+        "placeholder-input-attributes": "Placeholder-Input Attributes",
+        "placeholder-configuration": "Placeholder Configuration",
+        "tab-group-binding-and-amp-integration": "Tab Group Binding &amp; Integration",
+        "persistence": "Persistence",
+        "shareable-url": "Shareable URL"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/components/settings.md",
+      "title": "CustardUI - Settings",
+      "headings": {
+        "settings-dialog": "Settings Dialog",
+        "settings-icon-trigger": "Settings Icon Trigger",
+        "intro-popup-for-icon-trigger": "Intro Popup for Icon Trigger",
+        "opening-via-link": "Opening via Link",
+        "hash-trigger-recommended": "Hash Trigger (Recommended)",
+        "query-parameter": "Query Parameter",
+        "adaptive-display": "Adaptive Display",
+        "configuration": "Configuration",
+        "settings-options": "Settings Options",
+        "integration": "Integration"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/components/share.md",
+      "title": "Author Guide - Sharing",
+      "headings": {
+        "focused-views": "Focused Views",
+        "share-mode": "Share Mode",
+        "types-of-sharing": "Types of Sharing",
+        "toggling-share-mode": "Toggling Share Mode",
+        "selecting-elements": "Selecting Elements",
+        "generating-share-link": "Generating Share Link",
+        "exiting-share-mode": "Exiting Share Mode",
+        "focus-mode": "Focus Mode",
+        "configurations": "Configurations",
+        "using-custardui-without-the-settings-dialog": "Using CustardUI without the Settings Dialog",
+        "customizing-share-behavior-wip": "Customizing Share Behavior ( WIP )"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/components/tabs.md",
+      "title": "Author Guide - Tabs",
+      "headings": {
+        "basic-example": "Basic Example",
+        "advanced-example-with-badges": "Advanced Example with Badges",
+        "using-icons-in-headers": "Using Icons in Headers",
+        "tabs": "Tabs",
+        "no-id-tabs": "No-ID Tabs",
+        "multi-id-tabs": "Multi-ID Tabs",
+        "setting-the-default-tab": "Setting the Default Tab",
+        "header-syntax-with-rich-formatting": "Header Syntax with Rich Formatting",
+        "syntax-and-amp-rules": "Syntax &amp; Rules",
+        "attributes-and-amp-options": "Attributes &amp; Options",
+        "cv-tabgroup-attributes": "&lt;cv-tabgroup&gt; Attributes",
+        "cv-tab-attributes": "&lt;cv-tab&gt; Attributes",
+        "cv-tab-header-attributes": "&lt;cv-tab-header&gt; Attributes",
+        "cv-tab-body-attributes": "&lt;cv-tab-body&gt; Attributes",
+        "configuration": "Configuration",
+        "json-configuration-option-types": "JSON Configuration Option Types",
+        "binding-to-placeholders": "Binding to Placeholders",
+        "global-vs-local-tab-groups": "Global vs. Local Tab Groups",
+        "defining-local-components": "Defining Local Components",
+        "shareable-url": "Shareable URL"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/components/toggles.md",
+      "title": "CustardUI - Toggle Component",
+      "headings": {
+        "toggles": "Toggles",
+        "multi-id-toggles": "Multi-ID Toggles",
+        "toggles-with-peek-mode": "Toggles with Peek Mode",
+        "inline-controls": "Inline Controls",
+        "attributes-and-amp-options-of-cv-toggle": "Attributes &amp; Options of &lt;cv-toggle&gt;",
+        "configuration": "Configuration",
+        "key-configuration-fields-in-custardui-config-json-for-toggles": "Key Configuration Fields in custardui.config.json for Toggles",
+        "visibility-resolution-order": "Visibility Resolution Order",
+        "global-vs-local-toggles": "Global vs. Local Toggles",
+        "registering-local-toggles-for-settings": "Registering Local Toggles for Settings",
+        "shareable-url": "Shareable URL",
+        "troubleshooting": "Troubleshooting"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/configuration.md",
+      "title": "Author Guide - Configuration",
+      "headings": {
+        "configuration-reference": "Configuration Reference",
+        "configuration-file-custardui-config-json": "Configuration File (custardui.config.json)",
+        "basic-structure": "Basic Structure",
+        "summary-of-configuration-options": "Summary of Configuration Options",
+        "core-configuration-config": "Core Configuration (config)",
+        "global-options": "Global Options",
+        "settings-configuration-in-config-json-settings": "Settings Configuration in config.json: (settings)",
+        "script-tag-attributes": "Script Tag Attributes"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/gettingStarted.md",
+      "title": "Author Guide - Getting Started",
+      "headings": {
+        "getting-started": "Getting Started",
+        "what-s-in-this-guide": "What's in this guide",
+        "prerequisites": "Prerequisites",
+        "quick-start": "Quick Start",
+        "1-add-the-script-tag": "1. Add the Script Tag",
+        "2-create-a-config-file": "2. Create a Config File",
+        "3-use-features-and-components-in-your-content": "3. Use Features and Components in Your Content",
+        "what-s-next": "What's Next?"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/index.md",
+      "headings": {},
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/integrations/setupWithMarkbind.md",
+      "title": "Installation (MarkBind Setup)",
+      "headings": {
+        "setting-up-custardui-in-a-markbind-site": "Setting up CustardUI in a MarkBind Site",
+        "create-the-plugin-file": "Create the Plugin File",
+        "2-register-the-plugin-in-site-json": "2. Register the Plugin in site.json",
+        "3-create-custardui-config-json": "3. Create custardui.config.json"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/urlSharing.md",
+      "title": "CustardUI - URL Sharing",
+      "headings": {
+        "url-sharing": "URL Sharing",
+        "all-parameters": "All Parameters",
+        "view-state-parameters": "View State Parameters",
+        "settings-dialog-parameters": "Settings Dialog Parameters",
+        "focused-views-parameters": "Focused Views Parameters",
+        "tab-groups": "Tab Groups",
+        "placeholders": "Placeholders",
+        "combined-example-tabs-toggles-placeholders": "Combined Example (Tabs, Toggles, Placeholders)",
+        "encoding-of-url": "Encoding of URL",
+        "precedence": "Precedence",
+        "toggles": "Toggles",
+        "settings-dialog": "Settings Dialog",
+        "focused-views": "Focused Views",
+        "opening-share-mode": "Opening Share Mode",
+        "direct-focus-view-links": "Direct Focus View Links"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "design.md",
+      "headings": {
+        "colors": "Colors:",
+        "word-colors": "Word Colors"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/changesMade.md",
+      "title": "Changelog",
+      "headings": {
+        "changelog": "Changelog",
+        "v2-0-0": "v2.0.0",
+        "features-added": "Features Added",
+        "v1-7-0": "v1.7.0"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/componentWorkings.md",
+      "title": "Developer Guide - Components",
+      "headings": {
+        "how-do-the-components-work-rough-explanation": "How do the components work (rough explanation)",
+        "placeholders": "Placeholders"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/components/anchor.md",
+      "title": "Developer Guide - DOM Element Locator and Anchors",
+      "headings": {
+        "overview": "Overview",
+        "the-problem-it-solves": "The Problem It Solves",
+        "core-concepts": "Core Concepts",
+        "1-the-anchor-descriptor": "1. The Anchor Descriptor",
+        "2-stable-text-and-amp-placeholder-awareness": "2. Stable Text &amp; Placeholder Awareness",
+        "3-serialization": "3. Serialization",
+        "4-resolution-fuzzy-matching": "4. Resolution (Fuzzy Matching)",
+        "data-flow": "Data Flow",
+        "module-layout": "Module Layout",
+        "key-considerations": "Key Considerations"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/components/tabLogic.md",
+      "title": "Developer Guide - Tab Logic",
+      "headings": {
+        "overview": "Overview",
+        "core-principles": "Core Principles",
+        "declarative-visibility": "Declarative Visibility",
+        "state-synchronization": "State Synchronization",
+        "layout-stabilization-scroll-anchoring": "Layout Stabilization (Scroll Anchoring)",
+        "key-considerations": "Key Considerations"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/devGuide.md",
+      "title": "Developer Guide",
+      "headings": {
+        "developer-guide": "Developer Guide"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/framework.md",
+      "title": "Architectural Overview",
+      "headings": {
+        "architectural-overview": "Architectural Overview",
+        "why-svelte": "Why Svelte?"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/index.md",
+      "headings": {},
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/shareFunction.md",
+      "title": "Developer Guide - Share Functionality",
+      "headings": {
+        "share-function": "Share Function",
+        "core-concepts": "Core Concepts",
+        "1-the-overlay-interface": "1. The Overlay Interface",
+        "2-robust-deep-linking": "2. Robust Deep Linking",
+        "3-url-serialization": "3. URL Serialization"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/tests/focus-test.md",
+      "title": "Developer Guide - Focus and Sharing Tests",
+      "headings": {
+        "focus-and-sharing-tests": "Focus and Sharing Tests",
+        "intro-section": "Introduction",
+        "step-1": "Step 1: Install Dependencies",
+        "step-2": "Step 2: Configure the Plugin",
+        "troubleshooting": "Troubleshooting",
+        "error-1": "Error: Build Fails",
+        "final-section": "Final Section"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/tests/localComponents.md",
+      "title": "Developer Guide - Local Components",
+      "headings": {
+        "local-components": "Local Components",
+        "local-components-2": "Local Components",
+        "local-toggle": "Local Toggle",
+        "local-tab-groups": "Local Tab Groups",
+        "further-testing": "Further Testing"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/tests/nonStickyHeader.md",
+      "title": "Developer Guide - Non Sticky Header",
+      "headings": {},
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/tests/placeholders.md",
+      "title": "Developer Guide - Placeholder Tests",
+      "headings": {
+        "placeholder-tests": "Placeholder Tests",
+        "placeholders-from-config-work-with-tabgroup-on-page": "Placeholders from Config work with tabgroup on page:",
+        "fall-forward-behavior": "Fall forward Behavior"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/tests/tabs.md",
+      "title": "Developer Guide - Tabs",
+      "headings": {
+        "tabs": "Tabs",
+        "fruits-tabs": "Fruits Tabs",
+        "color-schemes": "Color Schemes"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/workflowAndRelease.md",
+      "title": "Developer Guide - Project Workflow and Releases",
+      "headings": {
+        "release-and-workflow-guide": "Release and Workflow Guide",
+        "branching-strategy": "Branching Strategy",
+        "core-branches": "Core Branches",
+        "why-we-use-and-quot-squash-and-merge-and-quot-for-production": "Why we use &quot;Squash and Merge&quot; for Production",
+        "the-development-lifecycle": "The Development Lifecycle",
+        "step-1-feature-development": "Step 1: Feature Development",
+        "step-2-beta-releases-experimental": "Step 2: Beta Releases (Experimental)",
+        "step-3-production-release-stable": "Step 3: Production Release (Stable)",
+        "maintenance-hotfixes": "Maintenance (Hotfixes)",
+        "summary-of-commands-and-amp-cdns": "Summary of Commands &amp; CDNs",
+        "npm-and-amp-deployment-commands": "NPM &amp; Deployment Commands",
+        "cdn-usage": "CDN Usage"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "index.md",
+      "title": "CustardUI - Your docs, shaped for every reader",
+      "headings": {
+        "custardui": "CustardUI",
+        "static-sites-don-t-have-to-be-static": "Static sites don't have to be static.",
+        "answer-questions-with-a-link": "Answer questions with a link.",
+        "one-resource-every-audience": "One resource. Every audience.",
+        "up-and-running-in-minutes": "Up and running in minutes.",
+        "your-docs-shaped-for-every-reader": "Your docs, shaped for every reader."
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "markbindSyntaxReference.md",
+      "headings": {
+        "markbind-comprehensive-syntax-reference": "MarkBind Comprehensive Syntax Reference",
+        "1-structure-and-amp-metadata": "1. Structure &amp; Metadata",
+        "frontmatter": "Frontmatter",
+        "variables": "Variables",
+        "includes": "Includes",
+        "2-basic-formatting": "2. Basic Formatting",
+        "text-styles": "Text Styles",
+        "headings": "Headings",
+        "lists": "Lists",
+        "tables": "Tables",
+        "3-components-and-amp-layout": "3. Components &amp; Layout",
+        "badges": "Badges",
+        "blockquotes": "Blockquotes",
+        "boxes": "Boxes",
+        "panels": "Panels",
+        "tabs": "Tabs",
+        "cardstacks": "CardStacks",
+        "4-navigation-and-amp-search": "4. Navigation &amp; Search",
+        "navbars-and-amp-site-menus": "Navbars &amp; Site Menus",
+        "page-navigation-and-amp-tools": "Page Navigation &amp; Tools",
+        "5-media-and-amp-diagrams": "5. Media &amp; Diagrams",
+        "images-pictures-and-amp-thumbnails": "Images, Pictures &amp; Thumbnails",
+        "annotations": "Annotations",
+        "diagrams-plantuml": "Diagrams (PlantUML)",
+        "embeds": "Embeds",
+        "6-interactive-features": "6. Interactive Features",
+        "modals-popovers-and-amp-tooltips": "Modals, Popovers &amp; Tooltips",
+        "questions-and-amp-quizzes": "Questions &amp; Quizzes",
+        "7-advanced-syntax": "7. Advanced Syntax",
+        "classes-and-amp-attributes": "Classes &amp; Attributes",
+        "math-formulae": "Math Formulae",
+        "footnotes": "Footnotes",
+        "tree-view": "Tree View",
+        "tags": "Tags"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "nus/index.md",
+      "title": "NUS — CustardUI Page",
+      "headings": {
+        "welcome-username-nus": "Welcome, [[username]]! (NUS)",
+        "share-nus-theme-link-clear-adaptation": "Share NUS theme link | Clear adaptation",
+        "content-with-adaptation-defaults-applied": "Content with adaptation defaults applied"
+      },
+      "headingKeywords": {}
+    }
+  ]
+}

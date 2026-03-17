@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="generator" content="MarkBind 6.3.1">
+    <meta name="viewport" content="width=device-width, initial-scale=1"><title>Developer Guide - Non Sticky Header</title> <link rel="stylesheet" href="/devdocs/markbind/css/bootstrap.min.css"> <link rel="stylesheet" href="/devdocs/markbind/fontawesome/css/all.min.css"> <link rel="stylesheet" href="/devdocs/markbind/glyphicons/css/bootstrap-glyphicons.min.css"><link rel="stylesheet" href="/devdocs/markbind/css/codeblock-light.min.css"><link rel="stylesheet" href="/devdocs/markbind/css/markbind.min.css"><link rel="stylesheet" href="/devdocs/plugins/codeBlockCopyButtons/codeBlockButtons.css"><link rel="stylesheet" href="/devdocs/plugins/codeBlockWrapButtons/codeBlockButtons.css"><link rel="stylesheet" href="/devdocs/plugins/markbind-plugin-anchors/markbind-plugin-anchors.css"><link rel="stylesheet" href="/devdocs/plugins/markbind-plugin-tree/markbind-plugin-tree.css">
+    
+  <link rel="stylesheet" href="/devdocs/stylesheets/main.css">
+  <link rel="stylesheet" href="/devdocs/stylesheets/custard.css">
+<link rel="icon" href="/devdocs/favicon.ico"></head>
+<script>
+  const baseUrl = '/devdocs'
+</script>
+<body  data-code-theme="light">
+<div id="app"><!--[--><div tags="dev-release" class="w-100 p-1 bg-info text-center d-print-none"><span><strong>This site documents developmental features of CustardUI (head of develop branch) and possible breaking changes.
+For the latest stable release, visit <a href="https://custardui.github.io">here</a>.</strong></span></div> <header><div data-v-26aac3dc><nav class="navbar navbar-expand-md d-print-none navbar-dark bg-dark" data-v-26aac3dc><div class="container-fluid" data-v-26aac3dc><div class="navbar-left" data-v-26aac3dc><!--[--><a href="/devdocs/index.html" title="Home" class="navbar-brand">CustardUI</a><!--]--></div><div class="navbar-default" data-v-26aac3dc><ul class="navbar-nav me-auto mt-2 mt-lg-0" data-v-26aac3dc><!--[--> <li><a highlight-on="exact" href="/devdocs/index.html" class="nav-link">HOME</a></li> <li><a highlight-on="sibling-or-child" href="/devdocs/authorGuide/index.html" class="nav-link">AUTHOR GUIDE</a></li> <li><a highlight-on="sibling-or-child" href="/devdocs/devGuide/index.html" class="nav-link">DEVELOPER GUIDE</a></li> <li><a highlight-on="exact" href="/devdocs/about.html" class="nav-link">ABOUT</a></li> <li><a href="https://github.com/custardui/custardui" target="_blank" class="nav-link"><span><span aria-hidden="true" class="fab fa-github"></span></span></a></li> <li><a highlight-on="none" href="#cv-open" class="nav-link">Settings</a></li> <li><a highlight-on="none" href="#cv-share" class="nav-link">Share</a></li> <!--]--></ul></div><ul class="navbar-nav navbar-right" data-v-26aac3dc><!--[--><li><form class="navbar-form"><div style="position:relative;" class="dropdown" data-v-00e26d0a><!--[--><input value="" data-bs-toggle="dropdown" type="text" class="form-control" placeholder="Search" autocomplete="off" data-v-00e26d0a><div class="form-control placeholder-div-hidden" data-v-00e26d0a>Search</div><!--]--><ul class="dropdown-menu search-dropdown-menu dropdown-menu-hidden dropdown-menu-end" data-v-00e26d0a><!--[--><!--]--></ul></div></form></li><!--]--></ul></div></nav><div style="display:none;" class="lower-navbar-container" data-v-26aac3dc><!--[--><!----><!----><!--]--></div></div></header> <div id="flex-body"><nav id="site-nav" data-v-6b1b63d2><!--[--><div class="site-nav-top"><div class="fw-bold mb-2" style="font-size:1.25rem;">Developer Guide</div></div> <div class="nav-component slim-scroll"><div class="site-nav-root"><!--[--><ul class="site-nav-list site-nav-list-root" data-v-6b1b63d2><!--[--><li><div class="site-nav-default-list-item site-nav-list-item-0" onclick="handleSiteNavClick(this)"><a href="/devdocs/devGuide/devGuide.html">Contributing</a></div></li> <li><div class="site-nav-default-list-item site-nav-list-item-0" onclick="handleSiteNavClick(this)">Tests
+
+<div class="site-nav-dropdown-btn-container"><i class="site-nav-dropdown-btn-icon" onclick="handleSiteNavClick(this.parentNode.parentNode, false); event.stopPropagation();"><span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span></i></div></div><ul class="site-nav-dropdown-container site-nav-list"><li><div class="site-nav-default-list-item site-nav-list-item-1" onclick="handleSiteNavClick(this)"><a href="/devdocs/devGuide/tests/nonStickyHeader.html">Non Sticky Header</a></div></li></ul></li><!--]--><!--v-if--></ul><!--]--></div></div><!--]--><!--v-if--></nav> <div id="content-wrapper"><div data-v-ef898034><nav aria-label="breadcrumb" class="breadcrumb-divider" data-v-ef898034><ol class="breadcrumb" data-v-ef898034><li class="notlink breadcrumb-marker" data-v-ef898034> ››   </li><!--[--><!--]--></ol></nav></div> <p><span id="title" class="d-none">Non Sticky Header</span></p> <p>hello there lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.</p> <p>Introduction
+This problem set gives you a chance to implement the Peggle gameplay in these layers:</p> <p>First, you need to build a physics engine.
+Next, you need to build the Peggle game engine on top of it.
+Finally, you need to render the engine onto the screen.
+This is how the three layers will interact:</p> <p>The renderer will ask the Peggle game engine: &quot;hey, what is the state of the current game?&quot; and the Peggle game engine will answer appropriately, for example &quot;the ball is at this position, the pegs are at these locations, these are the ones that are blue&quot; and so on.
+The Peggle game engine will ask the physics engine: &quot;hey, what will the state of the current object be in the next tick?&quot; and the physics engine will answer with like &quot;move this object here; this object collides with that object so the new position is here&quot; and so on.
+Note that you must build all of these from scratch -- this means no external libraries, and you cannot use physics engine related libraries such as SpriteKit and UIKit Dynamics.</p> <p>Why do we do this? We believe that designing such a complex system allows you to apply and hone your software engineering skills. Besides, it is always fun to build something that you take for granted, from scratch! (In the same line, if you have free time, it&#39;s fun to build your own SQL engine, or your own web server, or your own compiler.)</p> <p>In the final problem set, you will be required to bundle the physics engine as its own library to be used in your final game. Imagine that you are part of a big game company that produces many games. Other teams in your company should be able to import the physics engine and create their own games out of it. Hence, be sure to practice separation of code properly.</p> <p>In the following subsections, we are going to provide some pointers on how to build such a stack.</p> <p>The Physics Engine
+The physics engine simulates physics interactions between objects. This include things like object movement and collision.</p> <p>Having the physics engine as a separate layer from the game engine allows you to build other game engines on top of the physics engine. For example, you should not only be able to build a Peggle game engine on top of it, but also possibly Bubble Blast, Angry Birds, or Mario Bros!</p> <p>Note that building a physics engine that is too general might be too overkill for this assignment. You are to decide what features your physics engine supports; the only requirement is that the physics engine is enough to build the Peggle game. Nevertheless, we will require additional features in the final problem set, and if your design is not general enough and it is not easily extensible, you will face difficulties in implementing these additional features.</p> <p>You are again reminded not to use other libraries such as SpriteKit. Nevertheless, it is always a good idea to draw inspiration from such libraries. Take a look at what APIs does SpriteKit and other physics engines expose!</p> <p>If you do not have a physics background or have forgotten your physics classes, here are some things that you might want to research:</p> <p>What are vectors? How do you calculate the angle between two vectors?
+Suppose a particle is in a certain position (x, y) represented by a vector. This particle has a velocity (vx, vy) and acceleration (ax, ay). In t seconds, what will be its new position, new velocity, and new acceleration?
+Suppose two particles with certain velocity and acceleration collide at a certain point. What would be its new velocity and acceleration?
+You may also read up on the bouncing ball problem for more understanding on how to make a ball bounce.
+The Peggle Game Engine
+On top of the physics engine, you need to build the game engine. Peggle-specific logic will come in this layer, such as:</p> <p>What pegs are
+What the ball is
+Launching the ball
+Lighting up pegs when hit by a ball
+Removing the ball once it goes out of bounds
+The Renderer
+Finally, you need to render the game onto the screen. In the context of MVC, the physics engine and the Peggle game engine are the model: they model the domain logic, and they can be presented with anything (be it a web app, ASCII art, etc). The renderer would act as the view, throwing whatever the state of the game engine is onto the screen.</p> <p>In the context of iOS development, you can, again, use either SwiftUI or Storyboards (i.e. UIKit).</p> <p>The Game Loop
+To run the game, we need to build a game loop. This game loop runs many times every second (depending on the framerate of your game, typically 60 FPS or frames per second); on each time, the game will advance to the next step. This article provides an excellent explanation of how the game loop works.</p> <p>In the context of iOS development, you are recommended to make use of CADisplayLink. Unlike other mechanisms of timing, CADisplayLink syncs with the display refresh directly.</p> <p>Part 1: Explain your Design (25 points)
+Similar to the previous problem set, please come up with a developer guide, as well as at least 2 scenarios where you make a trade-off. For more information, please refer to the previous problem set.</p> <p>The dev guide makes up 15 points and the trade-off explanations make up 10 points.</p> <p>Part 2: Gameplay (85 points)
+Now that we have finished designing, let us create the game. The game should have the following features.</p> <p>Ball Launch (15 points)
+In the game, a ball should be launched from the top-center of the screen. The player should be able to decide at which direction the ball should be launched. However, the ball should only launch downwards, never upwards, even with the help of gravity.</p> <p>You get to decide the best way for the player to input a direction and launch the ball, but please explain how the player is supposed to go about doing so in your README.md file. You are also provided with a sprite of a cannon that you can use if you wish. However, this sprite is only needed in Problem Set 4. Note that the cannon.png is a spritesheet, you only need to implement one cannon.</p> <p>Ball Movement (20 points)
+Once the ball is launched, it should move according to the laws of physics. Specifically, the ball should be subjected to a downward acceleration (gravity) and the force from the initial launch. In layman terms, the movement of the ball should be affected by both the gravity and the initial direction of the ball.</p> <p>Thankfully, we are not a physics class, so we are not concerned with the accuracy of your physics simulation. We only require a visually sensible and reasonable movement of the ball (no polygonal movements, please). Of course, following some physics theorems may be easier than inventing your own.</p> <p>Ball Collision (20 points)
+Once the ball touches a wall or peg, the ball should bounce away in a natural and reasonable manner. Ideally, your implementation should demonstrate that our bouncy ball is indeed bouncy (not just micro-bounces, please). You may refer to this page as a starting point in your research on the bouncing ball problem.</p> <p>Peg Lighting (15 points)
+Once the ball touches a peg, the peg should light up, indicating that the ball has hit the peg. Once a peg is lit, it should remain lit.</p></div> <nav id="page-nav" data-v-6b1b63d2><!--[--><div class="nav-component slim-scroll"></div><!--]--><!--v-if--></nav> <div class="scroll-top-button fa-lg d-print-none" style="display:none;bottom:2%;right:2%;position:fixed;" aria-hidden="true"><!--[--><i class="fas fa-arrow-circle-up"></i><!--]--></div></div> <div><footer><div class="text-center"><small>[Generated by <a href="https://markbind.org/">MarkBind 6.3.1</a> on Tue, 17 Mar 2026, 23:58:59 GMT+8]</small><br></div></footer></div><!--]--></div>
+</body><script src="/devdocs/markbind/js/bootstrap-utility.min.js"></script>
+<script src="/devdocs/markbind/js/polyfill.min.js"></script>
+<script src="/devdocs/markbind/js/vue.global.prod.min.js"></script>
+<script src="/devdocs/markbind/js/markbind.min.js"></script>
+<script src="nonStickyHeader.page-vue-render.js"></script>
+<script>
+  MarkBind.setupWithSearch()
+</script>
+    <script src="/devdocs/plugins/custardui-devdocs/custardui.js" data-base-url="/devdocs"></script>
+    <script>
+    function copyCodeBlock(element) {
+        const pre = element.parentElement.parentElement;
+        const codeElement = pre.querySelector('code');
+        const copyButtonBody = element.querySelector('.function-btn-body');
+        const tooltipText = element.querySelector(".tooltiptext");
+
+        // create dummy text element to select() the text field
+        const textElement = document.createElement('textarea');
+        textElement.value = codeElement.textContent;
+        document.body.appendChild(textElement);
+        textElement.select();
+
+        document.execCommand('copy');
+        document.body.removeChild(textElement);
+        copyButtonBody.innerHTML = `
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="18"
+    height="18"
+    viewBox="2 2 22 22"
+  >
+    <path d="M 19.28125 5.28125 L 9 15.5625 L 4.71875 11.28125 L 3.28125 12.71875 L 8.28125 17.71875 
+    L 9 18.40625 L 9.71875 17.71875 L 20.71875 6.71875 Z"></path>
+  </svg>
+`;
+        console.log("Running tooltip");
+        tooltipText.innerText  = `Copied!`;
+        setTimeout(() => {
+            copyButtonBody.innerHTML = `
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="18" height="18" viewBox="0 0 18 18" version="1.1">
+    <g id="surface1">
+      <path d="M 11.273438 0 L 2.546875 0 C 1.746094 0 1.089844 0.613281 1.089844
+      1.363281 L 1.089844 10.910156 L 2.546875 10.910156 L 2.546875 1.363281 L 11.273438
+      1.363281 Z M 13.453125 2.726562 L 5.453125 2.726562 C 4.65625 2.726562 4 3.339844 4
+      4.089844 L 4 13.636719 C 4 14.386719 4.65625 15 5.453125 15 L 13.453125 15 C 14.253906
+      15 14.910156 14.386719 14.910156 13.636719 L 14.910156 4.089844 C 14.910156 3.339844
+      14.253906 2.726562 13.453125 2.726562 Z M 13.453125 13.636719 L 5.453125 13.636719 L
+      5.453125 4.089844 L 13.453125 4.089844 Z M 13.453125 13.636719 "/>
+    </g>
+</svg>
+`;
+            tooltipText.innerText  = `Copy`;
+        }, 3000);
+    }
+    </script>
+    <script>
+    function toggleCodeBlockWrap(element) {
+      const pre = element.parentElement.parentElement;
+      const tooltipText = element.querySelector(".tooltiptext");
+      const classList = pre.querySelector('code').classList; 
+      if (classList.contains('wrap')) {
+          classList.remove('wrap');
+          tooltipText.innerText  = `Wrap Text`;
+      } else {
+          classList.add('wrap')
+          tooltipText.innerText  = `Unwrap Text`;
+      }
+    }
+    </script>
+    <script type="module">
+    window.mermaidPromise = null;
+    
+    const loadMermaid = () => {
+      if (window.mermaidPromise === null) {
+        window.mermaidPromise = import('https://unpkg.com/mermaid@10/dist/mermaid.esm.min.mjs')
+          .then(({ default: mermaid }) => {
+            mermaid.initialize({
+              startOnLoad: false,
+            });
+            console.log('Mermaid loaded successfully');
+            return mermaid;
+          })
+          .catch((error) => {
+            console.error('Mermaid failed to load:', error);
+            window.mermaidPromise = false;
+            return null;
+          });
+      }
+      return window.mermaidPromise;
+    };
+
+    const renderMermaidDiagrams = (elements) => {
+      if (!elements || elements.length === 0) {
+        return Promise.resolve();
+      }
+
+      return loadMermaid().then(mermaid => {
+        if (!mermaid) return;
+        return mermaid.run({ nodes: Array.from(elements) })
+          .catch(err => console.error('Error rendering mermaid diagrams:', err));
+      });
+    };
+
+    const setupMermaidObserver = () => {
+      const observer = new MutationObserver((mutations) => {
+        let newMermaidElements = [];
+        
+        mutations.forEach(mutation => {
+          if (mutation.addedNodes.length) {
+            mutation.addedNodes.forEach(node => {
+              if (node.nodeType === 1 && node.classList && 
+                  node.classList.contains('mermaid')) {
+                newMermaidElements.push(node);
+              }
+              
+              if (node.nodeType === 1 && node.querySelectorAll) {
+                const mermaidInNode = node.querySelectorAll('.mermaid');
+                if (mermaidInNode.length) {
+                  newMermaidElements = [...newMermaidElements, ...mermaidInNode];
+                }
+              }
+            });
+          }
+        });
+        
+        if (newMermaidElements.length > 0) {
+          renderMermaidDiagrams(newMermaidElements);
+        }
+      });
+      
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+      
+      return observer;
+    };
+
+    // Initialize on DOM content loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      const existingDiagrams = document.querySelectorAll('.mermaid');
+      if (existingDiagrams.length > 0) {
+        renderMermaidDiagrams(existingDiagrams);
+      }
+      
+      setupMermaidObserver();
+    });
+
+  </script>
+</html>
