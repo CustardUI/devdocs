@@ -89,6 +89,9 @@
         "hash-trigger-recommended": "Hash Trigger (Recommended)",
         "query-parameter": "Query Parameter",
         "adaptive-display": "Adaptive Display",
+        "modal-tabs": "Modal Tabs",
+        "customize-tab": "Customize Tab",
+        "share-tab": "Share Tab",
         "configuration": "Configuration",
         "settings-options": "Settings Options",
         "integration": "Integration"
@@ -240,6 +243,7 @@
       "title": "Changelog",
       "headings": {
         "changelog": "Changelog",
+        "v2-1": "v2.1.*",
         "v2-0-0": "v2.0.0",
         "features-added": "Features Added",
         "v1-7-0": "v1.7.0"
