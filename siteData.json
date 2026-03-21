@@ -28,21 +28,35 @@
       "headingKeywords": {}
     },
     {
-      "src": "authorGuide/adaptations.md",
+      "src": "authorGuide/adaptations/adaptations.md",
       "title": "Author Guide - Site Adaptations",
       "headings": {
         "site-adaptations": "Site Adaptations",
         "how-it-works": "How It Works",
         "quick-start": "Quick Start",
         "file-placement": "File Placement",
+        "per-page-activation": "Per-Page Activation",
+        "activation-landing-page": "Activation Landing Page",
+        "clearing-an-adaptation": "Clearing an Adaptation"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/adaptations/configuration.md",
+      "title": "Author Guide - Adaptation Configurations",
+      "headings": {
+        "adaptation-configurations": "Adaptation Configurations",
+        "placeholder-adaptation-configurations": "Placeholder Adaptation Configurations",
+        "tabgroup-adaptation-configurations": "TabGroup Adaptation Configurations",
+        "toggle-adaptation-configurations": "Toggle Adaptation Configurations",
         "adaptation-json-schema": "Adaptation JSON Schema",
         "top-level-fields": "Top-level fields",
         "theme": "theme",
-        "defaults": "defaults",
-        "author-controlled-placeholders-adaptationplaceholder": "Author-Controlled Placeholders (adaptationPlaceholder)",
+        "preset": "preset",
+        "site-managed-components-sitemanaged": "Site-Managed Components (siteManaged)",
+        "site-managed-placeholders": "Site-Managed Placeholders",
+        "site-managed-toggles": "Site-Managed Toggles",
         "state-layering-precedence": "State Layering Precedence",
-        "per-page-activation": "Per-Page Activation",
-        "clearing-an-adaptation": "Clearing an Adaptation",
         "example-institution-adaptation-of-this-site": "Example: Institution Adaptation of this Site"
       },
       "headingKeywords": {}
@@ -450,11 +464,7 @@
     {
       "src": "nus/index.md",
       "title": "NUS — CustardUI Page",
-      "headings": {
-        "welcome-username-nus": "Welcome, [[username]]! (NUS)",
-        "share-nus-theme-link-clear-adaptation": "Share NUS theme link | Clear adaptation",
-        "content-with-adaptation-defaults-applied": "Content with adaptation defaults applied"
-      },
+      "headings": {},
       "headingKeywords": {}
     }
   ]

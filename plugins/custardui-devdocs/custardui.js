@@ -9203,8 +9203,8 @@
                 config.placeholders.forEach((def) => {
                     placeholderRegistryStore.register({
                         ...def,
-                        // adaptationPlaceholder implies hidden from user-facing settings
-                        hiddenFromSettings: def.adaptationPlaceholder ? true : def.hiddenFromSettings,
+                        // siteManaged implies hidden from user-facing settings
+                        hiddenFromSettings: def.siteManaged ? true : def.hiddenFromSettings,
                         source: 'config',
                     });
                 });
@@ -9264,7 +9264,7 @@
         }
         /**
          * Filters a record of incoming placeholders to only those that can be set by users.
-         * Extends filterValidPlaceholders() by also excluding adaptation-only placeholders.
+         * Extends filterValidPlaceholders() by also excluding siteManaged placeholders.
          * Use this for persistence loads and URL delta application.
          */
         filterUserSettablePlaceholders(placeholders = {}) {
@@ -9272,8 +9272,8 @@
             const userSettable = {};
             for (const [key, value] of Object.entries(valid)) {
                 const def = placeholderRegistryStore.get(key);
-                if (def?.adaptationPlaceholder) {
-                    // Silently skip — adaptation-only placeholders cannot be user-set
+                if (def?.siteManaged) {
+                    // Silently skip — site-managed placeholders cannot be user-set
                     continue;
                 }
                 userSettable[key] = value;
@@ -9461,8 +9461,8 @@
     		const defaults = this.computeDefaultState();
     		const validatedTabs = this.filterValidTabs(newState.tabs ?? {});
     		const validatedPlaceholders = placeholderManager.filterUserSettablePlaceholders(newState.placeholders ?? {});
-    		const validatedShownToggles = this.filterValidToggles(newState.shownToggles ?? defaults.shownToggles ?? []);
-    		const validatedPeekToggles = this.filterValidToggles(newState.peekToggles ?? defaults.peekToggles ?? []);
+    		const validatedShownToggles = this.filterNonSiteManagedToggleIds(this.filterValidToggles(newState.shownToggles ?? defaults.shownToggles ?? []));
+    		const validatedPeekToggles = this.filterNonSiteManagedToggleIds(this.filterValidToggles(newState.peekToggles ?? defaults.peekToggles ?? []));
 
     		this.state = {
     			shownToggles: validatedShownToggles,
@@ -9499,20 +9499,28 @@
     	}
 
     	/**
-    	 * Applies adaptation defaults on top of the config defaults, before persisted state.
+    	 * Applies adaptation preset on top of the config defaults, before persisted state.
     	 * User choices applied later via applyState() will override these.
     	 *
-    	 * @param defaults The defaults section from the adaptation config
+    	 * @param preset The preset section from the adaptation config
     	 */
-    	applyAdaptationDefaults(defaults) {
-    		if (!defaults) return;
+    	applyAdaptationDefaults(preset) {
+    		if (!preset) return;
 
-    		if (defaults.toggles) {
-    			this.applyToggleMap(defaults.toggles);
+    		if (preset.toggles) {
+    			this.applyToggleMap(preset.toggles);
     		}
 
-    		if (defaults.placeholders) {
-    			const validated = placeholderManager.filterValidPlaceholders(defaults.placeholders);
+    		if (preset.tabs) {
+    			const validated = this.filterValidTabs(preset.tabs);
+
+    			if (!this.state.tabs) this.state.tabs = {};
+
+    			Object.assign(this.state.tabs, validated);
+    		}
+
+    		if (preset.placeholders) {
+    			const validated = placeholderManager.filterValidPlaceholders(preset.placeholders);
 
     			if (!this.state.placeholders) this.state.placeholders = {};
 
@@ -9569,11 +9577,11 @@
     			}
     		}
 
-    		// 3. Seed author-controlled (adaptationPlaceholder) defaults.
+    		// 3. Seed site-managed (siteManaged) defaults.
     		// These are set by adaptations when active, and fall back to defaultValue when no adaptation is active.
     		// This is intentionally separate from regular user-settable placeholder defaults (see PR #206).
     		for (const def of placeholderRegistryStore.definitions) {
-    			if (def.adaptationPlaceholder && def.defaultValue !== undefined && def.defaultValue !== '') {
+    			if (def.siteManaged && def.defaultValue !== undefined && def.defaultValue !== '') {
     				placeholders[def.name] = def.defaultValue;
     			}
     		}
@@ -9631,13 +9639,13 @@
     	 */
     	applyToggleDelta(deltaState) {
     		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-    		const toShow = new Set(this.filterValidToggles(deltaState.shownToggles ?? []));
+    		const toShow = new Set(this.filterNonSiteManagedToggleIds(this.filterValidToggles(deltaState.shownToggles ?? [])));
 
     		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-    		const toPeek = new Set(this.filterValidToggles(deltaState.peekToggles ?? []));
+    		const toPeek = new Set(this.filterNonSiteManagedToggleIds(this.filterValidToggles(deltaState.peekToggles ?? [])));
 
     		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-    		const toHide = new Set(this.filterValidToggles(deltaState.hiddenToggles ?? []));
+    		const toHide = new Set(this.filterNonSiteManagedToggleIds(this.filterValidToggles(deltaState.hiddenToggles ?? [])));
 
     		// eslint-disable-next-line svelte/prefer-svelte-reactivity
     		const allMentioned = new Set([...toShow, ...toPeek, ...toHide]);
@@ -9683,6 +9691,18 @@
     		if (!this.state.placeholders) this.state.placeholders = {};
 
     		Object.assign(this.state.placeholders, validatedPlaceholders);
+    	}
+
+    	/**
+    	 * Removes toggle IDs belonging to siteManaged toggles.
+    	 * Used to prevent user-supplied state (URL, localStorage) from overriding site-controlled toggles.
+    	 */
+    	filterNonSiteManagedToggleIds(ids) {
+    		return ids.filter((id) => {
+    			const toggle = this.config.toggles?.find((t) => t.toggleId === id);
+
+    			return !toggle?.siteManaged;
+    		});
     	}
 
     	/**
@@ -9943,7 +9963,7 @@
     		() => {
     			if (!activeStateStore.config.toggles) return [];
 
-    			return activeStateStore.config.toggles.filter((t) => !t.isLocal || elementStore.detectedToggles.has(t.toggleId));
+    			return activeStateStore.config.toggles.filter((t) => (!t.isLocal || elementStore.detectedToggles.has(t.toggleId)) && !t.siteManaged);
     		}
     	);
 
@@ -10785,7 +10805,7 @@
     /**
      * Strips placeholder entries that should not appear in shareable URLs:
      * - Tab-group-derived placeholders (source: 'tabgroup') — implied by ?tabs=
-     * - Adaptation-only placeholders (adaptationPlaceholder: true) — author-controlled, not shareable
+     * - Site-managed placeholders (siteManaged: true) — site-controlled, not shareable
      */
     function stripNonShareablePlaceholders(placeholders, config) {
         const shareable = {};
@@ -10797,8 +10817,8 @@
             // That's fine as 'tabgroup' placeholders are mostly a runtime artifact.
             if ('source' in definition && definition.source === 'tabgroup')
                 continue; // implied by ?tabs=
-            if ('adaptationPlaceholder' in definition && definition.adaptationPlaceholder)
-                continue; // author-only
+            if ('siteManaged' in definition && definition.siteManaged)
+                continue; // site-managed, not shareable
             shareable[key] = value;
         }
         return shareable;
@@ -10816,6 +10836,9 @@
             if (!toggleConfig) {
                 return pageTogglesSet.has(id);
             }
+            // Site-managed toggles are never included in shareable URLs
+            if (toggleConfig.siteManaged)
+                return false;
             // Case 2: Configured as Global
             if (!toggleConfig.isLocal) {
                 return true;
@@ -10830,11 +10853,13 @@
         const absoluteHide = [];
         const relevantToggles = new Set(pageTogglesSet);
         for (const t of (config.toggles ?? [])) {
-            if (!t.isLocal)
+            if (!t.isLocal && !t.siteManaged)
                 relevantToggles.add(t.toggleId);
         }
+        // Build a set of siteManaged toggle IDs to exclude from absoluteHide
+        const siteManagedToggleIds = new Set((config.toggles ?? []).filter(t => t.siteManaged).map(t => t.toggleId));
         for (const id of relevantToggles) {
-            if (!shownSet.has(id) && !peekSet.has(id)) {
+            if (!shownSet.has(id) && !peekSet.has(id) && !siteManagedToggleIds.has(id)) {
                 absoluteHide.push(id);
             }
         }
@@ -16580,18 +16605,23 @@
 
     /* runtime.svelte.ts generated by Svelte v5.46.1 */
 
-    function stripAdaptationPlaceholders(state) {
-    	if (!state.placeholders) return state;
+    function stripSiteManaged(state) {
+    	// Strip siteManaged toggle values
+    	const siteManagedToggleIds = new Set((activeStateStore.config.toggles ?? []).filter((t) => t.siteManaged).map((t) => t.toggleId));
 
-    	const filtered = {};
+    	const shownToggles = (state.shownToggles ?? []).filter((id) => !siteManagedToggleIds.has(id));
+    	const peekToggles = (state.peekToggles ?? []).filter((id) => !siteManagedToggleIds.has(id));
 
-    	for (const [key, value] of Object.entries(state.placeholders)) {
+    	// Strip siteManaged placeholder keys
+    	const placeholders = {};
+
+    	for (const [key, value] of Object.entries(state.placeholders ?? {})) {
     		const def = placeholderRegistryStore.get(key);
 
-    		if (!def?.adaptationPlaceholder) filtered[key] = value;
+    		if (!def?.siteManaged) placeholders[key] = value;
     	}
 
-    	return { ...state, placeholders: filtered };
+    	return { ...state, shownToggles, peekToggles, placeholders };
     }
 
     /**
@@ -16620,7 +16650,7 @@
     		adaptationStore.init(opt.adaptationConfig ?? null);
 
     		// Initial State Resolution:
-    		// URL (Sparse Override) > Persistence (Full) > Adaptation Defaults > Config Default
+    		// URL (Sparse Override) > Persistence (Full) > Adaptation Preset > Config Default
     		this.resolveInitialState(opt.adaptationConfig ?? null);
 
     		// Resolve Exclusions
@@ -16659,7 +16689,7 @@
     	 * Resolves the starting application state by layering sources:
     	 *
     	 * 1. **Baseline**: `ActiveStateStore` initializes with defaults from the config file.
-    	 * 2. **Adaptation Defaults**: If an adaptation is active, its defaults are applied
+    	 * 2. **Adaptation Preset**: If an adaptation is active, its preset is applied
     	 *    on top of the config defaults (before persisted state, so user choices can win).
     	 * 3. **Persistence**: If local storage has a saved state, it replaces the baseline (`applyState`).
     	 * 4. **URL Overrides**: If the URL contains parameters (`?t-show=X`), these are applied
@@ -16667,9 +16697,9 @@
     	 *    retain their values from persistence/defaults.
     	 */
     	resolveInitialState(adaptationConfig) {
-    		// 1. Apply adaptation defaults on top of config defaults (before persisted state)
-    		if (adaptationConfig?.defaults) {
-    			activeStateStore.applyAdaptationDefaults(adaptationConfig.defaults);
+    		// 1. Apply adaptation preset on top of config defaults (before persisted state)
+    		if (adaptationConfig?.preset) {
+    			activeStateStore.applyAdaptationDefaults(adaptationConfig.preset);
     		}
 
     		// 2. Apply persisted base state on top of defaults (user choices win over adaptation defaults).
@@ -16725,7 +16755,7 @@
     		this.destroyEffectRoot = effect_root(() => {
     			// Automatic Persistence
     			user_effect(() => {
-    				this.persistenceManager.persistState(stripAdaptationPlaceholders(activeStateStore.state));
+    				this.persistenceManager.persistState(stripSiteManaged(activeStateStore.state));
     				this.persistenceManager.persistTabNavVisibility(uiStore.isTabGroupNavHeadingVisible);
     			});
 
@@ -16796,9 +16826,9 @@
     		this.persistenceManager.clearAll();
     		activeStateStore.reset();
 
-    		// Re-apply adaptation defaults so adaptation-controlled placeholders are not wiped by reset.
-    		if (adaptationStore.activeConfig?.defaults) {
-    			activeStateStore.applyAdaptationDefaults(adaptationStore.activeConfig.defaults);
+    		// Re-apply adaptation preset so adaptation-controlled placeholders are not wiped by reset.
+    		if (adaptationStore.activeConfig?.preset) {
+    			activeStateStore.applyAdaptationDefaults(adaptationStore.activeConfig.preset);
     		}
 
     		uiStore.reset();
@@ -16919,6 +16949,8 @@
 
     		if (placeholderId()) elementStore.registerPlaceholder(get(placeholderName));
     	});
+
+    	let isSiteManaged = user_derived(() => get(toggleConfig)?.siteManaged ?? false);
 
     	// Derive label text from config
     	let labelText = user_derived(() => {
@@ -17147,7 +17179,7 @@
     		};
 
     		if_block(node, ($$render) => {
-    			if (showInlineControl() && !get(isPlaceholderMode) && get(isHidden)) $$render(consequent_1);
+    			if (showInlineControl() && !get(isPlaceholderMode) && !get(isSiteManaged) && get(isHidden)) $$render(consequent_1);
     		});
     	}
 
@@ -17202,7 +17234,7 @@
     		};
 
     		if_block(node_3, ($$render) => {
-    			if (showInlineControl() && !get(isPlaceholderMode) && !get(isHidden)) $$render(consequent_3);
+    			if (showInlineControl() && !get(isPlaceholderMode) && !get(isSiteManaged) && !get(isHidden)) $$render(consequent_3);
     		});
     	}
 
@@ -17270,7 +17302,7 @@
     			'peek-mode': get(peekState),
     			hidden: get(isHidden),
     			'has-border': showPeekBorder() && get(peekState),
-    			'has-inline-control': showInlineControl() && !get(isPlaceholderMode)
+    			'has-inline-control': showInlineControl() && !get(isPlaceholderMode) && !get(isSiteManaged)
     		});
 
     		styles = set_style(div_5, '', styles, { 'max-height': get(currentMaxHeight) });
