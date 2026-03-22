@@ -46,9 +46,6 @@
       "title": "Author Guide - Adaptation Configurations",
       "headings": {
         "adaptation-configurations": "Adaptation Configurations",
-        "placeholder-adaptation-configurations": "Placeholder Adaptation Configurations",
-        "tabgroup-adaptation-configurations": "TabGroup Adaptation Configurations",
-        "toggle-adaptation-configurations": "Toggle Adaptation Configurations",
         "adaptation-json-schema": "Adaptation JSON Schema",
         "top-level-fields": "Top-level fields",
         "theme": "theme",
@@ -57,7 +54,27 @@
         "site-managed-placeholders": "Site-Managed Placeholders",
         "site-managed-toggles": "Site-Managed Toggles",
         "state-layering-precedence": "State Layering Precedence",
-        "example-institution-adaptation-of-this-site": "Example: Institution Adaptation of this Site"
+        "example-institution-adaptation-of-this-site": "Example: Institution Adaptation of this Site",
+        "placeholder-adaptation-configurations-sitemanaged": "Placeholder Adaptation Configurations (siteManaged)",
+        "toggle-adaptation-configurations-sitemanaged": "Toggle Adaptation Configurations (siteManaged)",
+        "label-adaptation-configurations": "Label Adaptation Configurations",
+        "tabgroup-adaptation-configurations": "TabGroup Adaptation Configurations"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/adaptations/samplePage.md",
+      "title": "Author Guide - Sample Page",
+      "headings": {
+        "programming-module-institutionname-generic-module": "Programming Module — [[institutionName : Generic Module]]",
+        "exercises-at-a-glance": "Exercises at a Glance",
+        "exercise-1-setting-up-your-environment": "Exercise 1 — Setting Up Your Environment ",
+        "exercise-2-writing-your-first-program": "Exercise 2 — Writing Your First Program ",
+        "exercise-3-advanced-problem-solving": "Exercise 3 — Advanced Problem Solving ",
+        "exercise-4-peer-review-and-amp-submission": "Exercise 4 — Peer Review &amp; Submission ",
+        "institution-resources": "Institution Resources",
+        "nus-resources": "NUS Resources",
+        "sample-institution-resources": "Sample Institution Resources"
       },
       "headingKeywords": {}
     },
@@ -66,6 +83,21 @@
       "title": "Components",
       "headings": {
         "components": "Components"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/components/labels.md",
+      "title": "CustardUI - Labels",
+      "headings": {
+        "label-component": "Label Component",
+        "usage": "Usage",
+        "add-the-optional-label-configuration": "Add the (Optional) Label Configuration",
+        "place-labels-in-content": "Place Labels in Content",
+        "label-configuration": "Label Configuration",
+        "shorthand-colors": "Shorthand Colors",
+        "adaptation-overrides": "Adaptation Overrides",
+        "live-demo": "Live Demo"
       },
       "headingKeywords": {}
     },
@@ -185,8 +217,8 @@
         "basic-structure": "Basic Structure",
         "summary-of-configuration-options": "Summary of Configuration Options",
         "core-configuration-config": "Core Configuration (config)",
-        "global-options": "Global Options",
         "settings-configuration-in-config-json-settings": "Settings Configuration in config.json: (settings)",
+        "global-options-in-custardui-config-json": "Global Options in custardui.config.json",
         "script-tag-attributes": "Script Tag Attributes"
       },
       "headingKeywords": {}
@@ -463,7 +495,11 @@
     },
     {
       "src": "nus/index.md",
-      "title": "NUS — CustardUI Page",
+      "headings": {},
+      "headingKeywords": {}
+    },
+    {
+      "src": "sample/index.md",
       "headings": {},
       "headingKeywords": {}
     }
