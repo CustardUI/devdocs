@@ -18346,11 +18346,21 @@
     	const DEFAULT_COLOR = '#6b7280';
     	let hasSlotContent = state(false);
 
-    	function onSlotChange(e) {
-    		const slot = e.target;
+    	user_effect(() => {
+    		const host = $$props.$$host;
 
-    		set(hasSlotContent, slot.assignedNodes({ flatten: true }).some((n) => n.nodeType === Node.ELEMENT_NODE || (n.textContent?.trim() ?? '') !== ''), true);
-    	}
+    		function update() {
+    			set(hasSlotContent, Array.from(host.childNodes).some((n) => n.nodeType === Node.ELEMENT_NODE || (n.textContent?.trim() ?? '') !== ''), true);
+    		}
+
+    		update();
+
+    		const observer = new MutationObserver(update);
+
+    		observer.observe(host, { childList: true, characterData: true, subtree: true });
+
+    		return () => observer.disconnect();
+    	});
 
     	let labelDef = user_derived(() => labelRegistryStore.get(name()));
     	let rawColor = user_derived(() => get(labelDef)?.color ?? (color() || DEFAULT_COLOR));
@@ -18398,7 +18408,7 @@
     					var fragment_2 = comment();
     					var node_2 = first_child(fragment_2);
 
-    					slot(node_2, $$props, 'default', { onslotchange: onSlotChange });
+    					slot(node_2, $$props, 'default', {});
     					append($$anchor, fragment_2);
     				};
 
@@ -18416,7 +18426,7 @@
     			var fragment_3 = comment();
     			var node_3 = first_child(fragment_3);
 
-    			slot(node_3, $$props, 'default', { onslotchange: onSlotChange });
+    			slot(node_3, $$props, 'default', {});
     			append($$anchor, fragment_3);
     		};
 
