@@ -202,6 +202,7 @@
         "key-configuration-fields-in-custardui-config-json-for-toggles": "Key Configuration Fields in custardui.config.json for Toggles",
         "visibility-resolution-order": "Visibility Resolution Order",
         "global-vs-local-toggles": "Global vs. Local Toggles",
+        "site-managed-toggles": "Site-Managed Toggles",
         "registering-local-toggles-for-settings": "Registering Local Toggles for Settings",
         "shareable-url": "Shareable URL",
         "troubleshooting": "Troubleshooting"
