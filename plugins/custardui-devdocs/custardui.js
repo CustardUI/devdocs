@@ -28,58 +28,58 @@
         return cleanbaseUrl + cleanPath;
     }
 
+    const SCRIPT_ATTRIBUTE_DEFAULTS = {
+        baseURL: '/',
+        configPath: '/custardui.config.json',
+    };
+    const FALLBACK_CONFIG = {
+        config: {},
+        settings: { enabled: false },
+    };
     /**
      * Finds the script tag that loaded the library and extracts configuration attributes.
      * Looks for `data-base-url` and `data-config-path`.
      */
     function getScriptAttributes() {
-        let scriptTag = document.currentScript;
-        const defaults = { baseURL: '/', configPath: '/custardui.config.json' };
-        if (!scriptTag || !scriptTag.hasAttribute('data-base-url')) {
-            const dataAttrMatch = document.querySelector('script[data-base-url]');
-            if (dataAttrMatch) {
-                scriptTag = dataAttrMatch;
-            }
-            else {
-                // Fallback: try to find script by src pattern
-                for (const script of document.scripts) {
-                    const src = script.src || '';
-                    if (/(?:custard(?:ui)?|@custardui\/custard(?:ui)?)(?:\.min)?\.(?:esm\.)?js($|\?)/i.test(src)) {
-                        scriptTag = script;
-                        break;
-                    }
-                }
+        const scriptTag = findScriptTag();
+        if (!scriptTag)
+            return SCRIPT_ATTRIBUTE_DEFAULTS;
+        return {
+            baseURL: scriptTag.getAttribute('data-base-url') || SCRIPT_ATTRIBUTE_DEFAULTS.baseURL,
+            configPath: scriptTag.getAttribute('data-config-path') || SCRIPT_ATTRIBUTE_DEFAULTS.configPath,
+        };
+    }
+    function findScriptTag() {
+        const current = document.currentScript;
+        if (current?.hasAttribute('data-base-url'))
+            return current;
+        const byAttr = document.querySelector('script[data-base-url]');
+        if (byAttr)
+            return byAttr;
+        // Fallback: find script by src pattern
+        for (const script of document.scripts) {
+            if (/(?:custard(?:ui)?|@custardui\/custard(?:ui)?)(?:\.min)?\.(?:esm\.)?js($|\?)/i.test(script.src)) {
+                return script;
             }
         }
-        if (scriptTag) {
-            return {
-                baseURL: scriptTag.getAttribute('data-base-url') || defaults.baseURL,
-                configPath: scriptTag.getAttribute('data-config-path') || defaults.configPath,
-            };
-        }
-        return defaults;
+        return null;
     }
     /**
      * Fetches and parses the configuration file.
+     * Returns the fallback config silently if the file is not found (404),
+     * since operating without a config file is a valid use case.
      */
     async function fetchConfig(configPath, baseURL) {
-        const fallbackMinimalConfig = {
-            config: {},
-            settings: { enabled: true },
-        };
         try {
             const fullConfigPath = prependBaseUrl(configPath, baseURL);
             const response = await fetch(fullConfigPath);
-            if (!response.ok) {
-                console.warn(`[CustardUI] Config file not found at ${fullConfigPath}. Using defaults.`);
-                return fallbackMinimalConfig;
-            }
-            const config = await response.json();
-            return config;
+            if (!response.ok)
+                return FALLBACK_CONFIG;
+            return await response.json();
         }
         catch (error) {
             console.error('[CustardUI] Error loading config file:', error);
-            return fallbackMinimalConfig;
+            return FALLBACK_CONFIG;
         }
     }
 
@@ -14575,7 +14575,8 @@
      * Initializes the UI manager (settings and share UI) using the provided config.
      */
     function initUIManager(runtime, config) {
-        const settingsEnabled = config.settings?.enabled === true;
+        const { enabled, ...widgetSettings } = config.settings ?? {};
+        const settingsEnabled = enabled === true;
         const callbacks = {
             resetToDefault: () => runtime.resetToDefault(),
             iconSettings: runtime.iconSettingsStore,
@@ -14584,7 +14585,7 @@
         const uiManager = new CustardUIManager({
             callbacks,
             settingsEnabled,
-            ...config.settings,
+            ...widgetSettings,
         });
         uiManager.render();
         return uiManager;
