@@ -311,15 +311,15 @@
       "title": "Developer Guide - DOM Element Locator and Anchors",
       "headings": {
         "overview": "Overview",
-        "the-problem-it-solves": "The Problem It Solves",
-        "core-concepts": "Core Concepts",
-        "1-the-anchor-descriptor": "1. The Anchor Descriptor",
-        "2-stable-text-and-amp-placeholder-awareness": "2. Stable Text &amp; Placeholder Awareness",
-        "3-serialization": "3. Serialization",
-        "4-resolution-fuzzy-matching": "4. Resolution (Fuzzy Matching)",
+        "generating-an-anchor-descriptor": "Generating an Anchor Descriptor",
+        "stable-text-and-amp-placeholder-awareness": "Stable Text &amp; Placeholder Awareness",
+        "serialization": "Serialization",
+        "resolving-an-anchor-descriptor": "Resolving an Anchor Descriptor",
+        "resolution-algorithm": "Resolution Algorithm",
+        "scoring-thresholds": "Scoring thresholds",
         "data-flow": "Data Flow",
-        "module-layout": "Module Layout",
-        "key-considerations": "Key Considerations"
+        "key-considerations": "Key Considerations",
+        "inspiration-and-future-work": "Inspiration and Future Work"
       },
       "headingKeywords": {}
     },

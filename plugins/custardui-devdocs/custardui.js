@@ -12211,32 +12211,44 @@
     }
 
     /**
+     * Walks the ancestor chain of `el` to find the first element with a non-empty
+     * `id` attribute. Returns both the id string and the ancestor element so the
+     * caller can use the element itself as a query scope.
+     * Returns `ancestorEl: null` when no id-bearing ancestor exists.
+     */
+    function findNearestIdAncestor(el) {
+        let node = el.parentElement;
+        while (node) {
+            if (node.id)
+                return { parentId: node.id, ancestorEl: node };
+            node = node.parentElement;
+        }
+        return { parentId: undefined, ancestorEl: null };
+    }
+    /**
      * Creates an AnchorDescriptor for a given DOM element.
      */
     function createDescriptor(el) {
         const tag = el.tagName;
         const normalizedText = getStableNormalizedText(el);
-        // Find nearest parent with an ID
-        let parentId;
-        let parent = el.parentElement;
-        while (parent) {
-            if (parent.id) {
-                parentId = parent.id;
-                break;
-            }
-            parent = parent.parentElement;
-        }
-        // Calculate index relative to the container
-        const container = parent || document.body;
+        const { parentId, ancestorEl: idAncestor } = findNearestIdAncestor(el);
+        const container = idAncestor ?? document.body;
         const siblings = Array.from(container.querySelectorAll(tag));
-        const index = siblings.indexOf(el);
+        const rawIndex = siblings.indexOf(el);
+        if (rawIndex === -1) {
+            console.error('[CustardUI] createDescriptor: element not found in container, ' +
+                'element may be detached from the DOM. Please open an issue.', el);
+        }
+        const index = rawIndex !== -1 ? rawIndex : 0;
         const descriptor = {
             tag,
-            index: index !== -1 ? index : 0,
+            index,
             textSnippet: normalizedText.substring(0, 32),
             textHash: hashCode(normalizedText),
-            elementId: el.id,
         };
+        if (el.id) {
+            descriptor.elementId = el.id;
+        }
         if (parentId) {
             descriptor.parentId = parentId;
         }
@@ -12438,7 +12450,7 @@
      * Returns an array of elements. For specific descriptors, usually contains 0 or 1 element.
      * For ID-only descriptors (tag='ANY'), may return multiple if duplicates exist.
      */
-    function resolve(root, descriptor) {
+    function resolve(descriptor) {
         // 0. Direct ID Shortcut
         if (descriptor.elementId) {
             // Always support duplicate IDs for consistency, even if technically invalid HTML.
@@ -12450,18 +12462,14 @@
                 return [];
         }
         // 1. Determine Scope
-        let scope = root;
-        // Optimization: If parentId exists, try to narrow scope immediately
+        // Default to document.body so index pool matches descriptor.ts,
+        // which also falls back to document.body when no id-bearing ancestor is found.
+        let scope = document.body;
+        // Optimization: If parentId exists, try to narrow scope immediately.
         if (descriptor.parentId) {
-            const foundParent = root.querySelector(`#${descriptor.parentId}`);
+            const foundParent = document.getElementById(descriptor.parentId);
             if (foundParent instanceof HTMLElement) {
                 scope = foundParent;
-            }
-            else {
-                const globalParent = document.getElementById(descriptor.parentId);
-                if (globalParent) {
-                    scope = globalParent;
-                }
             }
         }
         // 2. Candidate Search & Scoring
@@ -15728,7 +15736,6 @@
     }
 
     class HighlightService {
-    	rootEl;
     	overlayApp;
     	state = new HighlightState();
     	resizeObserver;
@@ -15737,9 +15744,7 @@
     	activeAnnotations = new Map();
     	onWindowResize = () => this.updatePositions();
 
-    	constructor(rootEl) {
-    		this.rootEl = rootEl;
-
+    	constructor() {
     		this.resizeObserver = new ResizeObserver(() => {
     			this.updatePositions();
     		});
@@ -15753,7 +15758,7 @@
     		const targets = [];
 
     		descriptors.forEach((desc) => {
-    			const matchingEls = resolve(this.rootEl, desc);
+    			const matchingEls = resolve(desc);
 
     			if (matchingEls && matchingEls.length > 0) targets.push(...matchingEls);
     		});
@@ -15771,7 +15776,7 @@
     		const annotations = new Map();
 
     		descriptors.forEach((desc) => {
-    			const matchingEls = resolve(this.rootEl, desc);
+    			const matchingEls = resolve(desc);
 
     			if (matchingEls && matchingEls.length > 0) {
     				targets.push(...matchingEls);
@@ -15937,7 +15942,6 @@
     const SHOW_ELEMENT_CLASS = 'cv-show-element';
 
     class FocusService {
-    	rootEl;
     	hiddenElements = new SvelteSet();
     	dividers = new SvelteSet(); // Store Svelte App instances
     	excludedTags;
@@ -15948,15 +15952,13 @@
 
     	highlightService;
 
-    	constructor(rootEl, options) {
-    		this.rootEl = rootEl;
-
+    	constructor(options) {
     		const userTags = options.shareExclusions?.tags || [];
     		const userIds = options.shareExclusions?.ids || [];
 
     		this.excludedTags = new SvelteSet([...DEFAULT_EXCLUDED_TAGS, ...userTags].map((t) => t.toUpperCase()));
     		this.excludedIds = new SvelteSet([...DEFAULT_EXCLUDED_IDS, ...userIds]);
-    		this.highlightService = new HighlightService(this.rootEl);
+    		this.highlightService = new HighlightService();
 
     		// Subscribe to store for exit signal
     		this.unsubscribe = effect_root(() => {
@@ -16048,7 +16050,7 @@
     		const targets = [];
 
     		descriptors.forEach((desc) => {
-    			const matchingEls = resolve(this.rootEl, desc);
+    			const matchingEls = resolve(desc);
 
     			if (matchingEls && matchingEls.length > 0) {
     				targets.push(...matchingEls);
@@ -16087,7 +16089,7 @@
     		const targets = [];
 
     		descriptors.forEach((desc) => {
-    			const matchingEls = resolve(this.rootEl, desc);
+    			const matchingEls = resolve(desc);
 
     			if (matchingEls && matchingEls.length > 0) {
     				targets.push(...matchingEls);
@@ -16779,7 +16781,7 @@
     		this.resolveInitialState(opt.adaptationConfig ?? null);
 
     		// Resolve Exclusions
-    		this.focusService = new FocusService(this.rootEl, {
+    		this.focusService = new FocusService({
     			shareExclusions: opt.configFile.config?.shareExclusions || {}
     		});
     	}
