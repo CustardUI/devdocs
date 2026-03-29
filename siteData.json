@@ -430,14 +430,11 @@
         "release-and-workflow-guide": "Release and Workflow Guide",
         "branching-strategy": "Branching Strategy",
         "core-branches": "Core Branches",
-        "why-we-use-and-quot-squash-and-merge-and-quot-for-production": "Why we use &quot;Squash and Merge&quot; for Production",
         "the-development-lifecycle": "The Development Lifecycle",
-        "step-1-feature-development": "Step 1: Feature Development",
-        "step-2-beta-releases-experimental": "Step 2: Beta Releases (Experimental)",
-        "step-3-production-release-stable": "Step 3: Production Release (Stable)",
-        "maintenance-hotfixes": "Maintenance (Hotfixes)",
-        "summary-of-commands-and-amp-cdns": "Summary of Commands &amp; CDNs",
-        "npm-and-amp-deployment-commands": "NPM &amp; Deployment Commands",
+        "a-feature-development": "A. Feature Development",
+        "b-beta-releases-from-develop-branch": "B. Beta Releases (from develop branch)",
+        "c-production-release-from-main-branch": "C. Production Release (from main branch)",
+        "d-hotfix-releases-from-main-branch": "D. Hotfix Releases (from main branch)",
         "cdn-usage": "CDN Usage"
       },
       "headingKeywords": {}

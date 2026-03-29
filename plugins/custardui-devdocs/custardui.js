@@ -1,5 +1,5 @@
 /*!
- * @custardui/custardui v2.1.2-beta.1
+ * @custardui/custardui v2.2.0
  * (c) 2026 Chan Ger Teck
  * Released under the MIT License.
  */
