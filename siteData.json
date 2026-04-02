@@ -79,10 +79,10 @@
       "headingKeywords": {}
     },
     {
-      "src": "authorGuide/components/all.md",
+      "src": "authorGuide/components/allComponents.md",
       "title": "Components",
       "headings": {
-        "components": "Components"
+        "components-and-amp-features": "Components &amp; Features"
       },
       "headingKeywords": {}
     },
@@ -90,14 +90,13 @@
       "src": "authorGuide/components/labels.md",
       "title": "CustardUI - Labels",
       "headings": {
-        "label-component": "Label Component",
-        "usage": "Usage",
-        "add-the-optional-label-configuration": "Add the (Optional) Label Configuration",
-        "place-labels-in-content": "Place Labels in Content",
-        "label-configuration": "Label Configuration",
+        "labels": "Labels",
+        "basic-syntax": "Basic Syntax",
+        "attributes-of-cv-label": "Attributes of &lt;cv-label&gt;",
+        "configuration": "Configuration",
+        "configuration-fields": "Configuration Fields",
         "shorthand-colors": "Shorthand Colors",
-        "adaptation-overrides": "Adaptation Overrides",
-        "live-demo": "Live Demo"
+        "adaptation-overrides": "Adaptation Overrides"
       },
       "headingKeywords": {}
     },
@@ -105,22 +104,22 @@
       "src": "authorGuide/components/placeholders.md",
       "title": "CustardUI - Placeholders",
       "headings": {
-        "simple-placeholders-variable-interpolation": "Simple Placeholders (Variable Interpolation)",
-        "usage": "Usage",
-        "add-the-placeholder-configuration": "Add the Placeholder Configuration",
-        "use-the-placeholder": "Use the placeholder",
-        "inline-fallback": "Inline Fallback",
-        "conditional-syntax-fall-forward": "Conditional Syntax (Fall-Forward)",
-        "user-set-vs-any-resolved-value": "User-Set vs. Any Resolved Value",
-        "placeholder-driven-toggle-visibility": "Placeholder-Driven Toggle Visibility",
-        "html-attribute-interpolation": "HTML Attribute Interpolation",
+        "placeholders": "Placeholders",
+        "basic-syntax": "Basic Syntax",
+        "inline-fallback-value": "Inline Fallback Value",
+        "conditional-syntax": "Conditional Syntax",
+        "html-attribute-binding": "HTML Attribute Binding",
+        "placeholder-driven-toggles": "Placeholder-Driven Toggles",
+        "attributes-of-cv-placeholder": "Attributes of &lt;cv-placeholder&gt;",
         "escaping-syntax": "Escaping Syntax",
-        "inline-editing-of-placeholders": "Inline Editing of Placeholders",
-        "placeholder-input-attributes": "Placeholder-Input Attributes",
-        "placeholder-configuration": "Placeholder Configuration",
-        "tab-group-binding-and-amp-integration": "Tab Group Binding &amp; Integration",
-        "persistence": "Persistence",
-        "shareable-url": "Shareable URL"
+        "placeholder-input": "Placeholder Input",
+        "attributes-of-cv-placeholder-input": "Attributes of &lt;cv-placeholder-input&gt;",
+        "configuration": "Configuration",
+        "configuration-fields": "Configuration Fields",
+        "global-vs-local-placeholders": "Global vs. Local Placeholders",
+        "site-managed-placeholders": "Site-Managed Placeholders",
+        "tab-group-binding": "Tab Group Binding",
+        "shareable-urls": "Shareable URLs"
       },
       "headingKeywords": {}
     },
@@ -170,21 +169,21 @@
         "advanced-example-with-badges": "Advanced Example with Badges",
         "using-icons-in-headers": "Using Icons in Headers",
         "tabs": "Tabs",
+        "basic-syntax": "Basic Syntax",
         "multi-id-tabs": "Multi-ID Tabs",
         "setting-the-default-tab": "Setting the Default Tab",
         "no-id-tabs": "No-ID Tabs",
         "attributes-of-cv-tabgroup": "Attributes of &lt;cv-tabgroup&gt;",
         "attributes-of-cv-tab": "Attributes of &lt;cv-tab&gt;",
+        "configuration": "Configuration",
+        "configuration-fields": "Configuration Fields",
+        "binding-to-placeholders": "Binding to Placeholders",
+        "global-vs-local-tab-groups": "Global vs. Local Tab Groups",
+        "shareable-url": "Shareable URL",
         "header-syntax-with-rich-formatting": "Header Syntax with Rich Formatting",
         "syntax-and-amp-rules": "Syntax &amp; Rules",
         "cv-tab-header-attributes": "&lt;cv-tab-header&gt; Attributes",
-        "cv-tab-body-attributes": "&lt;cv-tab-body&gt; Attributes",
-        "configuration": "Configuration",
-        "configuration-fields-in-custardui-config-json": "Configuration Fields in custardui.config.json",
-        "binding-to-placeholders": "Binding to Placeholders",
-        "global-vs-local-tab-groups": "Global vs. Local Tab Groups",
-        "keeping-local-tab-groups-in-settings": "Keeping Local Tab Groups in Settings",
-        "shareable-url": "Shareable URL"
+        "cv-tab-body-attributes": "&lt;cv-tab-body&gt; Attributes"
       },
       "headingKeywords": {}
     },
@@ -193,16 +192,16 @@
       "title": "CustardUI - Toggle Component",
       "headings": {
         "toggles": "Toggles",
+        "basic-syntax": "Basic Syntax",
         "toggle-peek-mode": "Toggle Peek Mode",
         "multi-id-toggles": "Multi-ID Toggles",
+        "placeholder-driven-toggles": "Placeholder-Driven Toggles",
         "attributes-of-cv-toggle": "Attributes of &lt;cv-toggle&gt;",
         "toggle-control": "Toggle Control",
         "attributes-of-cv-toggle-control": "Attributes of &lt;cv-toggle-control&gt;",
         "configuration": "Configuration",
-        "configuration-fields-in-custardui-config-json": "Configuration Fields in custardui.config.json",
-        "visibility-resolution-order": "Visibility Resolution Order",
+        "configuration-fields": "Configuration Fields",
         "global-vs-local-toggles": "Global vs. Local Toggles",
-        "keeping-local-toggles-in-settings": "Keeping Local Toggles in Settings",
         "site-managed-toggles": "Site-Managed Toggles",
         "shareable-url": "Shareable URL",
         "troubleshooting": "Troubleshooting"
@@ -444,12 +443,10 @@
       "src": "index.md",
       "title": "CustardUI - Your docs, shaped for every reader",
       "headings": {
-        "custardui": "CustardUI",
-        "static-sites-don-t-have-to-be-static": "Static sites don't have to be static.",
-        "answer-questions-with-a-link": "Answer questions with a link.",
-        "one-resource-every-audience": "One resource. Every audience.",
-        "up-and-running-in-minutes": "Up and running in minutes.",
-        "your-docs-shaped-for-every-reader": "Your docs, shaped for every reader."
+        "what-it-can-do": "What it can do",
+        "how-it-works": "How it works",
+        "works-with-any-static-site": "Works with any static site",
+        "how-to-get-started": "How to Get Started"
       },
       "headingKeywords": {}
     },
