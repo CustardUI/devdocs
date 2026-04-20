@@ -21,9 +21,10 @@
     },
     {
       "src": "about.md",
-      "title": "About Page",
+      "title": "About Us",
       "headings": {
-        "about-page": "About Page"
+        "about-us": "About Us",
+        "contributors": "Contributors ✨"
       },
       "headingKeywords": {}
     },
