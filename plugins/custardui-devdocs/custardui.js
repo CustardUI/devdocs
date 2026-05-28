@@ -118,12 +118,16 @@
     const HYDRATION_START = '[';
     /** used to indicate that an `{:else}...` block was rendered */
     const HYDRATION_START_ELSE = '[!';
+    /** used to indicate that a boundary's `failed` snippet was rendered on the server */
+    const HYDRATION_START_FAILED = '[?';
     const HYDRATION_END = ']';
     const HYDRATION_ERROR = {};
 
-    const UNINITIALIZED = Symbol();
+    const UNINITIALIZED = Symbol('uninitialized');
 
     const NAMESPACE_HTML = 'http://www.w3.org/1999/xhtml';
+    const NAMESPACE_SVG = 'http://www.w3.org/2000/svg';
+    const NAMESPACE_MATHML = 'http://www.w3.org/1998/Math/MathML';
 
     const ATTACHMENT_KEY = '@attach';
 
@@ -133,6 +137,7 @@
     // to de-opt (this occurs often when using popular extensions).
     var is_array = Array.isArray;
     var index_of = Array.prototype.indexOf;
+    var includes = Array.prototype.includes;
     var array_from = Array.from;
     var object_keys = Object.keys;
     var define_property = Object.defineProperty;
@@ -215,10 +220,12 @@
     const MAYBE_DIRTY = 1 << 12;
     const INERT = 1 << 13;
     const DESTROYED = 1 << 14;
+    /** Set once a reaction has run for the first time */
+    const REACTION_RAN = 1 << 15;
+    /** Effect is in the process of getting destroyed. Can be observed in child teardown functions */
+    const DESTROYING = 1 << 25;
 
     // Flags exclusive to effects
-    /** Set once an effect that should run synchronously has run */
-    const EFFECT_RAN = 1 << 15;
     /**
      * 'Transparent' effects do not create a transition boundary.
      * This is on a block effect 99% of the time but may also be on a branch effect if its parent block effect was pruned
@@ -234,9 +241,10 @@
     /**
      * Tells that we marked this derived and its reactions as visited during the "mark as (maybe) dirty"-phase.
      * Will be lifted during execution of the derived and during checking its dirty state (both are necessary
-     * because a derived might be checked but not executed).
+     * because a derived might be checked but not executed). This is a pure performance optimization flag and
+     * should not be used for any other purpose!
      */
-    const WAS_MARKED = 1 << 15;
+    const WAS_MARKED = 1 << 16;
 
     // Flags used for async
     const REACTION_IS_UPDATING = 1 << 21;
@@ -247,12 +255,22 @@
     const STATE_SYMBOL = Symbol('$state');
     const LEGACY_PROPS = Symbol('legacy props');
     const LOADING_ATTR_SYMBOL = Symbol('');
+    const ATTRIBUTES_CACHE = Symbol('attributes');
+    const CLASS_CACHE = Symbol('class');
+    const STYLE_CACHE = Symbol('style');
+    const TEXT_CACHE = Symbol('text');
+    const FORM_RESET_HANDLER = Symbol('form reset');
 
     /** allow users to ignore aborted signal errors if `reason.name === 'StaleReactionError` */
     const STALE_REACTION = new (class StaleReactionError extends Error {
     	name = 'StaleReactionError';
     	message = 'The reaction that called `getAbortSignal()` was re-run or destroyed';
     })();
+
+    const IS_XHTML =
+    	// We gotta write it like this because after downleveling the pure comment may end up in the wrong location
+    	!!globalThis.document?.contentType &&
+    	/* @__PURE__ */ globalThis.document.contentType.includes('xml');
     const TEXT_NODE = 3;
     const COMMENT_NODE = 8;
 
@@ -280,6 +298,19 @@
     function async_derived_orphan() {
     	{
     		throw new Error(`https://svelte.dev/e/async_derived_orphan`);
+    	}
+    }
+
+    /**
+     * Keyed each block has duplicate key `%value%` at indexes %a% and %b%
+     * @param {string} a
+     * @param {string} b
+     * @param {string | undefined | null} [value]
+     * @returns {never}
+     */
+    function each_key_duplicate(a, b, value) {
+    	{
+    		throw new Error(`https://svelte.dev/e/each_key_duplicate`);
     	}
     }
 
@@ -390,6 +421,15 @@
 
 
     /**
+     * Reading a derived belonging to a now-destroyed effect may result in stale values
+     */
+    function derived_inert() {
+    	{
+    		console.warn(`https://svelte.dev/e/derived_inert`);
+    	}
+    }
+
+    /**
      * Hydration failed because the initial UI does not match what was rendered on the server. The error occurred near %location%
      * @param {string | undefined | null} [location]
      */
@@ -495,7 +535,12 @@
     			if (data === HYDRATION_END) {
     				if (depth === 0) return node;
     				depth -= 1;
-    			} else if (data === HYDRATION_START || data === HYDRATION_START_ELSE) {
+    			} else if (
+    				data === HYDRATION_START ||
+    				data === HYDRATION_START_ELSE ||
+    				// "[1", "[2", etc. for if blocks
+    				(data[0] === '[' && !isNaN(Number(data.slice(1))))
+    			) {
     				depth += 1;
     			}
     		}
@@ -592,6 +637,7 @@
     		e: null,
     		s: props,
     		x: null,
+    		r: /** @type {Effect} */ (active_effect),
     		l: legacy_mode_flag && !runes ? { s: null, u: null, $: [] } : null
     	};
     }
@@ -712,19 +758,16 @@
     		return error;
     	}
 
-    	if ((effect.f & EFFECT_RAN) === 0) {
-    		// if the error occurred while creating this subtree, we let it
-    		// bubble up until it hits a boundary that can handle it
-    		if ((effect.f & BOUNDARY_EFFECT) === 0) {
+    	// if the error occurred while creating this subtree, we let it
+    	// bubble up until it hits a boundary that can handle it, unless
+    	// it's an $effect in which case it doesn't run immediately
+    	if ((effect.f & REACTION_RAN) === 0 && (effect.f & EFFECT) === 0) {
 
-    			throw error;
-    		}
-
-    		/** @type {Boundary} */ (effect.b).error(error);
-    	} else {
-    		// otherwise we bubble up the effect tree ourselves
-    		invoke_error_boundary(error, effect);
+    		throw error;
     	}
+
+    	// otherwise we bubble up the effect tree ourselves
+    	invoke_error_boundary(error, effect);
     }
 
     /**
@@ -734,6 +777,11 @@
     function invoke_error_boundary(error, effect) {
     	while (effect !== null) {
     		if ((effect.f & BOUNDARY_EFFECT) !== 0) {
+    			if ((effect.f & REACTION_RAN) === 0) {
+    				// we are still creating the boundary effect
+    				throw error;
+    			}
+
     			try {
     				/** @type {Boundary} */ (effect.b).error(error);
     				return;
@@ -748,23 +796,116 @@
     	throw error;
     }
 
+    /** @import { Derived, Signal } from '#client' */
+
+    const STATUS_MASK = -7169;
+
+    /**
+     * @param {Signal} signal
+     * @param {number} status
+     */
+    function set_signal_status(signal, status) {
+    	signal.f = (signal.f & STATUS_MASK) | status;
+    }
+
+    /**
+     * Set a derived's status to CLEAN or MAYBE_DIRTY based on its connection state.
+     * @param {Derived} derived
+     */
+    function update_derived_status(derived) {
+    	// Only mark as MAYBE_DIRTY if disconnected and has dependencies.
+    	if ((derived.f & CONNECTED) !== 0 || derived.deps === null) {
+    		set_signal_status(derived, CLEAN);
+    	} else {
+    		set_signal_status(derived, MAYBE_DIRTY);
+    	}
+    }
+
+    /** @import { Derived, Effect, Value } from '#client' */
+
+    /**
+     * @param {Value[] | null} deps
+     */
+    function clear_marked(deps) {
+    	if (deps === null) return;
+
+    	for (const dep of deps) {
+    		if ((dep.f & DERIVED) === 0 || (dep.f & WAS_MARKED) === 0) {
+    			continue;
+    		}
+
+    		dep.f ^= WAS_MARKED;
+
+    		clear_marked(/** @type {Derived} */ (dep).deps);
+    	}
+    }
+
+    /**
+     * @param {Effect} effect
+     * @param {Set<Effect>} dirty_effects
+     * @param {Set<Effect>} maybe_dirty_effects
+     */
+    function defer_effect(effect, dirty_effects, maybe_dirty_effects) {
+    	if ((effect.f & DIRTY) !== 0) {
+    		dirty_effects.add(effect);
+    	} else if ((effect.f & MAYBE_DIRTY) !== 0) {
+    		maybe_dirty_effects.add(effect);
+    	}
+
+    	// Since we're not executing these effects now, we need to clear any WAS_MARKED flags
+    	// so that other batches can correctly reach these effects during their own traversal
+    	clear_marked(effect.deps);
+
+    	// mark as clean so they get scheduled if they depend on pending async state
+    	set_signal_status(effect, CLEAN);
+    }
+
+    /** @import { StoreReferencesContainer } from '#client' */
+    /** @import { Store } from '#shared' */
+
+    /**
+     * Whether or not the prop currently being read is a store binding, as in
+     * `<Child bind:x={$y} />`. If it is, we treat the prop as mutable even in
+     * runes mode, and skip `binding_property_non_reactive` validation
+     */
+    let is_store_binding = false;
+
+    /**
+     * Returns a tuple that indicates whether `fn()` reads a prop that is a store binding.
+     * Used to prevent `binding_property_non_reactive` validation false positives and
+     * ensure that these props are treated as mutable even in runes mode
+     * @template T
+     * @param {() => T} fn
+     * @returns {[T, boolean]}
+     */
+    function capture_store_binding(fn) {
+    	var previous_is_store_binding = is_store_binding;
+
+    	try {
+    		is_store_binding = false;
+    		return [fn(), is_store_binding];
+    	} finally {
+    		is_store_binding = previous_is_store_binding;
+    	}
+    }
+
     /** @import { Fork } from 'svelte' */
     /** @import { Derived, Effect, Reaction, Source, Value } from '#client' */
 
-    /**
-     * @typedef {{
-     *   parent: EffectTarget | null;
-     *   effect: Effect | null;
-     *   effects: Effect[];
-     *   render_effects: Effect[];
-     * }} EffectTarget
-     */
+    /** @type {Batch | null} */
+    let first_batch = null;
 
-    /** @type {Set<Batch>} */
-    const batches = new Set();
+    /** @type {Batch | null} */
+    let last_batch = null;
 
     /** @type {Batch | null} */
     let current_batch = null;
+
+    /**
+     * This is needed to avoid overwriting inputs
+     * @type {Batch | null}
+     */
+    let previous_batch = null;
 
     /**
      * When time travelling (i.e. working in one batch, while other batches
@@ -774,37 +915,72 @@
      */
     let batch_values = null;
 
-    // TODO this should really be a property of `batch`
-    /** @type {Effect[]} */
-    let queued_root_effects = [];
-
     /** @type {Effect | null} */
     let last_scheduled_effect = null;
 
-    let is_flushing = false;
     let is_flushing_sync = false;
+    let is_processing = false;
+
+    /**
+     * During traversal, this is an array. Newly created effects are (if not immediately
+     * executed) pushed to this array, rather than going through the scheduling
+     * rigamarole that would cause another turn of the flush loop.
+     * @type {Effect[] | null}
+     */
+    let collected_effects = null;
+
+    /**
+     * An array of effects that are marked during traversal as a result of a `set`
+     * (not `internal_set`) call. These will be added to the next batch and
+     * trigger another `batch.process()`
+     * @type {Effect[] | null}
+     * @deprecated when we get rid of legacy mode and stores, we can get rid of this
+     */
+    let legacy_updates = null;
+
+    var flush_count = 0;
+
+    /** @type {Set<Value>} */
+    var source_stacks = new Set();
+
+    let uid = 1;
 
     class Batch {
-    	committed = false;
+    	id = uid++;
+
+    	/** True as soon as `#process` was called */
+    	#started = false;
+
+    	linked = true;
+
+    	/** @type {Batch | null} */
+    	#prev = null;
+
+    	/** @type {Batch | null} */
+    	#next = null;
+
+    	/** @type {Map<Effect, ReturnType<typeof deferred<any>>>} */
+    	async_deriveds = new Map();
 
     	/**
-    	 * The current values of any sources that are updated in this batch
+    	 * The current values of any signals that are updated in this batch.
+    	 * Tuple format: [value, is_derived] (note: is_derived is false for deriveds, too, if they were overridden via assignment)
     	 * They keys of this map are identical to `this.#previous`
-    	 * @type {Map<Source, any>}
+    	 * @type {Map<Value, [any, boolean]>}
     	 */
     	current = new Map();
 
     	/**
-    	 * The values of any sources that are updated in this batch _before_ those updates took place.
+    	 * The values of any signals (sources and deriveds) that are updated in this batch _before_ those updates took place.
     	 * They keys of this map are identical to `this.#current`
-    	 * @type {Map<Source, any>}
+    	 * @type {Map<Value, any>}
     	 */
     	previous = new Map();
 
     	/**
     	 * When the batch is committed (and the DOM is updated), we need to remove old branches
     	 * and append new ones by calling the functions added inside (if/each/key/etc) blocks
-    	 * @type {Set<() => void>}
+    	 * @type {Set<(batch: Batch) => void>}
     	 */
     	#commit_callbacks = new Set();
 
@@ -815,14 +991,21 @@
     	#discard_callbacks = new Set();
 
     	/**
+    	 * Callbacks that should run only when a fork is committed.
+    	 * @type {Set<(batch: Batch) => void>}
+    	 */
+    	#fork_commit_callbacks = new Set();
+
+    	/**
     	 * The number of async effects that are currently in flight
     	 */
     	#pending = 0;
 
     	/**
-    	 * The number of async effects that are currently in flight, _not_ inside a pending boundary
+    	 * Async effects that are currently in flight, _not_ inside a pending boundary
+    	 * @type {Map<Effect, number>}
     	 */
-    	#blocking_pending = 0;
+    	#blocking_pending = new Map();
 
     	/**
     	 * A deferred that resolves when the batch is committed, used with `settled()`
@@ -830,6 +1013,18 @@
     	 * @type {{ promise: Promise<void>, resolve: (value?: any) => void, reject: (reason: unknown) => void } | null}
     	 */
     	#deferred = null;
+
+    	/**
+    	 * The root effects that need to be flushed
+    	 * @type {Effect[]}
+    	 */
+    	#roots = [];
+
+    	/**
+    	 * Effects created while this batch was active.
+    	 * @type {Effect[]}
+    	 */
+    	#new_effects = [];
 
     	/**
     	 * Deferred effects (which run after async work has completed) that are DIRTY
@@ -844,70 +1039,236 @@
     	#maybe_dirty_effects = new Set();
 
     	/**
-    	 * A set of branches that still exist, but will be destroyed when this batch
-    	 * is committed — we skip over these during `process`
+    	 * A map of branches that still exist, but will be destroyed when this batch
+    	 * is committed — we skip over these during `process`.
+    	 * The value contains child effects that were dirty/maybe_dirty before being reset,
+    	 * so they can be rescheduled if the branch survives.
+    	 * @type {Map<Effect, { d: Effect[], m: Effect[] }>}
+    	 */
+    	#skipped_branches = new Map();
+
+    	/**
+    	 * Inverse of #skipped_branches which we need to tell prior batches to unskip them when committing
     	 * @type {Set<Effect>}
     	 */
-    	skipped_effects = new Set();
+    	#unskipped_branches = new Set();
 
     	is_fork = false;
 
-    	is_deferred() {
-    		return this.is_fork || this.#blocking_pending > 0;
+    	#decrement_queued = false;
+
+    	constructor() {
+    		// link batch
+    		if (last_batch === null) {
+    			first_batch = last_batch = this;
+    		} else {
+    			last_batch.#next = this;
+    			this.#prev = last_batch;
+    		}
+
+    		last_batch = this;
+    	}
+
+    	#is_deferred() {
+    		if (this.is_fork) return true;
+
+    		for (const effect of this.#blocking_pending.keys()) {
+    			var e = effect;
+    			var skipped = false;
+
+    			while (e.parent !== null) {
+    				if (this.#skipped_branches.has(e)) {
+    					skipped = true;
+    					break;
+    				}
+
+    				e = e.parent;
+    			}
+
+    			if (!skipped) {
+    				return true;
+    			}
+    		}
+
+    		return false;
     	}
 
     	/**
-    	 *
-    	 * @param {Effect[]} root_effects
+    	 * Add an effect to the #skipped_branches map and reset its children
+    	 * @param {Effect} effect
     	 */
-    	process(root_effects) {
-    		queued_root_effects = [];
+    	skip_effect(effect) {
+    		if (!this.#skipped_branches.has(effect)) {
+    			this.#skipped_branches.set(effect, { d: [], m: [] });
+    		}
+    		this.#unskipped_branches.delete(effect);
+    	}
+
+    	/**
+    	 * Remove an effect from the #skipped_branches map and reschedule
+    	 * any tracked dirty/maybe_dirty child effects
+    	 * @param {Effect} effect
+    	 * @param {(e: Effect) => void} callback
+    	 */
+    	unskip_effect(effect, callback = (e) => this.schedule(e)) {
+    		var tracked = this.#skipped_branches.get(effect);
+    		if (tracked) {
+    			this.#skipped_branches.delete(effect);
+
+    			for (var e of tracked.d) {
+    				set_signal_status(e, DIRTY);
+    				callback(e);
+    			}
+
+    			for (e of tracked.m) {
+    				set_signal_status(e, MAYBE_DIRTY);
+    				callback(e);
+    			}
+    		}
+    		this.#unskipped_branches.add(effect);
+    	}
+
+    	#process() {
+    		this.#started = true;
+
+    		if (flush_count++ > 1000) {
+    			this.#unlink();
+    			infinite_loop_guard();
+    		}
+
+    		// We always reschedule previously-deferred effects, not just when
+    		// #is_deferred() is true, because traversing the tree could make
+    		// an if block that contains the last blocking pending effect falsy,
+    		// causing the block to no longer be deferred.
+    		for (const e of this.#dirty_effects) {
+    			this.#maybe_dirty_effects.delete(e);
+    			set_signal_status(e, DIRTY);
+    			this.schedule(e);
+    		}
+
+    		for (const e of this.#maybe_dirty_effects) {
+    			set_signal_status(e, MAYBE_DIRTY);
+    			this.schedule(e);
+    		}
+
+    		const roots = this.#roots;
+    		this.#roots = [];
 
     		this.apply();
 
-    		/** @type {EffectTarget} */
-    		var target = {
-    			parent: null,
-    			effect: null,
-    			effects: [],
-    			render_effects: []
-    		};
+    		/** @type {Effect[]} */
+    		var effects = (collected_effects = []);
 
-    		for (const root of root_effects) {
-    			this.#traverse_effect_tree(root, target);
-    			// Note: #traverse_effect_tree runs block effects eagerly, which can schedule effects,
-    			// which means queued_root_effects now may be filled again.
+    		/** @type {Effect[]} */
+    		var render_effects = [];
 
-    			// Helpful for debugging reactivity loss that has to do with branches being skipped:
-    			// log_inconsistent_branches(root);
+    		/**
+    		 * @type {Effect[]}
+    		 * @deprecated when we get rid of legacy mode and stores, we can get rid of this
+    		 */
+    		var updates = (legacy_updates = []);
+
+    		for (const root of roots) {
+    			try {
+    				this.#traverse(root, effects, render_effects);
+    			} catch (e) {
+    				reset_all(root);
+    				// If there's no async work left, this branch is now dead and needs
+    				// to be discarded to not become a zombie that is never cleaned up.
+    				// See https://github.com/sveltejs/svelte/issues/18221#issuecomment-4497918414
+    				// for a (non-minimal) reproduction that demonstrates a case where this is necessary
+    				// to not get follow-up false-positives via "batch has scheduled roots" invariant errors.
+    				if (!this.#is_deferred()) this.discard();
+    				throw e;
+    			}
     		}
 
-    		if (!this.is_fork) {
-    			this.#resolve();
+    		// any writes should take effect in a subsequent batch
+    		current_batch = null;
+
+    		if (updates.length > 0) {
+    			var batch = Batch.ensure();
+    			for (const e of updates) {
+    				batch.schedule(e);
+    			}
     		}
 
-    		if (this.is_deferred()) {
-    			this.#defer_effects(target.effects);
-    			this.#defer_effects(target.render_effects);
-    		} else {
-    			current_batch = null;
+    		collected_effects = null;
+    		legacy_updates = null;
 
-    			flush_queued_effects(target.render_effects);
-    			flush_queued_effects(target.effects);
+    		// if the batch has outstanding pending work, stash effects and bail
+    		if (this.#is_deferred()) {
+    			this.#defer_effects(render_effects);
+    			this.#defer_effects(effects);
 
-    			this.#deferred?.resolve();
+    			for (const [e, t] of this.#skipped_branches) {
+    				reset_branch(e, t);
+    			}
+
+    			if (updates.length > 0) {
+    				/** @type {Batch} */ (/** @type {unknown} */ (current_batch)).#process();
+    			}
+
+    			return;
     		}
 
-    		batch_values = null;
+    		const earlier_batch = this.#find_earlier_batch();
+
+    		if (earlier_batch) {
+    			// If this batch collected deferred effects during traversal, they still need
+    			// to run after being merged into the earlier batch.
+    			this.#defer_effects(render_effects);
+    			this.#defer_effects(effects);
+    			earlier_batch.#merge(this);
+    			return;
+    		}
+
+    		// clear effects. Those that are still needed will be rescheduled through unskipping the skipped branches.
+    		this.#dirty_effects.clear();
+    		this.#maybe_dirty_effects.clear();
+
+    		// append/remove branches
+    		for (const fn of this.#commit_callbacks) fn(this);
+    		this.#commit_callbacks.clear();
+
+    		previous_batch = this;
+    		flush_queued_effects(render_effects);
+    		flush_queued_effects(effects);
+    		previous_batch = null;
+
+    		this.#deferred?.resolve();
+
+    		var next_batch = /** @type {Batch | null} */ (/** @type {unknown} */ (current_batch));
+
+    		if (this.#pending === 0 && (this.#roots.length === 0 || next_batch !== null)) {
+    			this.#unlink();
+    		}
+
+    		// Edge case: During traversal new branches might create effects that run immediately and set state,
+    		// causing an effect and therefore a root to be scheduled again. We need to traverse the current batch
+    		// once more in that case - most of the time this will just clean up dirty branches.
+    		if (this.#roots.length > 0) {
+    			if (next_batch !== null) {
+    				const batch = next_batch;
+    				batch.#roots.push(...this.#roots.filter((r) => !batch.#roots.includes(r)));
+    			} else {
+    				next_batch = this;
+    			}
+    		}
+
+    		if (next_batch !== null) {
+    			next_batch.#process();
+    		}
     	}
 
     	/**
     	 * Traverse the effect tree, executing effects or stashing
     	 * them for later execution as appropriate
     	 * @param {Effect} root
-    	 * @param {EffectTarget} target
+    	 * @param {Effect[]} effects
+    	 * @param {Effect[]} render_effects
     	 */
-    	#traverse_effect_tree(root, target) {
+    	#traverse(root, effects, render_effects) {
     		root.f ^= CLEAN;
 
     		var effect = root.first;
@@ -917,24 +1278,15 @@
     			var is_branch = (flags & (BRANCH_EFFECT | ROOT_EFFECT)) !== 0;
     			var is_skippable_branch = is_branch && (flags & CLEAN) !== 0;
 
-    			var skip = is_skippable_branch || (flags & INERT) !== 0 || this.skipped_effects.has(effect);
-
-    			if ((effect.f & BOUNDARY_EFFECT) !== 0 && effect.b?.is_pending()) {
-    				target = {
-    					parent: target,
-    					effect,
-    					effects: [],
-    					render_effects: []
-    				};
-    			}
+    			var skip = is_skippable_branch || (flags & INERT) !== 0 || this.#skipped_branches.has(effect);
 
     			if (!skip && effect.fn !== null) {
     				if (is_branch) {
     					effect.f ^= CLEAN;
     				} else if ((flags & EFFECT) !== 0) {
-    					target.effects.push(effect);
+    					effects.push(effect);
     				} else if (is_dirty(effect)) {
-    					if ((effect.f & BLOCK_EFFECT) !== 0) this.#dirty_effects.add(effect);
+    					if ((flags & BLOCK_EFFECT) !== 0) this.#maybe_dirty_effects.add(effect);
     					update_effect(effect);
     				}
 
@@ -946,127 +1298,175 @@
     				}
     			}
 
-    			var parent = effect.parent;
-    			effect = effect.next;
+    			while (effect !== null) {
+    				var next = effect.next;
 
-    			while (effect === null && parent !== null) {
-    				if (parent === target.effect) {
-    					// TODO rather than traversing into pending boundaries and deferring the effects,
-    					// could we just attach the effects _to_ the pending boundary and schedule them
-    					// once the boundary is ready?
-    					this.#defer_effects(target.effects);
-    					this.#defer_effects(target.render_effects);
-
-    					target = /** @type {EffectTarget} */ (target.parent);
+    				if (next !== null) {
+    					effect = next;
+    					break;
     				}
 
-    				effect = parent.next;
-    				parent = parent.parent;
+    				effect = effect.parent;
     			}
     		}
+    	}
+
+    	#find_earlier_batch() {
+    		var batch = this.#prev;
+
+    		while (batch !== null) {
+    			if (!batch.is_fork) {
+    				// if the batches are connected, break
+    				for (const [value, [, is_derived]] of this.current) {
+    					if (batch.current.has(value) && !is_derived) {
+    						return batch;
+    					}
+    				}
+    			}
+
+    			batch = batch.#prev;
+    		}
+
+    		return null;
+    	}
+
+    	/**
+    	 * @param {Batch} batch
+    	 */
+    	#merge(batch) {
+    		for (const [source, value] of batch.current) {
+    			if (!this.previous.has(source) && batch.previous.has(source)) {
+    				this.previous.set(source, batch.previous.get(source));
+    			}
+
+    			this.current.set(source, value);
+    		}
+
+    		for (const [effect, deferred] of batch.async_deriveds) {
+    			const d = this.async_deriveds.get(effect);
+    			if (d) deferred.promise.then(d.resolve).catch(d.reject);
+    		}
+
+    		// Mark is not guaranteed not touch these, so we transfer them
+    		this.transfer_effects(batch.#dirty_effects, batch.#maybe_dirty_effects);
+
+    		/**
+    		 * mark all effects that depend on `batch.current`, except the
+    		 * async effects that we just resolved (TODO unless they depend
+    		 * on values in this batch that are NOT in the later batch?).
+    		 * Through this we also will populate the correct #skipped_branches,
+    		 * oncommit callbacks etc, so we don't need to merge them separately.
+    		 * @param {Value} value
+    		 */
+    		const mark = (value) => {
+    			var reactions = value.reactions;
+    			if (reactions === null) return;
+
+    			for (const reaction of reactions) {
+    				var flags = reaction.f;
+
+    				if ((flags & DERIVED) !== 0) {
+    					mark(/** @type {Derived} */ (reaction));
+    				} else {
+    					var effect = /** @type {Effect} */ (reaction);
+
+    					if (flags & (ASYNC | BLOCK_EFFECT) && !this.async_deriveds.has(effect)) {
+    						this.#maybe_dirty_effects.delete(effect);
+    						set_signal_status(effect, DIRTY);
+    						this.schedule(effect);
+    					}
+    				}
+    			}
+    		};
+
+    		for (const source of this.current.keys()) {
+    			mark(source);
+    		}
+
+    		this.oncommit(() => batch.discard());
+    		batch.#unlink();
+
+    		current_batch = this;
+    		this.#process();
     	}
 
     	/**
     	 * @param {Effect[]} effects
     	 */
     	#defer_effects(effects) {
-    		for (const e of effects) {
-    			if ((e.f & DIRTY) !== 0) {
-    				this.#dirty_effects.add(e);
-    			} else if ((e.f & MAYBE_DIRTY) !== 0) {
-    				this.#maybe_dirty_effects.add(e);
-    			}
-
-    			// Since we're not executing these effects now, we need to clear any WAS_MARKED flags
-    			// so that other batches can correctly reach these effects during their own traversal
-    			this.#clear_marked(e.deps);
-
-    			// mark as clean so they get scheduled if they depend on pending async state
-    			set_signal_status(e, CLEAN);
-    		}
-    	}
-
-    	/**
-    	 * @param {Value[] | null} deps
-    	 */
-    	#clear_marked(deps) {
-    		if (deps === null) return;
-
-    		for (const dep of deps) {
-    			if ((dep.f & DERIVED) === 0 || (dep.f & WAS_MARKED) === 0) {
-    				continue;
-    			}
-
-    			dep.f ^= WAS_MARKED;
-
-    			this.#clear_marked(/** @type {Derived} */ (dep).deps);
+    		for (var i = 0; i < effects.length; i += 1) {
+    			defer_effect(effects[i], this.#dirty_effects, this.#maybe_dirty_effects);
     		}
     	}
 
     	/**
     	 * Associate a change to a given source with the current
     	 * batch, noting its previous and current values
-    	 * @param {Source} source
+    	 * @param {Value} source
     	 * @param {any} value
+    	 * @param {boolean} [is_derived]
     	 */
-    	capture(source, value) {
-    		if (!this.previous.has(source)) {
-    			this.previous.set(source, value);
+    	capture(source, value, is_derived = false) {
+    		if (source.v !== UNINITIALIZED && !this.previous.has(source)) {
+    			this.previous.set(source, source.v);
     		}
 
     		// Don't save errors in `batch_values`, or they won't be thrown in `runtime.js#get`
     		if ((source.f & ERROR_VALUE) === 0) {
-    			this.current.set(source, source.v);
-    			batch_values?.set(source, source.v);
+    			this.current.set(source, [value, is_derived]);
+    			batch_values?.set(source, value);
+    		}
+
+    		if (!this.is_fork) {
+    			source.v = value;
     		}
     	}
 
     	activate() {
     		current_batch = this;
-    		this.apply();
     	}
 
     	deactivate() {
-    		// If we're not the current batch, don't deactivate,
-    		// else we could create zombie batches that are never flushed
-    		if (current_batch !== this) return;
-
     		current_batch = null;
     		batch_values = null;
     	}
 
     	flush() {
-    		this.activate();
+    		try {
+    			if (DEV) ;
 
-    		if (queued_root_effects.length > 0) {
-    			flush_effects();
+    			is_processing = true;
+    			current_batch = this;
 
-    			if (current_batch !== null && current_batch !== this) {
-    				// this can happen if a new batch was created during `flush_effects()`
-    				return;
-    			}
-    		} else if (this.#pending === 0) {
-    			this.process([]); // TODO this feels awkward
+    			this.#process();
+    		} finally {
+    			flush_count = 0;
+    			last_scheduled_effect = null;
+    			collected_effects = null;
+    			legacy_updates = null;
+    			is_processing = false;
+
+    			current_batch = null;
+    			batch_values = null;
+
+    			old_values.clear();
     		}
-
-    		this.deactivate();
     	}
 
     	discard() {
     		for (const fn of this.#discard_callbacks) fn(this);
     		this.#discard_callbacks.clear();
+    		this.#fork_commit_callbacks.clear();
+
+    		this.#unlink();
+    		this.#deferred?.resolve();
     	}
 
-    	#resolve() {
-    		if (this.#blocking_pending === 0) {
-    			// append/remove branches
-    			for (const fn of this.#commit_callbacks) fn();
-    			this.#commit_callbacks.clear();
-    		}
-
-    		if (this.#pending === 0) {
-    			this.#commit();
-    		}
+    	/**
+    	 * @param {Effect} effect
+    	 */
+    	register_created_effect(effect) {
+    		this.#new_effects.push(effect);
     	}
 
     	#commit() {
@@ -1074,124 +1474,180 @@
     		// in other words, we re-run block/async effects with the newly
     		// committed state, unless the batch in question has a more
     		// recent value for a given source
-    		if (batches.size > 1) {
-    			this.previous.clear();
+    		for (let batch = first_batch; batch !== null; batch = batch.#next) {
+    			var is_earlier = batch.id < this.id;
 
-    			var previous_batch_values = batch_values;
-    			var is_earlier = true;
+    			/** @type {Source[]} */
+    			var sources = [];
 
-    			/** @type {EffectTarget} */
-    			var dummy_target = {
-    				parent: null,
-    				effect: null,
-    				effects: [],
-    				render_effects: []
-    			};
+    			for (const [source, [value, is_derived]] of this.current) {
+    				if (batch.current.has(source)) {
+    					var batch_value = /** @type {[any, boolean]} */ (batch.current.get(source))[0]; // faster than destructuring
 
-    			for (const batch of batches) {
-    				if (batch === this) {
-    					is_earlier = false;
-    					continue;
+    					if (is_earlier && value !== batch_value) {
+    						// bring the value up to date
+    						batch.current.set(source, [value, is_derived]);
+    					} else {
+    						// same value or later batch has more recent value,
+    						// no need to re-run these effects
+    						continue;
+    					}
     				}
 
-    				/** @type {Source[]} */
-    				const sources = [];
+    				sources.push(source);
+    			}
 
-    				for (const [source, value] of this.current) {
-    					if (batch.current.has(source)) {
-    						if (is_earlier && value !== batch.current.get(source)) {
-    							// bring the value up to date
-    							batch.current.set(source, value);
-    						} else {
-    							// same value or later batch has more recent value,
-    							// no need to re-run these effects
-    							continue;
-    						}
-    					}
-
-    					sources.push(source);
-    				}
-
-    				if (sources.length === 0) {
-    					continue;
-    				}
-
-    				// Re-run async/block effects that depend on distinct values changed in both batches
-    				const others = [...batch.current.keys()].filter((s) => !this.current.has(s));
-    				if (others.length > 0) {
-    					// Avoid running queued root effects on the wrong branch
-    					var prev_queued_root_effects = queued_root_effects;
-    					queued_root_effects = [];
-
-    					/** @type {Set<Value>} */
-    					const marked = new Set();
-    					/** @type {Map<Reaction, boolean>} */
-    					const checked = new Map();
-    					for (const source of sources) {
-    						mark_effects(source, others, marked, checked);
-    					}
-
-    					if (queued_root_effects.length > 0) {
-    						current_batch = batch;
-    						batch.apply();
-
-    						for (const root of queued_root_effects) {
-    							batch.#traverse_effect_tree(root, dummy_target);
-    						}
-
-    						// TODO do we need to do anything with `target`? defer block effects?
-
-    						batch.deactivate();
-    					}
-
-    					queued_root_effects = prev_queued_root_effects;
+    			if (is_earlier) {
+    				// TODO do we need to restart these in some cases, instead of
+    				// immediately resolving them? Likely not because of how this.apply() works.
+    				for (const [effect, deferred] of this.async_deriveds) {
+    					const d = batch.async_deriveds.get(effect);
+    					if (d) deferred.promise.then(d.resolve).catch(d.reject);
     				}
     			}
 
-    			current_batch = null;
-    			batch_values = previous_batch_values;
-    		}
+    			if (!batch.#started) continue;
 
-    		this.committed = true;
-    		batches.delete(this);
+    			// Re-run async/block effects that depend on distinct values changed in both batches (ignoring deriveds)
+    			var others = [...batch.current.keys()].filter(
+    				(s) => !(/** @type {[any, boolean]} */ (batch.current.get(s))[1]) && !this.current.has(s)
+    			);
+
+    			if (others.length === 0) {
+    				if (is_earlier) {
+    					// this batch is now obsolete and can be discarded
+    					batch.discard();
+    				}
+    			} else if (sources.length > 0) {
+
+    				// A batch was unskipped in a later batch -> tell prior batches to unskip it, too
+    				if (is_earlier) {
+    					for (const unskipped of this.#unskipped_branches) {
+    						batch.unskip_effect(unskipped, (e) => {
+    							if ((e.f & (BLOCK_EFFECT | ASYNC)) !== 0) {
+    								batch.schedule(e);
+    							} else {
+    								batch.#defer_effects([e]);
+    							}
+    						});
+    					}
+    				}
+
+    				batch.activate();
+
+    				/** @type {Set<Value>} */
+    				var marked = new Set();
+
+    				/** @type {Map<Reaction, boolean>} */
+    				var checked = new Map();
+
+    				for (var source of sources) {
+    					mark_effects(source, others, marked, checked);
+    				}
+
+    				checked = new Map();
+    				var current_unequal = [...batch.current]
+    					.filter(([c, v1]) => {
+    						const v2 = this.current.get(c);
+    						if (!v2) return true;
+    						// Either their values are different or one is a derived but not the other
+    						return v2[0] !== v1[0] || v2[1] !== v1[1];
+    					})
+    					.map(([c]) => c);
+
+    				if (current_unequal.length > 0) {
+    					for (const effect of this.#new_effects) {
+    						if (
+    							(effect.f & (DESTROYED | INERT | EAGER_EFFECT)) === 0 &&
+    							depends_on(effect, current_unequal, checked)
+    						) {
+    							if ((effect.f & (ASYNC | BLOCK_EFFECT)) !== 0) {
+    								set_signal_status(effect, DIRTY);
+    								batch.schedule(effect);
+    							} else {
+    								batch.#dirty_effects.add(effect);
+    							}
+    						}
+    					}
+    				}
+
+    				// Only apply and traverse when we know we triggered async work with marking the effects
+    				// and know this won't run anyway right afterwards
+    				if (batch.#roots.length > 0 && !batch.#decrement_queued) {
+    					batch.apply();
+
+    					for (var root of batch.#roots) {
+    						batch.#traverse(root, [], []);
+    					}
+
+    					batch.#roots = [];
+    				}
+
+    				batch.deactivate();
+    			}
+    		}
     	}
 
     	/**
-    	 *
     	 * @param {boolean} blocking
+    	 * @param {Effect} effect
     	 */
-    	increment(blocking) {
+    	increment(blocking, effect) {
     		this.#pending += 1;
-    		if (blocking) this.#blocking_pending += 1;
+
+    		if (blocking) {
+    			let blocking_pending_count = this.#blocking_pending.get(effect) ?? 0;
+    			this.#blocking_pending.set(effect, blocking_pending_count + 1);
+    		}
     	}
 
     	/**
-    	 *
     	 * @param {boolean} blocking
+    	 * @param {Effect} effect
     	 */
-    	decrement(blocking) {
+    	decrement(blocking, effect) {
     		this.#pending -= 1;
-    		if (blocking) this.#blocking_pending -= 1;
 
-    		this.revive();
-    	}
+    		if (blocking) {
+    			let blocking_pending_count = this.#blocking_pending.get(effect) ?? 0;
 
-    	revive() {
-    		for (const e of this.#dirty_effects) {
-    			this.#maybe_dirty_effects.delete(e);
-    			set_signal_status(e, DIRTY);
-    			schedule_effect(e);
+    			if (blocking_pending_count === 1) {
+    				this.#blocking_pending.delete(effect);
+    			} else {
+    				this.#blocking_pending.set(effect, blocking_pending_count - 1);
+    			}
     		}
 
-    		for (const e of this.#maybe_dirty_effects) {
-    			set_signal_status(e, MAYBE_DIRTY);
-    			schedule_effect(e);
-    		}
+    		if (this.#decrement_queued) return;
+    		this.#decrement_queued = true;
 
-    		this.flush();
+    		queue_micro_task(() => {
+    			this.#decrement_queued = false;
+
+    			if (this.linked) {
+    				this.flush();
+    			}
+    		});
     	}
 
-    	/** @param {() => void} fn */
+    	/**
+    	 * @param {Set<Effect>} dirty_effects
+    	 * @param {Set<Effect>} maybe_dirty_effects
+    	 */
+    	transfer_effects(dirty_effects, maybe_dirty_effects) {
+    		for (const e of dirty_effects) {
+    			this.#dirty_effects.add(e);
+    		}
+
+    		for (const e of maybe_dirty_effects) {
+    			this.#maybe_dirty_effects.add(e);
+    		}
+
+    		dirty_effects.clear();
+    		maybe_dirty_effects.clear();
+    	}
+
+    	/** @param {(batch: Batch) => void} fn */
     	oncommit(fn) {
     		this.#commit_callbacks.add(fn);
     	}
@@ -1201,6 +1657,16 @@
     		this.#discard_callbacks.add(fn);
     	}
 
+    	/** @param {(batch: Batch) => void} fn */
+    	on_fork_commit(fn) {
+    		this.#fork_commit_callbacks.add(fn);
+    	}
+
+    	run_fork_commit_callbacks() {
+    		for (const fn of this.#fork_commit_callbacks) fn(this);
+    		this.#fork_commit_callbacks.clear();
+    	}
+
     	settled() {
     		return (this.#deferred ??= deferred()).promise;
     	}
@@ -1208,16 +1674,12 @@
     	static ensure() {
     		if (current_batch === null) {
     			const batch = (current_batch = new Batch());
-    			batches.add(current_batch);
 
-    			if (!is_flushing_sync) {
-    				Batch.enqueue(() => {
-    					if (current_batch !== batch) {
-    						// a flushSync happened in the meantime
-    						return;
+    			if (!is_processing && !is_flushing_sync) {
+    				queue_micro_task(() => {
+    					if (!batch.#started) {
+    						batch.flush();
     					}
-
-    					batch.flush();
     				});
     			}
     		}
@@ -1225,16 +1687,94 @@
     		return current_batch;
     	}
 
-    	/** @param {() => void} task */
-    	static enqueue(task) {
-    		queue_micro_task(task);
+    	apply() {
+    		{
+    			batch_values = null;
+    			return;
+    		}
     	}
 
-    	apply() {
-    		return;
+    	/**
+    	 *
+    	 * @param {Effect} effect
+    	 */
+    	schedule(effect) {
+    		last_scheduled_effect = effect;
+
+    		// defer render effects inside a pending boundary
+    		// TODO the `REACTION_RAN` check is only necessary because of legacy `$:` effects AFAICT — we can remove later
+    		if (
+    			effect.b?.is_pending &&
+    			(effect.f & (EFFECT | RENDER_EFFECT | MANAGED_EFFECT)) !== 0 &&
+    			(effect.f & REACTION_RAN) === 0
+    		) {
+    			effect.b.defer_effect(effect);
+    			return;
+    		}
+
+    		var e = effect;
+
+    		while (e.parent !== null) {
+    			e = e.parent;
+    			var flags = e.f;
+
+    			// if the effect is being scheduled because a parent (each/await/etc) block
+    			// updated an internal source, or because a branch is being unskipped,
+    			// bail out or we'll cause a second flush
+    			if (collected_effects !== null && e === active_effect) {
+
+    				// in sync mode, render effects run during traversal. in an extreme edge case
+    				// — namely that we're setting a value inside a derived read during traversal —
+    				// they can be made dirty after they have already been visited, in which
+    				// case we shouldn't bail out. we also shouldn't bail out if we're
+    				// updating a store inside a `$:`, since this might invalidate
+    				// effects that were already visited
+    				if (
+    					(active_reaction === null || (active_reaction.f & DERIVED) === 0) &&
+    					true
+    				) {
+    					return;
+    				}
+    			}
+
+    			if ((flags & (ROOT_EFFECT | BRANCH_EFFECT)) !== 0) {
+    				if ((flags & CLEAN) === 0) {
+    					// branch is already dirty, bail
+    					return;
+    				}
+
+    				e.f ^= CLEAN;
+    			}
+    		}
+
+    		this.#roots.push(e);
+    	}
+
+    	#unlink() {
+    		// #merge calls #unlink, discard later on does it again - prevent
+    		// running it multiple times to not corrupt the linked list
+    		if (!this.linked) return;
+
+    		var prev = this.#prev;
+    		var next = this.#next;
+
+    		if (prev === null) {
+    			first_batch = next;
+    		} else {
+    			prev.#next = next;
+    		}
+
+    		if (next === null) {
+    			last_batch = prev;
+    		} else {
+    			next.#prev = prev;
+    		}
+
+    		this.linked = false;
     	}
     }
 
+    // TODO Svelte@6 think about removing the callback argument.
     /**
      * Synchronously flush any pending updates.
      * Returns void if no callback is provided, otherwise returns the result of calling the callback.
@@ -1254,59 +1794,19 @@
     		while (true) {
     			flush_tasks();
 
-    			if (queued_root_effects.length === 0) {
-    				current_batch?.flush();
-
-    				// we need to check again, in case we just updated an `$effect.pending()`
-    				if (queued_root_effects.length === 0) {
-    					// this would be reset in `flush_effects()` but since we are early returning here,
-    					// we need to reset it here as well in case the first time there's 0 queued root effects
-    					last_scheduled_effect = null;
-
-    					return /** @type {T} */ (result);
-    				}
+    			if (current_batch === null) {
+    				return /** @type {T} */ (result);
     			}
 
-    			flush_effects();
+    			current_batch.flush();
     		}
     	} finally {
     		is_flushing_sync = was_flushing_sync;
     	}
     }
 
-    function flush_effects() {
-    	var was_updating_effect = is_updating_effect;
-    	is_flushing = true;
-
-    	var source_stacks = null;
-
-    	try {
-    		var flush_count = 0;
-    		set_is_updating_effect(true);
-
-    		while (queued_root_effects.length > 0) {
-    			var batch = Batch.ensure();
-
-    			if (flush_count++ > 1000) {
-    				var updates, entry; if (DEV) ;
-
-    				infinite_loop_guard();
-    			}
-
-    			batch.process(queued_root_effects);
-    			old_values.clear();
-
-    			if (DEV) ;
-    		}
-    	} finally {
-    		is_flushing = false;
-    		set_is_updating_effect(was_updating_effect);
-
-    		last_scheduled_effect = null;
-    	}
-    }
-
     function infinite_loop_guard() {
+
     	try {
     		effect_update_depth_exceeded();
     	} catch (error) {
@@ -1343,16 +1843,15 @@
     			// don't know if we need to keep them until they are executed. Doing the check
     			// here (rather than in `update_effect`) allows us to skip the work for
     			// immediate effects.
-    			if (effect.deps === null && effect.first === null && effect.nodes === null) {
-    				// if there's no teardown or abort controller we completely unlink
-    				// the effect from the graph
-    				if (effect.teardown === null && effect.ac === null) {
-    					// remove this effect from the graph
-    					unlink_effect(effect);
-    				} else {
-    					// keep the effect in the graph, but free up some memory
-    					effect.fn = null;
-    				}
+    			if (
+    				effect.deps === null &&
+    				effect.first === null &&
+    				effect.nodes === null &&
+    				effect.teardown === null &&
+    				effect.ac === null
+    			) {
+    				// remove this effect from the graph
+    				unlink_effect(effect);
     			}
 
     			// If update_effect() has a flushSync() in it, we may have flushed another flush_queued_effects(),
@@ -1434,7 +1933,7 @@
 
     	if (reaction.deps !== null) {
     		for (const dep of reaction.deps) {
-    			if (sources.includes(dep)) {
+    			if (includes.call(sources, dep)) {
     				return true;
     			}
 
@@ -1451,34 +1950,53 @@
     }
 
     /**
-     * @param {Effect} signal
+     * @param {Effect} effect
      * @returns {void}
      */
-    function schedule_effect(signal) {
-    	var effect = (last_scheduled_effect = signal);
+    function schedule_effect(effect) {
+    	/** @type {Batch} */ (current_batch).schedule(effect);
+    }
 
-    	while (effect.parent !== null) {
-    		effect = effect.parent;
-    		var flags = effect.f;
-
-    		// if the effect is being scheduled because a parent (each/await/etc) block
-    		// updated an internal source, bail out or we'll cause a second flush
-    		if (
-    			is_flushing &&
-    			effect === active_effect &&
-    			(flags & BLOCK_EFFECT) !== 0 &&
-    			(flags & HEAD_EFFECT) === 0
-    		) {
-    			return;
-    		}
-
-    		if ((flags & (ROOT_EFFECT | BRANCH_EFFECT)) !== 0) {
-    			if ((flags & CLEAN) === 0) return;
-    			effect.f ^= CLEAN;
-    		}
+    /**
+     * Mark all the effects inside a skipped branch CLEAN, so that
+     * they can be correctly rescheduled later. Tracks dirty and maybe_dirty
+     * effects so they can be rescheduled if the branch survives.
+     * @param {Effect} effect
+     * @param {{ d: Effect[], m: Effect[] }} tracked
+     */
+    function reset_branch(effect, tracked) {
+    	// clean branch = nothing dirty inside, no need to traverse further
+    	if ((effect.f & BRANCH_EFFECT) !== 0 && (effect.f & CLEAN) !== 0) {
+    		return;
     	}
 
-    	queued_root_effects.push(effect);
+    	if ((effect.f & DIRTY) !== 0) {
+    		tracked.d.push(effect);
+    	} else if ((effect.f & MAYBE_DIRTY) !== 0) {
+    		tracked.m.push(effect);
+    	}
+
+    	set_signal_status(effect, CLEAN);
+
+    	var e = effect.first;
+    	while (e !== null) {
+    		reset_branch(e, tracked);
+    		e = e.next;
+    	}
+    }
+
+    /**
+     * Mark an entire effect tree clean following an error
+     * @param {Effect} effect
+     */
+    function reset_all(effect) {
+    	set_signal_status(effect, CLEAN);
+
+    	var e = effect.first;
+    	while (e !== null) {
+    		reset_all(e);
+    		e = e.next;
+    	}
     }
 
     /**
@@ -1570,29 +2088,37 @@
 
     /**
      * @typedef {{
-     * 	 onerror?: (error: unknown, reset: () => void) => void;
-     *   failed?: (anchor: Node, error: () => unknown, reset: () => () => void) => void;
-     *   pending?: (anchor: Node) => void;
+     * 	 onerror?: ((error: unknown, reset: () => void) => void) | null;
+     *   failed?: ((anchor: Node, error: () => unknown, reset: () => () => void) => void) | null;
+     *   pending?: ((anchor: Node) => void) | null;
      * }} BoundaryProps
      */
 
-    var flags = EFFECT_TRANSPARENT | EFFECT_PRESERVED | BOUNDARY_EFFECT;
+    var flags = EFFECT_TRANSPARENT | EFFECT_PRESERVED;
 
     /**
      * @param {TemplateNode} node
      * @param {BoundaryProps} props
      * @param {((anchor: Node) => void)} children
+     * @param {((error: unknown) => unknown) | undefined} [transform_error]
      * @returns {void}
      */
-    function boundary(node, props, children) {
-    	new Boundary(node, props, children);
+    function boundary(node, props, children, transform_error) {
+    	new Boundary(node, props, children, transform_error);
     }
 
     class Boundary {
     	/** @type {Boundary | null} */
     	parent;
 
-    	#pending = false;
+    	is_pending = false;
+
+    	/**
+    	 * API-level transformError transform function. Transforms errors before they reach the `failed` snippet.
+    	 * Inherited from parent boundary, or defaults to identity.
+    	 * @type {(error: unknown) => unknown}
+    	 */
+    	transform_error;
 
     	/** @type {TemplateNode} */
     	#anchor;
@@ -1621,13 +2147,15 @@
     	/** @type {DocumentFragment | null} */
     	#offscreen_fragment = null;
 
-    	/** @type {TemplateNode | null} */
-    	#pending_anchor = null;
-
     	#local_pending_count = 0;
     	#pending_count = 0;
+    	#pending_count_update_queued = false;
 
-    	#is_creating_fallback = false;
+    	/** @type {Set<Effect>} */
+    	#dirty_effects = new Set();
+
+    	/** @type {Set<Effect>} */
+    	#maybe_dirty_effects = new Set();
 
     	/**
     	 * A source containing the number of pending async deriveds/expressions.
@@ -1650,51 +2178,47 @@
     	 * @param {TemplateNode} node
     	 * @param {BoundaryProps} props
     	 * @param {((anchor: Node) => void)} children
+    	 * @param {((error: unknown) => unknown) | undefined} [transform_error]
     	 */
-    	constructor(node, props, children) {
+    	constructor(node, props, children, transform_error) {
     		this.#anchor = node;
     		this.#props = props;
-    		this.#children = children;
+
+    		this.#children = (anchor) => {
+    			var effect = /** @type {Effect} */ (active_effect);
+
+    			effect.b = this;
+    			effect.f |= BOUNDARY_EFFECT;
+
+    			children(anchor);
+    		};
 
     		this.parent = /** @type {Effect} */ (active_effect).b;
 
-    		this.#pending = !!this.#props.pending;
+    		// Inherit transform_error from parent boundary, or use the provided one, or default to identity
+    		this.transform_error = transform_error ?? this.parent?.transform_error ?? ((e) => e);
 
     		this.#effect = block(() => {
-    			/** @type {Effect} */ (active_effect).b = this;
-
     			if (hydrating) {
-    				const comment = this.#hydrate_open;
+    				const comment = /** @type {Comment} */ (this.#hydrate_open);
     				hydrate_next();
 
-    				const server_rendered_pending =
-    					/** @type {Comment} */ (comment).nodeType === COMMENT_NODE &&
-    					/** @type {Comment} */ (comment).data === HYDRATION_START_ELSE;
+    				const server_rendered_pending = comment.data === HYDRATION_START_ELSE;
+    				const server_rendered_failed = comment.data.startsWith(HYDRATION_START_FAILED);
 
-    				if (server_rendered_pending) {
+    				if (server_rendered_failed) {
+    					// Server rendered the failed snippet - hydrate it.
+    					// The serialized error is embedded in the comment: <!--[?<json>-->
+    					const serialized_error = JSON.parse(comment.data.slice(HYDRATION_START_FAILED.length));
+    					this.#hydrate_failed_content(serialized_error);
+    				} else if (server_rendered_pending) {
     					this.#hydrate_pending_content();
     				} else {
     					this.#hydrate_resolved_content();
     				}
     			} else {
-    				var anchor = this.#get_anchor();
-
-    				try {
-    					this.#main_effect = branch(() => children(anchor));
-    				} catch (error) {
-    					this.error(error);
-    				}
-
-    				if (this.#pending_count > 0) {
-    					this.#show_pending_snippet();
-    				} else {
-    					this.#pending = false;
-    				}
+    				this.#render();
     			}
-
-    			return () => {
-    				this.#pending_anchor?.remove();
-    			};
     		}, flags);
 
     		if (hydrating) {
@@ -1708,58 +2232,103 @@
     		} catch (error) {
     			this.error(error);
     		}
+    	}
 
-    		// Since server rendered resolved content, we never show pending state
-    		// Even if client-side async operations are still running, the content is already displayed
-    		this.#pending = false;
+    	/**
+    	 * @param {unknown} error The deserialized error from the server's hydration comment
+    	 */
+    	#hydrate_failed_content(error) {
+    		const failed = this.#props.failed;
+    		if (!failed) return;
+
+    		this.#failed_effect = branch(() => {
+    			failed(
+    				this.#anchor,
+    				() => error,
+    				() => () => {}
+    			);
+    		});
     	}
 
     	#hydrate_pending_content() {
     		const pending = this.#props.pending;
-    		if (!pending) {
-    			return;
-    		}
+    		if (!pending) return;
+
+    		this.is_pending = true;
     		this.#pending_effect = branch(() => pending(this.#anchor));
 
-    		Batch.enqueue(() => {
-    			var anchor = this.#get_anchor();
+    		queue_micro_task(() => {
+    			var fragment = (this.#offscreen_fragment = document.createDocumentFragment());
+    			var anchor = create_text();
+
+    			fragment.append(anchor);
 
     			this.#main_effect = this.#run(() => {
-    				Batch.ensure();
     				return branch(() => this.#children(anchor));
     			});
 
-    			if (this.#pending_count > 0) {
-    				this.#show_pending_snippet();
-    			} else {
+    			if (this.#pending_count === 0) {
+    				this.#anchor.before(fragment);
+    				this.#offscreen_fragment = null;
+
     				pause_effect(/** @type {Effect} */ (this.#pending_effect), () => {
     					this.#pending_effect = null;
     				});
 
-    				this.#pending = false;
+    				this.#resolve(/** @type {Batch} */ (current_batch));
     			}
     		});
     	}
 
-    	#get_anchor() {
-    		var anchor = this.#anchor;
+    	#render() {
+    		try {
+    			this.is_pending = this.has_pending_snippet();
+    			this.#pending_count = 0;
+    			this.#local_pending_count = 0;
 
-    		if (this.#pending) {
-    			this.#pending_anchor = create_text();
-    			this.#anchor.before(this.#pending_anchor);
+    			this.#main_effect = branch(() => {
+    				this.#children(this.#anchor);
+    			});
 
-    			anchor = this.#pending_anchor;
+    			if (this.#pending_count > 0) {
+    				var fragment = (this.#offscreen_fragment = document.createDocumentFragment());
+    				move_effect(this.#main_effect, fragment);
+
+    				const pending = /** @type {(anchor: Node) => void} */ (this.#props.pending);
+    				this.#pending_effect = branch(() => pending(this.#anchor));
+    			} else {
+    				this.#resolve(/** @type {Batch} */ (current_batch));
+    			}
+    		} catch (error) {
+    			this.error(error);
     		}
-
-    		return anchor;
     	}
 
     	/**
-    	 * Returns `true` if the effect exists inside a boundary whose pending snippet is shown
+    	 * @param {Batch} batch
+    	 */
+    	#resolve(batch) {
+    		this.is_pending = false;
+
+    		// any effects that were previously deferred should be transferred
+    		// to the batch, which will flush in the next microtask
+    		batch.transfer_effects(this.#dirty_effects, this.#maybe_dirty_effects);
+    	}
+
+    	/**
+    	 * Defer an effect inside a pending boundary until the boundary resolves
+    	 * @param {Effect} effect
+    	 */
+    	defer_effect(effect) {
+    		defer_effect(effect, this.#dirty_effects, this.#maybe_dirty_effects);
+    	}
+
+    	/**
+    	 * Returns `false` if the effect exists inside a boundary whose pending snippet is shown
     	 * @returns {boolean}
     	 */
-    	is_pending() {
-    		return this.#pending || (!!this.parent && this.parent.is_pending());
+    	is_rendered() {
+    		return !this.is_pending && (!this.parent || this.parent.is_rendered());
     	}
 
     	has_pending_snippet() {
@@ -1767,7 +2336,8 @@
     	}
 
     	/**
-    	 * @param {() => Effect | null} fn
+    	 * @template T
+    	 * @param {() => T} fn
     	 */
     	#run(fn) {
     		var previous_effect = active_effect;
@@ -1779,6 +2349,7 @@
     		set_component_context(this.#effect.ctx);
 
     		try {
+    			Batch.ensure();
     			return fn();
     		} catch (e) {
     			handle_error(e);
@@ -1790,29 +2361,16 @@
     		}
     	}
 
-    	#show_pending_snippet() {
-    		const pending = /** @type {(anchor: Node) => void} */ (this.#props.pending);
-
-    		if (this.#main_effect !== null) {
-    			this.#offscreen_fragment = document.createDocumentFragment();
-    			this.#offscreen_fragment.append(/** @type {TemplateNode} */ (this.#pending_anchor));
-    			move_effect(this.#main_effect, this.#offscreen_fragment);
-    		}
-
-    		if (this.#pending_effect === null) {
-    			this.#pending_effect = branch(() => pending(this.#anchor));
-    		}
-    	}
-
     	/**
     	 * Updates the pending count associated with the currently visible pending snippet,
     	 * if any, such that we can replace the snippet with content once work is done
     	 * @param {1 | -1} d
+    	 * @param {Batch} batch
     	 */
-    	#update_pending_count(d) {
+    	#update_pending_count(d, batch) {
     		if (!this.has_pending_snippet()) {
     			if (this.parent) {
-    				this.parent.#update_pending_count(d);
+    				this.parent.#update_pending_count(d, batch);
     			}
 
     			// if there's no parent, we're in a scope with no pending snippet
@@ -1822,7 +2380,7 @@
     		this.#pending_count += d;
 
     		if (this.#pending_count === 0) {
-    			this.#pending = false;
+    			this.#resolve(batch);
 
     			if (this.#pending_effect) {
     				pause_effect(this.#pending_effect, () => {
@@ -1842,15 +2400,22 @@
     	 * and controls when the current `pending` snippet (if any) is removed.
     	 * Do not call from inside the class
     	 * @param {1 | -1} d
+    	 * @param {Batch} batch
     	 */
-    	update_pending_count(d) {
-    		this.#update_pending_count(d);
+    	update_pending_count(d, batch) {
+    		this.#update_pending_count(d, batch);
 
     		this.#local_pending_count += d;
 
-    		if (this.#effect_pending) {
-    			internal_set(this.#effect_pending, this.#local_pending_count);
-    		}
+    		if (!this.#effect_pending || this.#pending_count_update_queued) return;
+    		this.#pending_count_update_queued = true;
+
+    		queue_micro_task(() => {
+    			this.#pending_count_update_queued = false;
+    			if (this.#effect_pending) {
+    				internal_set(this.#effect_pending, this.#local_pending_count);
+    			}
+    		});
     	}
 
     	get_effect_pending() {
@@ -1860,15 +2425,29 @@
 
     	/** @param {unknown} error */
     	error(error) {
-    		var onerror = this.#props.onerror;
-    		let failed = this.#props.failed;
-
     		// If we have nothing to capture the error, or if we hit an error while
     		// rendering the fallback, re-throw for another boundary to handle
-    		if (this.#is_creating_fallback || (!onerror && !failed)) {
+    		if (!this.#props.onerror && !this.#props.failed) {
     			throw error;
     		}
 
+    		if (current_batch?.is_fork) {
+    			if (this.#main_effect) current_batch.skip_effect(this.#main_effect);
+    			if (this.#pending_effect) current_batch.skip_effect(this.#pending_effect);
+    			if (this.#failed_effect) current_batch.skip_effect(this.#failed_effect);
+
+    			current_batch.on_fork_commit(() => {
+    				this.#handle_error(error);
+    			});
+    		} else {
+    			this.#handle_error(error);
+    		}
+    	}
+
+    	/**
+    	 * @param {unknown} error
+    	 */
+    	#handle_error(error) {
     		if (this.#main_effect) {
     			destroy_effect(this.#main_effect);
     			this.#main_effect = null;
@@ -1890,6 +2469,8 @@
     			set_hydrate_node(skip_nodes());
     		}
 
+    		var onerror = this.#props.onerror;
+    		let failed = this.#props.failed;
     		var did_reset = false;
     		var calling_on_error = false;
 
@@ -1905,76 +2486,86 @@
     				svelte_boundary_reset_onerror();
     			}
 
-    			// If the failure happened while flushing effects, current_batch can be null
-    			Batch.ensure();
-
-    			this.#local_pending_count = 0;
-
     			if (this.#failed_effect !== null) {
     				pause_effect(this.#failed_effect, () => {
     					this.#failed_effect = null;
     				});
     			}
 
-    			// we intentionally do not try to find the nearest pending boundary. If this boundary has one, we'll render it on reset
-    			// but it would be really weird to show the parent's boundary on a child reset.
-    			this.#pending = this.has_pending_snippet();
-
-    			this.#main_effect = this.#run(() => {
-    				this.#is_creating_fallback = false;
-    				return branch(() => this.#children(this.#anchor));
+    			this.#run(() => {
+    				this.#render();
     			});
-
-    			if (this.#pending_count > 0) {
-    				this.#show_pending_snippet();
-    			} else {
-    				this.#pending = false;
-    			}
     		};
 
-    		var previous_reaction = active_reaction;
+    		/** @param {unknown} transformed_error */
+    		const handle_error_result = (transformed_error) => {
+    			try {
+    				calling_on_error = true;
+    				onerror?.(transformed_error, reset);
+    				calling_on_error = false;
+    			} catch (error) {
+    				invoke_error_boundary(error, this.#effect && this.#effect.parent);
+    			}
 
-    		try {
-    			set_active_reaction(null);
-    			calling_on_error = true;
-    			onerror?.(error, reset);
-    			calling_on_error = false;
-    		} catch (error) {
-    			invoke_error_boundary(error, this.#effect && this.#effect.parent);
-    		} finally {
-    			set_active_reaction(previous_reaction);
-    		}
-
-    		if (failed) {
-    			queue_micro_task(() => {
+    			if (failed) {
     				this.#failed_effect = this.#run(() => {
-    					Batch.ensure();
-    					this.#is_creating_fallback = true;
-
     					try {
     						return branch(() => {
+    							// errors in `failed` snippets cause the boundary to error again
+    							// TODO Svelte 6: revisit this decision, most likely better to go to parent boundary instead
+    							var effect = /** @type {Effect} */ (active_effect);
+
+    							effect.b = this;
+    							effect.f |= BOUNDARY_EFFECT;
+
     							failed(
     								this.#anchor,
-    								() => error,
+    								() => transformed_error,
     								() => reset
     							);
     						});
     					} catch (error) {
     						invoke_error_boundary(error, /** @type {Effect} */ (this.#effect.parent));
     						return null;
-    					} finally {
-    						this.#is_creating_fallback = false;
     					}
     				});
-    			});
-    		}
+    			}
+    		};
+
+    		queue_micro_task(() => {
+    			// Run the error through the API-level transformError transform (e.g. SvelteKit's handleError)
+    			/** @type {unknown} */
+    			var result;
+    			try {
+    				result = this.transform_error(error);
+    			} catch (e) {
+    				invoke_error_boundary(e, this.#effect && this.#effect.parent);
+    				return;
+    			}
+
+    			if (
+    				result !== null &&
+    				typeof result === 'object' &&
+    				typeof (/** @type {any} */ (result).then) === 'function'
+    			) {
+    				// transformError returned a Promise — wait for it
+    				/** @type {any} */ (result).then(
+    					handle_error_result,
+    					/** @param {unknown} e */
+    					(e) => invoke_error_boundary(e, this.#effect && this.#effect.parent)
+    				);
+    			} else {
+    				// Synchronous result — handle immediately
+    				handle_error_result(result);
+    			}
+    		});
     	}
     }
 
-    /** @import { Effect, TemplateNode, Value } from '#client' */
+    /** @import { Blocker, Effect, Value } from '#client' */
 
     /**
-     * @param {Array<Promise<void>>} blockers
+     * @param {Blocker[]} blockers
      * @param {Array<() => any>} sync
      * @param {Array<() => Promise<any>>} async
      * @param {(values: Value[]) => any} fn
@@ -1982,48 +2573,65 @@
     function flatten(blockers, sync, async, fn) {
     	const d = is_runes() ? derived : derived_safe_equal;
 
-    	if (async.length === 0 && blockers.length === 0) {
+    	// Filter out already-settled blockers - no need to wait for them
+    	var pending = blockers.filter((b) => !b.settled);
+
+    	if (async.length === 0 && pending.length === 0) {
     		fn(sync.map(d));
     		return;
     	}
 
-    	var batch = current_batch;
     	var parent = /** @type {Effect} */ (active_effect);
 
     	var restore = capture();
+    	var blocker_promise =
+    		pending.length === 1
+    			? pending[0].promise
+    			: pending.length > 1
+    				? Promise.all(pending.map((b) => b.promise))
+    				: null;
 
-    	function run() {
-    		Promise.all(async.map((expression) => async_derived(expression)))
-    			.then((result) => {
-    				restore();
+    	/** @param {Value[]} values */
+    	function finish(values) {
+    		if ((parent.f & DESTROYED) !== 0) {
+    			return;
+    		}
 
-    				try {
-    					fn([...sync.map(d), ...result]);
-    				} catch (error) {
-    					// ignore errors in blocks that have already been destroyed
-    					if ((parent.f & DESTROYED) === 0) {
-    						invoke_error_boundary(error, parent);
-    					}
-    				}
+    		restore();
 
-    				batch?.deactivate();
-    				unset_context();
-    			})
-    			.catch((error) => {
-    				invoke_error_boundary(error, parent);
-    			});
+    		try {
+    			fn(values);
+    		} catch (error) {
+    			invoke_error_boundary(error, parent);
+    		}
+
+    		unset_context();
     	}
 
-    	if (blockers.length > 0) {
-    		Promise.all(blockers).then(() => {
-    			restore();
+    	var decrement_pending = increment_pending();
 
-    			try {
-    				return run();
-    			} finally {
-    				batch?.deactivate();
-    				unset_context();
-    			}
+    	// Fast path: blockers but no async expressions
+    	if (async.length === 0) {
+    		/** @type {Promise<any>} */ (blocker_promise)
+    			.then(() => finish(sync.map(d)))
+    			.finally(decrement_pending);
+
+    		return;
+    	}
+
+    	// Full path: has async expressions
+    	function run() {
+    		Promise.all(async.map((expression) => async_derived(expression)))
+    			.then((result) => finish([...sync.map(d), ...result]))
+    			.catch((error) => invoke_error_boundary(error, parent))
+    			.finally(decrement_pending);
+    	}
+
+    	if (blocker_promise) {
+    		blocker_promise.then(() => {
+    			restore();
+    			run();
+    			unset_context();
     		});
     	} else {
     		run();
@@ -2036,27 +2644,53 @@
      * causes `b` to be registered as a dependency).
      */
     function capture() {
-    	var previous_effect = active_effect;
+    	var previous_effect = /** @type {Effect} */ (active_effect);
     	var previous_reaction = active_reaction;
     	var previous_component_context = component_context;
-    	var previous_batch = current_batch;
+    	var previous_batch = /** @type {Batch} */ (current_batch);
 
     	return function restore(activate_batch = true) {
     		set_active_effect(previous_effect);
     		set_active_reaction(previous_reaction);
     		set_component_context(previous_component_context);
-    		if (activate_batch) previous_batch?.activate();
+
+    		if (activate_batch && (previous_effect.f & DESTROYED) === 0) {
+    			// TODO we only need optional chaining here because `{#await ...}` blocks
+    			// are anomalous. Once we retire them we can get rid of it
+    			previous_batch?.activate();
+    			previous_batch?.apply();
+    		}
     	};
     }
 
-    function unset_context() {
+    function unset_context(deactivate_batch = true) {
     	set_active_effect(null);
     	set_active_reaction(null);
     	set_component_context(null);
+    	if (deactivate_batch) current_batch?.deactivate();
     }
 
-    /** @import { Derived, Effect, Source } from '#client' */
+    /**
+     * @returns {(skip?: boolean) => void}
+     */
+    function increment_pending() {
+    	var effect = /** @type {Effect} */ (active_effect);
+    	var boundary = effect.b; // undefined if called outside the render tree, e.g. a standalone $effect.root
+    	var batch = /** @type {Batch} */ (current_batch);
+    	var blocking = !!boundary?.is_rendered();
+
+    	boundary?.update_pending_count(1, batch);
+    	batch.increment(blocking, effect);
+
+    	return () => {
+    		boundary?.update_pending_count(-1, batch);
+    		batch.decrement(blocking, effect);
+    	};
+    }
+
+    /** @import { Derived, Effect, Reaction, Source, Value } from '#client' */
     /** @import { Batch } from './batch.js'; */
+    /** @import { Boundary } from '../dom/blocks/boundary.js'; */
 
     /**
      * @template V
@@ -2066,10 +2700,6 @@
     /*#__NO_SIDE_EFFECTS__*/
     function derived(fn) {
     	var flags = DERIVED | DIRTY;
-    	var parent_derived =
-    		active_reaction !== null && (active_reaction.f & DERIVED) !== 0
-    			? /** @type {Derived} */ (active_reaction)
-    			: null;
 
     	if (active_effect !== null) {
     		// Since deriveds are evaluated lazily, any effects created inside them are
@@ -2089,28 +2719,29 @@
     		rv: 0,
     		v: /** @type {V} */ (UNINITIALIZED),
     		wv: 0,
-    		parent: parent_derived ?? active_effect,
+    		parent: active_effect,
     		ac: null
     	};
 
     	return signal;
     }
 
+    const OBSOLETE = Symbol('obsolete');
+
     /**
      * @template V
      * @param {() => V | Promise<V>} fn
+     * @param {string} [label]
      * @param {string} [location] If provided, print a warning if the value is not read immediately after update
      * @returns {Promise<Source<V>>}
      */
     /*#__NO_SIDE_EFFECTS__*/
-    function async_derived(fn, location) {
+    function async_derived(fn, label, location) {
     	let parent = /** @type {Effect | null} */ (active_effect);
 
     	if (parent === null) {
     		async_derived_orphan();
     	}
-
-    	var boundary = /** @type {Boundary} */ (parent.b);
 
     	var promise = /** @type {Promise<V>} */ (/** @type {unknown} */ (undefined));
     	var signal = source(/** @type {V} */ (UNINITIALIZED));
@@ -2118,10 +2749,11 @@
     	// only suspend in async deriveds created on initialisation
     	var should_suspend = !active_reaction;
 
-    	/** @type {Map<Batch, ReturnType<typeof deferred<V>>>} */
-    	var deferreds = new Map();
+    	/** @type {Set<ReturnType<typeof deferred<V>>>} */
+    	var deferreds = new Set();
 
     	async_effect(() => {
+    		var effect = /** @type {Effect} */ (active_effect);
 
     		/** @type {ReturnType<typeof deferred<V>>} */
     		var d = deferred();
@@ -2132,16 +2764,12 @@
     			// of fn() to read any signals it might access, so that we track them as dependencies.
     			// We call `unset_context` to undo any `save` calls that happen inside `fn()`
     			Promise.resolve(fn())
-    				.then(d.resolve, d.reject)
-    				.then(() => {
-    					if (batch === current_batch && batch.committed) {
-    						// if the batch was rejected as stale, we need to cleanup
-    						// after any `$.save(...)` calls inside `fn()`
-    						batch.deactivate();
-    					}
-
-    					unset_context();
-    				});
+    				.then(d.resolve, (e) => {
+    					// if the promise was rejected by the user, via `getAbortSignal`, then
+    					// wait for a subsequent resolution instead of flushing the batch
+    					if (e !== STALE_REACTION) d.reject(e);
+    				})
+    				.finally(unset_context);
     		} catch (error) {
     			d.reject(error);
     			unset_context();
@@ -2150,14 +2778,28 @@
     		var batch = /** @type {Batch} */ (current_batch);
 
     		if (should_suspend) {
-    			var blocking = !boundary.is_pending();
+    			// we only increment the batch's pending state for updates, not creation, otherwise
+    			// we will decrement to zero before the work that depends on this promise (e.g. a
+    			// template effect) has initialized, causing the batch to resolve prematurely
+    			if ((effect.f & REACTION_RAN) !== 0) {
+    				var decrement_pending = increment_pending();
+    			}
 
-    			boundary.update_pending_count(1);
-    			batch.increment(blocking);
+    			if (
+    				// boundary can be null if the async derived is inside an $effect.root not connected to the component render tree
+    				parent.b?.is_rendered()
+    			) {
+    				batch.async_deriveds.get(effect)?.reject(OBSOLETE);
+    			} else {
+    				// While the boundary is still showing pending, a new run supersedes all older in-flight runs
+    				// for this async expression. Cancel eagerly so resolution cannot commit stale values.
+    				for (const d of deferreds.values()) {
+    					d.reject(OBSOLETE);
+    				}
+    			}
 
-    			deferreds.get(batch)?.reject(STALE_REACTION);
-    			deferreds.delete(batch); // delete to ensure correct order in Map iteration below
-    			deferreds.set(batch, d);
+    			deferreds.add(d);
+    			batch.async_deriveds.set(effect, d);
     		}
 
     		/**
@@ -2166,42 +2808,35 @@
     		 */
     		const handler = (value, error = undefined) => {
 
+    			decrement_pending?.();
+    			deferreds.delete(d);
+
+    			if (error === OBSOLETE) return;
+
     			batch.activate();
 
     			if (error) {
-    				if (error !== STALE_REACTION) {
-    					signal.f |= ERROR_VALUE;
+    				signal.f |= ERROR_VALUE;
 
-    					// @ts-expect-error the error is the wrong type, but we don't care
-    					internal_set(signal, error);
-    				}
+    				// @ts-expect-error the error is the wrong type, but we don't care
+    				internal_set(signal, error);
     			} else {
     				if ((signal.f & ERROR_VALUE) !== 0) {
     					signal.f ^= ERROR_VALUE;
     				}
 
     				internal_set(signal, value);
-
-    				// All prior async derived runs are now stale
-    				for (const [b, d] of deferreds) {
-    					deferreds.delete(b);
-    					if (b === batch) break;
-    					d.reject(STALE_REACTION);
-    				}
     			}
 
-    			if (should_suspend) {
-    				boundary.update_pending_count(-1);
-    				batch.decrement(blocking);
-    			}
+    			batch.deactivate();
     		};
 
     		d.promise.then(handler, (e) => handler(null, e || 'unknown'));
     	});
 
     	teardown(() => {
-    		for (const d of deferreds.values()) {
-    			d.reject(STALE_REACTION);
+    		for (const d of deferreds) {
+    			d.reject(OBSOLETE);
     		}
     	});
 
@@ -2268,23 +2903,6 @@
     }
 
     /**
-     * @param {Derived} derived
-     * @returns {Effect | null}
-     */
-    function get_derived_parent_effect(derived) {
-    	var parent = derived.parent;
-    	while (parent !== null) {
-    		if ((parent.f & DERIVED) === 0) {
-    			// The original parent effect might've been destroyed but the derived
-    			// is used elsewhere now - do not return the destroyed effect in that case
-    			return (parent.f & DESTROYED) === 0 ? /** @type {Effect} */ (parent) : null;
-    		}
-    		parent = parent.parent;
-    	}
-    	return null;
-    }
-
-    /**
      * @template T
      * @param {Derived} derived
      * @returns {T}
@@ -2292,8 +2910,20 @@
     function execute_derived(derived) {
     	var value;
     	var prev_active_effect = active_effect;
+    	var parent = derived.parent;
 
-    	set_active_effect(get_derived_parent_effect(derived));
+    	if (
+    		!is_destroying_effect &&
+    		parent !== null &&
+    		derived.v !== UNINITIALIZED && // if it was never evaluated before, it's guaranteed to fail downstream, so we try to execute instead
+    		(parent.f & (DESTROYED | INERT)) !== 0
+    	) {
+    		derived_inert();
+
+    		return derived.v;
+    	}
+
+    	set_active_effect(parent);
 
     	{
     		try {
@@ -2316,15 +2946,32 @@
     	var value = execute_derived(derived);
 
     	if (!derived.equals(value)) {
+    		derived.wv = increment_write_version();
+
     		// in a fork, we don't update the underlying value, just `batch_values`.
     		// the underlying value will be updated when the fork is committed.
     		// otherwise, the next time we get here after a 'real world' state
     		// change, `derived.equals` may incorrectly return `true`
-    		if (!current_batch?.is_fork) {
-    			derived.v = value;
-    		}
+    		if (!current_batch?.is_fork || derived.deps === null) {
+    			if (current_batch !== null) {
+    				// We also write to previous_batch because if it exists, it is a sign that we're
+    				// currently in the process of flushing effects. These updates to deriveds may belong
+    				// to the previous batch, not the new one (which can already exist if an earlier
+    				// effect wrote to a source). This can cause bugs when running batch.#commit() later,
+    				// but not adding it to current_batch can, too, so we add it to both.
+    				// See https://github.com/sveltejs/svelte/pull/18117 for more details.
+    				current_batch.capture(derived, value, true);
+    				previous_batch?.capture(derived, value, true);
+    			} else {
+    				derived.v = value;
+    			}
 
-    		derived.wv = increment_write_version();
+    			// deriveds without dependencies should never be recomputed
+    			if (derived.deps === null) {
+    				set_signal_status(derived, CLEAN);
+    				return;
+    			}
+    		}
     	}
 
     	// don't mark derived clean if we're reading it inside a
@@ -2342,14 +2989,53 @@
     			batch_values.set(derived, value);
     		}
     	} else {
-    		var status = (derived.f & CONNECTED) === 0 ? MAYBE_DIRTY : CLEAN;
-    		set_signal_status(derived, status);
+    		update_derived_status(derived);
+    	}
+    }
+
+    /**
+     * @param {Derived} derived
+     */
+    function freeze_derived_effects(derived) {
+    	if (derived.effects === null) return;
+
+    	for (const e of derived.effects) {
+    		// if the effect has a teardown function or abort signal, call it
+    		if (e.teardown || e.ac) {
+    			e.teardown?.();
+    			e.ac?.abort(STALE_REACTION);
+
+    			// make it a noop so it doesn't get called again if the derived
+    			// is unfrozen. we don't set it to `null`, because the existence
+    			// of a teardown function is what determines whether the
+    			// effect runs again during unfreezing (but not for teardown-only effects)
+    			if (e.fn !== null) e.teardown = noop;
+    			e.ac = null;
+
+    			remove_reactions(e, 0);
+    			destroy_effect_children(e);
+    		}
+    	}
+    }
+
+    /**
+     * @param {Derived} derived
+     */
+    function unfreeze_derived_effects(derived) {
+    	if (derived.effects === null) return;
+
+    	for (const e of derived.effects) {
+    		// if the effect was previously frozen — indicated by the presence
+    		// of a teardown function — unfreeze it
+    		if (e.teardown && e.fn !== null) {
+    			update_effect(e);
+    		}
     	}
     }
 
     /** @import { Derived, Effect, Source, Value } from '#client' */
 
-    /** @type {Set<any>} */
+    /** @type {Set<Effect>} */
     let eager_effects = new Set();
 
     /** @type {Map<Source, any>} */
@@ -2429,51 +3115,50 @@
     		(!untracking || (active_reaction.f & EAGER_EFFECT) !== 0) &&
     		is_runes() &&
     		(active_reaction.f & (DERIVED | BLOCK_EFFECT | ASYNC | EAGER_EFFECT)) !== 0 &&
-    		!current_sources?.includes(source)
+    		(current_sources === null || !includes.call(current_sources, source))
     	) {
     		state_unsafe_mutation();
     	}
 
     	let new_value = should_proxy ? proxy(value) : value;
 
-    	return internal_set(source, new_value);
+    	return internal_set(source, new_value, legacy_updates);
     }
 
     /**
      * @template V
      * @param {Source<V>} source
      * @param {V} value
+     * @param {Effect[] | null} [updated_during_traversal]
      * @returns {V}
      */
-    function internal_set(source, value) {
+    function internal_set(source, value, updated_during_traversal = null) {
     	if (!source.equals(value)) {
-    		var old_value = source.v;
-
-    		if (is_destroying_effect) {
-    			old_values.set(source, value);
-    		} else {
-    			old_values.set(source, old_value);
-    		}
-
-    		source.v = value;
+    		old_values.set(source, is_destroying_effect ? value : source.v);
 
     		var batch = Batch.ensure();
-    		batch.capture(source, old_value);
+    		batch.capture(source, value);
 
     		if ((source.f & DERIVED) !== 0) {
+    			const derived = /** @type {Derived} */ (source);
+
     			// if we are assigning to a dirty derived we set it to clean/maybe dirty but we also eagerly execute it to track the dependencies
     			if ((source.f & DIRTY) !== 0) {
-    				execute_derived(/** @type {Derived} */ (source));
+    				execute_derived(derived);
     			}
 
-    			set_signal_status(source, (source.f & CONNECTED) !== 0 ? CLEAN : MAYBE_DIRTY);
+    			// During time traveling we don't want to reset the status so that
+    			// traversal of the graph in the other batches still happens
+    			if (batch_values === null) {
+    				update_derived_status(derived);
+    			}
     		}
 
     		source.wv = increment_write_version();
 
     		// For debugging, in case you want to know which reactions are being scheduled:
     		// log_reactions(source);
-    		mark_reactions(source, DIRTY);
+    		mark_reactions(source, DIRTY, updated_during_traversal);
 
     		// It's possible that the current reaction might not have up-to-date dependencies
     		// whilst it's actively running. So in the case of ensuring it registers the reaction
@@ -2502,25 +3187,28 @@
 
     function flush_eager_effects() {
     	eager_effects_deferred = false;
-    	var prev_is_updating_effect = is_updating_effect;
-    	set_is_updating_effect(true);
 
-    	const inspects = Array.from(eager_effects);
-
-    	try {
-    		for (const effect of inspects) {
-    			// Mark clean inspect-effects as maybe dirty and then check their dirtiness
-    			// instead of just updating the effects - this way we avoid overfiring.
-    			if ((effect.f & CLEAN) !== 0) {
-    				set_signal_status(effect, MAYBE_DIRTY);
-    			}
-
-    			if (is_dirty(effect)) {
-    				update_effect(effect);
-    			}
+    	for (const effect of eager_effects) {
+    		// Mark clean inspect-effects as maybe dirty and then check their dirtiness
+    		// instead of just updating the effects - this way we avoid overfiring.
+    		if ((effect.f & CLEAN) !== 0) {
+    			set_signal_status(effect, MAYBE_DIRTY);
     		}
-    	} finally {
-    		set_is_updating_effect(prev_is_updating_effect);
+
+    		let dirty;
+
+    		try {
+    			dirty = is_dirty(effect);
+    		} catch {
+    			// Dirty-checking can evaluate derived dependencies and throw in cases where
+    			// parent effects are about to destroy this eager effect. Run the effect so
+    			// its own error handling can deal with transient failures.
+    			dirty = true;
+    		}
+
+    		if (dirty) {
+    			update_effect(effect);
+    		}
     	}
 
     	eager_effects.clear();
@@ -2537,9 +3225,10 @@
     /**
      * @param {Value} signal
      * @param {number} status should be DIRTY or MAYBE_DIRTY
+     * @param {Effect[] | null} updated_during_traversal
      * @returns {void}
      */
-    function mark_reactions(signal, status) {
+    function mark_reactions(signal, status, updated_during_traversal) {
     	var reactions = signal.reactions;
     	if (reactions === null) return;
 
@@ -2560,25 +3249,39 @@
     			set_signal_status(reaction, status);
     		}
 
-    		if ((flags & DERIVED) !== 0) {
+    		if ((flags & EAGER_EFFECT) !== 0) {
+    			// Eager effects need to run immediately:
+    			// - for $inspect so that the stack trace makes sense
+    			// - for $state.eager because they might be without an effect parent
+    			eager_effects.add(/** @type {Effect} */ (reaction));
+    		} else if ((flags & DERIVED) !== 0) {
     			var derived = /** @type {Derived} */ (reaction);
 
     			batch_values?.delete(derived);
 
     			if ((flags & WAS_MARKED) === 0) {
-    				// Only connected deriveds can be reliably unmarked right away
-    				if (flags & CONNECTED) {
+    				// Only connected deriveds being executed outside the update cycle can be reliably unmarked right away
+    				if (
+    					flags & CONNECTED &&
+    					(active_effect === null || (active_effect.f & REACTION_IS_UPDATING) === 0)
+    				) {
     					reaction.f |= WAS_MARKED;
     				}
 
-    				mark_reactions(derived, MAYBE_DIRTY);
+    				mark_reactions(derived, MAYBE_DIRTY, updated_during_traversal);
     			}
     		} else if (not_dirty) {
+    			var effect = /** @type {Effect} */ (reaction);
+
     			if ((flags & BLOCK_EFFECT) !== 0 && eager_block_effects !== null) {
-    				eager_block_effects.add(/** @type {Effect} */ (reaction));
+    				eager_block_effects.add(effect);
     			}
 
-    			schedule_effect(/** @type {Effect} */ (reaction));
+    			if (updated_during_traversal !== null) {
+    				updated_during_traversal.push(effect);
+    			} else {
+    				schedule_effect(effect);
+    			}
     		}
     	}
     }
@@ -2656,7 +3359,7 @@
     			}
     			var s = sources.get(prop);
     			if (s === undefined) {
-    				s = with_parent(() => {
+    				with_parent(() => {
     					var s = state(descriptor.value);
     					sources.set(prop, s);
     					return s;
@@ -2922,21 +3625,15 @@
 
     	if (is_extensible(element_prototype)) {
     		// the following assignments improve perf of lookups on DOM nodes
-    		// @ts-expect-error
-    		element_prototype.__click = undefined;
-    		// @ts-expect-error
-    		element_prototype.__className = undefined;
-    		// @ts-expect-error
-    		element_prototype.__attributes = null;
-    		// @ts-expect-error
-    		element_prototype.__style = undefined;
+    		/** @type {any} */ (element_prototype)[CLASS_CACHE] = undefined;
+    		/** @type {any} */ (element_prototype)[ATTRIBUTES_CACHE] = null;
+    		/** @type {any} */ (element_prototype)[STYLE_CACHE] = undefined;
     		// @ts-expect-error
     		element_prototype.__e = undefined;
     	}
 
     	if (is_extensible(text_prototype)) {
-    		// @ts-expect-error
-    		text_prototype.__t = undefined;
+    		/** @type {any} */ (text_prototype)[TEXT_CACHE] = undefined;
     	}
     }
 
@@ -2990,6 +3687,10 @@
     		return text;
     	}
 
+    	if (is_text) {
+    		merge_text_nodes(/** @type {Text} */ (child));
+    	}
+
     	set_hydrate_node(child);
     	return child;
     }
@@ -3010,14 +3711,18 @@
     		return first;
     	}
 
-    	// if an {expression} is empty during SSR, there might be no
-    	// text node to hydrate — we must therefore create one
-    	if (is_text && hydrate_node?.nodeType !== TEXT_NODE) {
-    		var text = create_text();
+    	if (is_text) {
+    		// if an {expression} is empty during SSR, there might be no
+    		// text node to hydrate — we must therefore create one
+    		if (hydrate_node?.nodeType !== TEXT_NODE) {
+    			var text = create_text();
 
-    		hydrate_node?.before(text);
-    		set_hydrate_node(text);
-    		return text;
+    			hydrate_node?.before(text);
+    			set_hydrate_node(text);
+    			return text;
+    		}
+
+    		merge_text_nodes(/** @type {Text} */ (hydrate_node));
     	}
 
     	return hydrate_node;
@@ -3043,20 +3748,24 @@
     		return next_sibling;
     	}
 
-    	// if a sibling {expression} is empty during SSR, there might be no
-    	// text node to hydrate — we must therefore create one
-    	if (is_text && next_sibling?.nodeType !== TEXT_NODE) {
-    		var text = create_text();
-    		// If the next sibling is `null` and we're handling text then it's because
-    		// the SSR content was empty for the text, so we need to generate a new text
-    		// node and insert it after the last sibling
-    		if (next_sibling === null) {
-    			last_sibling?.after(text);
-    		} else {
-    			next_sibling.before(text);
+    	if (is_text) {
+    		// if a sibling {expression} is empty during SSR, there might be no
+    		// text node to hydrate — we must therefore create one
+    		if (next_sibling?.nodeType !== TEXT_NODE) {
+    			var text = create_text();
+    			// If the next sibling is `null` and we're handling text then it's because
+    			// the SSR content was empty for the text, so we need to generate a new text
+    			// node and insert it after the last sibling
+    			if (next_sibling === null) {
+    				last_sibling?.after(text);
+    			} else {
+    				next_sibling.before(text);
+    			}
+    			set_hydrate_node(text);
+    			return text;
     		}
-    		set_hydrate_node(text);
-    		return text;
+
+    		merge_text_nodes(/** @type {Text} */ (next_sibling));
     	}
 
     	set_hydrate_node(next_sibling);
@@ -3080,6 +3789,41 @@
      */
     function should_defer_append() {
     	return false;
+    }
+
+    /**
+     * @template {keyof HTMLElementTagNameMap | string} T
+     * @param {T} tag
+     * @param {string} [namespace]
+     * @param {string} [is]
+     * @returns {T extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[T] : Element}
+     */
+    function create_element(tag, namespace, is) {
+    	let options = undefined;
+    	return /** @type {T extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[T] : Element} */ (
+    		document.createElementNS(namespace ?? NAMESPACE_HTML, tag, options)
+    	);
+    }
+
+    /**
+     * Browsers split text nodes larger than 65536 bytes when parsing.
+     * For hydration to succeed, we need to stitch them back together
+     * @param {Text} text
+     */
+    function merge_text_nodes(text) {
+    	if (/** @type {string} */ (text.nodeValue).length < 65536) {
+    		return;
+    	}
+
+    	let next = text.nextSibling;
+
+    	while (next !== null && next.nodeType === TEXT_NODE) {
+    		next.remove();
+
+    		/** @type {string} */ (text.nodeValue) += /** @type {string} */ (next.nodeValue);
+
+    		next = text.nextSibling;
+    	}
     }
 
     /**
@@ -3125,8 +3869,7 @@
     				Promise.resolve().then(() => {
     					if (!evt.defaultPrevented) {
     						for (const e of /**@type {HTMLFormElement} */ (evt.target).elements) {
-    							// @ts-expect-error
-    							e.__on_r?.();
+    							/** @type {any} */ (e)[FORM_RESET_HANDLER]?.();
     						}
     					}
     				});
@@ -3154,7 +3897,7 @@
     	}
     }
 
-    /** @import { ComponentContext, ComponentContextLegacy, Derived, Effect, TemplateNode, TransitionManager } from '#client' */
+    /** @import { Blocker, ComponentContext, ComponentContextLegacy, Derived, Effect, TemplateNode, TransitionManager } from '#client' */
 
     /**
      * @param {'$effect' | '$effect.pre' | '$inspect'} rune
@@ -3191,10 +3934,9 @@
     /**
      * @param {number} type
      * @param {null | (() => void | (() => void))} fn
-     * @param {boolean} sync
      * @returns {Effect}
      */
-    function create_effect(type, fn, sync) {
+    function create_effect(type, fn) {
     	var parent = active_effect;
 
     	if (parent !== null && (parent.f & INERT) !== 0) {
@@ -3219,35 +3961,41 @@
     		ac: null
     	};
 
-    	if (sync) {
-    		try {
-    			update_effect(effect);
-    			effect.f |= EFFECT_RAN;
-    		} catch (e) {
-    			destroy_effect(effect);
-    			throw e;
-    		}
-    	} else if (fn !== null) {
-    		schedule_effect(effect);
-    	}
+    	current_batch?.register_created_effect(effect);
 
     	/** @type {Effect | null} */
     	var e = effect;
 
-    	// if an effect has already ran and doesn't need to be kept in the tree
-    	// (because it won't re-run, has no DOM, and has no teardown etc)
-    	// then we skip it and go to its child (if any)
-    	if (
-    		sync &&
-    		e.deps === null &&
-    		e.teardown === null &&
-    		e.nodes === null &&
-    		e.first === e.last && // either `null`, or a singular child
-    		(e.f & EFFECT_PRESERVED) === 0
-    	) {
-    		e = e.first;
-    		if ((type & BLOCK_EFFECT) !== 0 && (type & EFFECT_TRANSPARENT) !== 0 && e !== null) {
-    			e.f |= EFFECT_TRANSPARENT;
+    	if ((type & EFFECT) !== 0) {
+    		if (collected_effects !== null) {
+    			// created during traversal — collect and run afterwards
+    			collected_effects.push(effect);
+    		} else {
+    			// schedule for later
+    			Batch.ensure().schedule(effect);
+    		}
+    	} else if (fn !== null) {
+    		try {
+    			update_effect(effect);
+    		} catch (e) {
+    			destroy_effect(effect);
+    			throw e;
+    		}
+
+    		// if an effect doesn't need to be kept in the tree (because it
+    		// won't re-run, has no DOM, and has no teardown etc)
+    		// then we skip it and go to its child (if any)
+    		if (
+    			e.deps === null &&
+    			e.teardown === null &&
+    			e.nodes === null &&
+    			e.first === e.last && // either `null`, or a singular child
+    			(e.f & EFFECT_PRESERVED) === 0
+    		) {
+    			e = e.first;
+    			if ((type & BLOCK_EFFECT) !== 0 && (type & EFFECT_TRANSPARENT) !== 0 && e !== null) {
+    				e.f |= EFFECT_TRANSPARENT;
+    			}
     		}
     	}
 
@@ -3284,7 +4032,7 @@
      * @param {() => void} fn
      */
     function teardown(fn) {
-    	const effect = create_effect(RENDER_EFFECT, null, false);
+    	const effect = create_effect(RENDER_EFFECT, null);
     	set_signal_status(effect, CLEAN);
     	effect.teardown = fn;
     	return effect;
@@ -3300,7 +4048,11 @@
     	// Non-nested `$effect(...)` in a component should be deferred
     	// until the component is mounted
     	var flags = /** @type {Effect} */ (active_effect).f;
-    	var defer = !active_reaction && (flags & BRANCH_EFFECT) !== 0 && (flags & EFFECT_RAN) === 0;
+    	var defer =
+    		!active_reaction &&
+    		(flags & BRANCH_EFFECT) !== 0 &&
+    		component_context !== null &&
+    		!component_context.i;
 
     	if (defer) {
     		// Top-level `$effect(...)` in an unmounted component — defer until mount
@@ -3316,7 +4068,7 @@
      * @param {() => void | (() => void)} fn
      */
     function create_user_effect(fn) {
-    	return create_effect(EFFECT | USER_EFFECT, fn, false);
+    	return create_effect(EFFECT | USER_EFFECT, fn);
     }
 
     /**
@@ -3326,7 +4078,7 @@
      */
     function user_pre_effect(fn) {
     	validate_effect();
-    	return create_effect(RENDER_EFFECT | USER_EFFECT, fn, true);
+    	return create_effect(RENDER_EFFECT | USER_EFFECT, fn);
     }
 
     /**
@@ -3336,7 +4088,7 @@
      */
     function effect_root(fn) {
     	Batch.ensure();
-    	const effect = create_effect(ROOT_EFFECT | EFFECT_PRESERVED, fn, true);
+    	const effect = create_effect(ROOT_EFFECT | EFFECT_PRESERVED, fn);
 
     	return () => {
     		destroy_effect(effect);
@@ -3350,7 +4102,7 @@
      */
     function component_root(fn) {
     	Batch.ensure();
-    	const effect = create_effect(ROOT_EFFECT | EFFECT_PRESERVED, fn, true);
+    	const effect = create_effect(ROOT_EFFECT | EFFECT_PRESERVED, fn);
 
     	return (options = {}) => {
     		return new Promise((fulfil) => {
@@ -3372,7 +4124,7 @@
      * @returns {Effect}
      */
     function effect(fn) {
-    	return create_effect(EFFECT, fn, false);
+    	return create_effect(EFFECT, fn);
     }
 
     /**
@@ -3380,7 +4132,7 @@
      * @returns {Effect}
      */
     function async_effect(fn) {
-    	return create_effect(ASYNC | EFFECT_PRESERVED, fn, true);
+    	return create_effect(ASYNC | EFFECT_PRESERVED, fn);
     }
 
     /**
@@ -3388,18 +4140,18 @@
      * @returns {Effect}
      */
     function render_effect(fn, flags = 0) {
-    	return create_effect(RENDER_EFFECT | flags, fn, true);
+    	return create_effect(RENDER_EFFECT | flags, fn);
     }
 
     /**
      * @param {(...expressions: any) => void | (() => void)} fn
      * @param {Array<() => any>} sync
      * @param {Array<() => Promise<any>>} async
-     * @param {Array<Promise<void>>} blockers
+     * @param {Blocker[]} blockers
      */
     function template_effect(fn, sync = [], async = [], blockers = []) {
     	flatten(blockers, sync, async, (values) => {
-    		create_effect(RENDER_EFFECT, () => fn(...values.map(get)), true);
+    		create_effect(RENDER_EFFECT, () => fn(...values.map(get)));
     	});
     }
 
@@ -3408,7 +4160,7 @@
      * @param {number} flags
      */
     function block(fn, flags = 0) {
-    	var effect = create_effect(BLOCK_EFFECT | flags, fn, true);
+    	var effect = create_effect(BLOCK_EFFECT | flags, fn);
     	return effect;
     }
 
@@ -3417,7 +4169,7 @@
      * @param {number} flags
      */
     function managed(fn, flags = 0) {
-    	var effect = create_effect(MANAGED_EFFECT | flags, fn, true);
+    	var effect = create_effect(MANAGED_EFFECT | flags, fn);
     	return effect;
     }
 
@@ -3425,7 +4177,7 @@
      * @param {(() => void)} fn
      */
     function branch(fn) {
-    	return create_effect(BRANCH_EFFECT | EFFECT_PRESERVED, fn, true);
+    	return create_effect(BRANCH_EFFECT | EFFECT_PRESERVED, fn);
     }
 
     /**
@@ -3511,9 +4263,9 @@
     		removed = true;
     	}
 
+    	set_signal_status(effect, DESTROYING);
     	destroy_effect_children(effect, remove_dom && !removed);
     	remove_reactions(effect, 0);
-    	set_signal_status(effect, DESTROYED);
 
     	var transitions = effect.nodes && effect.nodes.t;
 
@@ -3524,6 +4276,9 @@
     	}
 
     	execute_effect_teardown(effect);
+
+    	effect.f ^= DESTROYING;
+    	effect.f |= DESTROYED;
 
     	var parent = effect.parent;
 
@@ -3542,6 +4297,7 @@
     		effect.fn =
     		effect.nodes =
     		effect.ac =
+    		effect.b =
     			null;
     }
 
@@ -3634,16 +4390,22 @@
 
     	while (child !== null) {
     		var sibling = child.next;
-    		var transparent =
-    			(child.f & EFFECT_TRANSPARENT) !== 0 ||
-    			// If this is a branch effect without a block effect parent,
-    			// it means the parent block effect was pruned. In that case,
-    			// transparency information was transferred to the branch effect.
-    			((child.f & BRANCH_EFFECT) !== 0 && (effect.f & BLOCK_EFFECT) !== 0);
-    		// TODO we don't need to call pause_children recursively with a linked list in place
-    		// it's slightly more involved though as we have to account for `transparent` changing
-    		// through the tree.
-    		pause_children(child, transitions, transparent ? local : false);
+
+    		// If this child is a root effect, then it will become an independent root when its parent
+    		// is destroyed, it should therefore not become inert nor partake in transitions.
+    		if ((child.f & ROOT_EFFECT) === 0) {
+    			var transparent =
+    				(child.f & EFFECT_TRANSPARENT) !== 0 ||
+    				// If this is a branch effect without a block effect parent,
+    				// it means the parent block effect was pruned. In that case,
+    				// transparency information was transferred to the branch effect.
+    				((child.f & BRANCH_EFFECT) !== 0 && (effect.f & BLOCK_EFFECT) !== 0);
+    			// TODO we don't need to call pause_children recursively with a linked list in place
+    			// it's slightly more involved though as we have to account for `transparent` changing
+    			// through the tree.
+    			pause_children(child, transitions, transparent ? local : false);
+    		}
+
     		child = sibling;
     	}
     }
@@ -3671,7 +4433,7 @@
     	// `{#if foo}{foo.bar()}{/if}` if `foo` is now `undefined
     	if ((effect.f & CLEAN) === 0) {
     		set_signal_status(effect, DIRTY);
-    		schedule_effect(effect);
+    		Batch.ensure().schedule(effect); // Assumption: This happens during the commit phase of the batch, causing another flush, but it's safe
     	}
 
     	var child = effect.first;
@@ -3717,14 +4479,9 @@
     	}
     }
 
-    /** @import { Derived, Effect, Reaction, Signal, Source, Value } from '#client' */
+    /** @import { Derived, Effect, Reaction, Source, Value } from '#client' */
 
     let is_updating_effect = false;
-
-    /** @param {boolean} value */
-    function set_is_updating_effect(value) {
-    	is_updating_effect = value;
-    }
 
     let is_destroying_effect = false;
 
@@ -3829,21 +4586,18 @@
     	}
 
     	if ((flags & MAYBE_DIRTY) !== 0) {
-    		var dependencies = reaction.deps;
+    		var dependencies = /** @type {Value[]} */ (reaction.deps);
+    		var length = dependencies.length;
 
-    		if (dependencies !== null) {
-    			var length = dependencies.length;
+    		for (var i = 0; i < length; i++) {
+    			var dependency = dependencies[i];
 
-    			for (var i = 0; i < length; i++) {
-    				var dependency = dependencies[i];
+    			if (is_dirty(/** @type {Derived} */ (dependency))) {
+    				update_derived(/** @type {Derived} */ (dependency));
+    			}
 
-    				if (is_dirty(/** @type {Derived} */ (dependency))) {
-    					update_derived(/** @type {Derived} */ (dependency));
-    				}
-
-    				if (dependency.wv > reaction.wv) {
-    					return true;
-    				}
+    			if (dependency.wv > reaction.wv) {
+    				return true;
     			}
     		}
 
@@ -3869,7 +4623,7 @@
     	var reactions = signal.reactions;
     	if (reactions === null) return;
 
-    	if (current_sources?.includes(signal)) {
+    	if (current_sources !== null && includes.call(current_sources, signal)) {
     		return;
     	}
 
@@ -3924,12 +4678,19 @@
     		reaction.f |= REACTION_IS_UPDATING;
     		var fn = /** @type {Function} */ (reaction.fn);
     		var result = fn();
+    		reaction.f |= REACTION_RAN;
     		var deps = reaction.deps;
+
+    		// Don't remove reactions during fork;
+    		// they must remain for when fork is discarded
+    		var is_fork = current_batch?.is_fork;
 
     		if (new_deps !== null) {
     			var i;
 
-    			remove_reactions(reaction, skipped_deps);
+    			if (!is_fork) {
+    				remove_reactions(reaction, skipped_deps);
+    			}
 
     			if (deps !== null && skipped_deps > 0) {
     				deps.length = skipped_deps + new_deps.length;
@@ -3945,7 +4706,7 @@
     					(deps[i].reactions ??= []).push(reaction);
     				}
     			}
-    		} else if (deps !== null && skipped_deps < deps.length) {
+    		} else if (!is_fork && deps !== null && skipped_deps < deps.length) {
     			remove_reactions(reaction, skipped_deps);
     			deps.length = skipped_deps;
     		}
@@ -3974,6 +4735,20 @@
     		// the same version
     		if (previous_reaction !== null && previous_reaction !== reaction) {
     			read_version++;
+
+    			// update the `rv` of the previous reaction's deps — both existing and new —
+    			// so that they are not added again
+    			if (previous_reaction.deps !== null) {
+    				for (let i = 0; i < previous_skipped_deps; i += 1) {
+    					previous_reaction.deps[i].rv = read_version;
+    				}
+    			}
+
+    			if (previous_deps !== null) {
+    				for (const dep of previous_deps) {
+    					dep.rv = read_version;
+    				}
+    			}
 
     			if (untracked_writes !== null) {
     				if (previous_untracked_writes === null) {
@@ -4034,18 +4809,31 @@
     		// Destroying a child effect while updating a parent effect can cause a dependency to appear
     		// to be unused, when in fact it is used by the currently-updating parent. Checking `new_deps`
     		// allows us to skip the expensive work of disconnecting and immediately reconnecting it
-    		(new_deps === null || !new_deps.includes(dependency))
+    		(new_deps === null || !includes.call(new_deps, dependency))
     	) {
-    		set_signal_status(dependency, MAYBE_DIRTY);
+    		var derived = /** @type {Derived} */ (dependency);
+
     		// If we are working with a derived that is owned by an effect, then mark it as being
     		// disconnected and remove the mark flag, as it cannot be reliably removed otherwise
-    		if ((dependency.f & CONNECTED) !== 0) {
-    			dependency.f ^= CONNECTED;
-    			dependency.f &= ~WAS_MARKED;
+    		if ((derived.f & CONNECTED) !== 0) {
+    			derived.f ^= CONNECTED;
+    			derived.f &= ~WAS_MARKED;
     		}
+
+    		// In a fork it's possible that a derived is executed and gets reactions, then commits, but is
+    		// never re-executed. This is possible when the derived is only executed once in the context
+    		// of a new branch which happens before fork.commit() runs. In this case, the derived still has
+    		// UNINITIALIZED as its value, and then when it's loosing its reactions we need to ensure it stays
+    		// DIRTY so it is reexecuted once someone wants its value again.
+    		if (derived.v !== UNINITIALIZED) {
+    			update_derived_status(derived);
+    		}
+
+    		// freeze any effects inside this derived
+    		freeze_derived_effects(derived);
+
     		// Disconnect any reactions owned by this reaction
-    		destroy_derived_effects(/** @type {Derived} **/ (dependency));
-    		remove_reactions(/** @type {Derived} **/ (dependency), 0);
+    		remove_reactions(derived, 0);
     	}
     }
 
@@ -4132,7 +4920,7 @@
     		// we don't add the dependency, because that would create a memory leak
     		var destroyed = active_effect !== null && (active_effect.f & DESTROYED) !== 0;
 
-    		if (!destroyed && !current_sources?.includes(signal)) {
+    		if (!destroyed && (current_sources === null || !includes.call(current_sources, signal))) {
     			var deps = active_reaction.deps;
 
     			if ((active_reaction.f & REACTION_IS_UPDATING) !== 0) {
@@ -4147,34 +4935,40 @@
     						skipped_deps++;
     					} else if (new_deps === null) {
     						new_deps = [signal];
-    					} else if (!new_deps.includes(signal)) {
+    					} else {
     						new_deps.push(signal);
     					}
     				}
     			} else {
-    				// we're adding a dependency outside the init/update cycle
-    				// (i.e. after an `await`)
-    				(active_reaction.deps ??= []).push(signal);
+    				// We're adding a dependency outside the init/update cycle (i.e. after an `await`).
+    				// We have to deduplicate deps/reactions in this case or remove_reactions could
+    				// disconnect deps/reactions that are actually still in use (if skip_deps says
+    				// "disconnect all after this index" and some of the signals are also present in
+    				// list prior to the cutoff index, i.e. that should be kept).
+    				active_reaction.deps ??= [];
+    				if (!includes.call(active_reaction.deps, signal)) {
+    					active_reaction.deps.push(signal);
+    				}
 
     				var reactions = signal.reactions;
 
     				if (reactions === null) {
     					signal.reactions = [active_reaction];
-    				} else if (!reactions.includes(active_reaction)) {
+    				} else if (!includes.call(reactions, active_reaction)) {
     					reactions.push(active_reaction);
     				}
     			}
     		}
     	}
 
-    	if (is_destroying_effect) {
-    		if (old_values.has(signal)) {
-    			return old_values.get(signal);
-    		}
+    	if (is_destroying_effect && old_values.has(signal)) {
+    		return old_values.get(signal);
+    	}
 
-    		if (is_derived) {
-    			var derived = /** @type {Derived} */ (signal);
+    	if (is_derived) {
+    		var derived = /** @type {Derived} */ (signal);
 
+    		if (is_destroying_effect) {
     			var value = derived.v;
 
     			// if the derived is dirty and has reactions, or depends on the values that just changed, re-execute
@@ -4190,17 +4984,29 @@
 
     			return value;
     		}
-    	} else if (
-    		is_derived &&
-    		(!batch_values?.has(signal) || (current_batch?.is_fork && !effect_tracking()))
-    	) {
-    		derived = /** @type {Derived} */ (signal);
+
+    		// connect disconnected deriveds if we are reading them inside an effect,
+    		// or inside another derived that is already connected
+    		var should_connect =
+    			(derived.f & CONNECTED) === 0 &&
+    			!untracking &&
+    			active_reaction !== null &&
+    			(is_updating_effect || (active_reaction.f & CONNECTED) !== 0);
+
+    		var is_new = (derived.f & REACTION_RAN) === 0;
 
     		if (is_dirty(derived)) {
+    			if (should_connect) {
+    				// set the flag before `update_derived`, so that the derived
+    				// is added as a reaction to its dependencies
+    				derived.f |= CONNECTED;
+    			}
+
     			update_derived(derived);
     		}
 
-    		if (is_updating_effect && effect_tracking() && (derived.f & CONNECTED) === 0) {
+    		if (should_connect && !is_new) {
+    			unfreeze_derived_effects(derived);
     			reconnect(derived);
     		}
     	}
@@ -4222,14 +5028,15 @@
      * @param {Derived} derived
      */
     function reconnect(derived) {
-    	if (derived.deps === null) return;
+    	derived.f |= CONNECTED;
 
-    	derived.f ^= CONNECTED;
+    	if (derived.deps === null) return;
 
     	for (const dep of derived.deps) {
     		(dep.reactions ??= []).push(derived);
 
     		if ((dep.f & DERIVED) !== 0 && (dep.f & CONNECTED) === 0) {
+    			unfreeze_derived_effects(/** @type {Derived} */ (dep));
     			reconnect(/** @type {Derived} */ (dep));
     		}
     	}
@@ -4277,17 +5084,6 @@
     	} finally {
     		untracking = previous_untracking;
     	}
-    }
-
-    const STATUS_MASK = -7169;
-
-    /**
-     * @param {Signal} signal
-     * @param {number} status
-     * @returns {void}
-     */
-    function set_signal_status(signal, status) {
-    	signal.f = (signal.f & STATUS_MASK) | status;
     }
 
     /**
@@ -4364,6 +5160,12 @@
     	}
     }
 
+    /**
+     * Used on elements, as a map of event type -> event handler,
+     * and on events themselves to track which element handled an event
+     */
+    const event_symbol = Symbol('events');
+
     /** @type {Set<string>} */
     const all_registered_events = new Set();
 
@@ -4439,6 +5241,17 @@
     }
 
     /**
+     * @param {string} event_name
+     * @param {Element} element
+     * @param {EventListener} [handler]
+     * @returns {void}
+     */
+    function delegated(event_name, element, handler) {
+    	// @ts-expect-error
+    	(element[event_symbol] ??= {})[event_name] = handler;
+    }
+
+    /**
      * @param {Array<string>} events
      * @returns {void}
      */
@@ -4474,8 +5287,8 @@
     	last_propagated_event = event;
 
     	// composedPath contains list of nodes the event has propagated through.
-    	// We check __root to skip all nodes below it in case this is a
-    	// parent of the __root node, which indicates that there's nested
+    	// We check `event_symbol` to skip all nodes below it in case this is a
+    	// parent of the `event_symbol` node, which indicates that there's nested
     	// mounted apps. In this case we don't want to trigger events multiple times.
     	var path_idx = 0;
 
@@ -4483,7 +5296,7 @@
     	// without it the variable will be DCE'd and things will
     	// fail mysteriously in Firefox
     	// @ts-expect-error is added below
-    	var handled_at = last_propagated_event === event && event.__root;
+    	var handled_at = last_propagated_event === event && event[event_symbol];
 
     	if (handled_at) {
     		var at_idx = path.indexOf(handled_at);
@@ -4495,7 +5308,7 @@
     			// -> ignore, but set handle_at to document/window so that we're resetting the event
     			// chain in case someone manually dispatches the same event object again.
     			// @ts-expect-error
-    			event.__root = handler_element;
+    			event[event_symbol] = handler_element;
     			return;
     		}
 
@@ -4531,9 +5344,9 @@
     	});
 
     	// This started because of Chromium issue https://chromestatus.com/feature/5128696823545856,
-    	// where removal or moving of of the DOM can cause sync `blur` events to fire, which can cause logic
+    	// where removal or moving of the DOM can cause sync `blur` events to fire, which can cause logic
     	// to run inside the current `active_reaction`, which isn't what we want at all. However, on reflection,
-    	// it's probably best that all event handled by Svelte have this behaviour, as we don't really want
+    	// it's probably best that all events handled by Svelte have this behaviour, as we don't really want
     	// an event handler to run in the context of another reaction or effect.
     	var previous_reaction = active_reaction;
     	var previous_effect = active_effect;
@@ -4551,16 +5364,11 @@
     		var other_errors = [];
 
     		while (current_target !== null) {
-    			/** @type {null | Element} */
-    			var parent_element =
-    				current_target.assignedSlot ||
-    				current_target.parentNode ||
-    				/** @type {any} */ (current_target).host ||
-    				null;
+    			if (current_target === handler_element) break;
 
     			try {
     				// @ts-expect-error
-    				var delegated = current_target['__' + event_name];
+    				var delegated = current_target[event_symbol]?.[event_name];
 
     				if (
     					delegated != null &&
@@ -4578,10 +5386,10 @@
     					throw_error = error;
     				}
     			}
-    			if (event.cancelBubble || parent_element === handler_element || parent_element === null) {
-    				break;
-    			}
-    			current_target = parent_element;
+    			if (event.cancelBubble) break;
+
+    			path_idx++;
+    			current_target = path_idx < path.length ? /** @type {Element} */ (path[path_idx]) : null;
     		}
 
     		if (throw_error) {
@@ -4595,7 +5403,7 @@
     		}
     	} finally {
     		// @ts-expect-error is used above
-    		event.__root = handler_element;
+    		event[event_symbol] = handler_element;
     		// @ts-ignore remove proxy on currentTarget
     		delete event.currentTarget;
     		set_active_reaction(previous_reaction);
@@ -4603,10 +5411,27 @@
     	}
     }
 
+    const policy =
+    	// We gotta write it like this because after downleveling the pure comment may end up in the wrong location
+    	globalThis?.window?.trustedTypes &&
+    	/* @__PURE__ */ globalThis.window.trustedTypes.createPolicy('svelte-trusted-html', {
+    		/** @param {string} html */
+    		createHTML: (html) => {
+    			return html;
+    		}
+    	});
+
     /** @param {string} html */
+    function create_trusted_html(html) {
+    	return /** @type {string} */ (policy?.createHTML(html) ?? html);
+    }
+
+    /**
+     * @param {string} html
+     */
     function create_fragment_from_html(html) {
-    	var elem = document.createElement('template');
-    	elem.innerHTML = html.replaceAll('<!>', '<!---->'); // XHTML compliance
+    	var elem = create_element('template');
+    	elem.innerHTML = create_trusted_html(html.replaceAll('<!>', '<!---->')); // XHTML compliance
     	return elem.content;
     }
 
@@ -4740,6 +5565,8 @@
     		// if an {expression} is empty during SSR, we need to insert an empty text node
     		node.before((node = create_text()));
     		set_hydrate_node(node);
+    	} else {
+    		merge_text_nodes(/** @type {Text} */ (node));
     	}
 
     	assign_nodes(node, node);
@@ -4779,7 +5606,7 @@
     		// When hydrating and outer component and an inner component is async, i.e. blocked on a promise,
     		// then by the time the inner resolves we have already advanced to the end of the hydrated nodes
     		// of the parent component. Check for defined for that reason to avoid rewinding the parent's end marker.
-    		if ((effect.f & EFFECT_RAN) === 0 || effect.nodes.end === null) {
+    		if ((effect.f & REACTION_RAN) === 0 || effect.nodes.end === null) {
     			effect.nodes.end = hydrate_node;
     		}
 
@@ -4903,12 +5730,11 @@
      */
     function set_text(text, value) {
     	// For objects, we apply string coercion (which might make things like $state array references in the template reactive) before diffing
-    	var str = value == null ? '' : typeof value === 'object' ? value + '' : value;
-    	// @ts-expect-error
-    	if (str !== (text.__t ??= text.nodeValue)) {
-    		// @ts-expect-error
-    		text.__t = str;
-    		text.nodeValue = str + '';
+    	var str = value == null ? '' : typeof value === 'object' ? `${value}` : value;
+    	// prettier-ignore
+    	if (str !== (/** @type {any} */ (text)[TEXT_CACHE] ??= text.nodeValue)) {
+    		/** @type {any} */ (text)[TEXT_CACHE] = str;
+    		text.nodeValue = `${str}`;
     	}
     }
 
@@ -4939,6 +5765,7 @@
      *  	context?: Map<any, any>;
      * 		intro?: boolean;
      * 		recover?: boolean;
+     *		transformError?: (error: unknown) => unknown;
      * 	} : {
      * 		target: Document | Element | ShadowRoot;
      * 		props: Props;
@@ -4946,6 +5773,7 @@
      *  	context?: Map<any, any>;
      * 		intro?: boolean;
      * 		recover?: boolean;
+     *		transformError?: (error: unknown) => unknown;
      * 	}} options
      * @returns {Exports}
      */
@@ -5007,8 +5835,8 @@
     	}
     }
 
-    /** @type {Map<string, number>} */
-    const document_listeners = new Map();
+    /** @type {Map<EventTarget, Map<string, number>>} */
+    const listeners = new Map();
 
     /**
      * @template {Record<string, any>} Exports
@@ -5016,42 +5844,11 @@
      * @param {MountOptions} options
      * @returns {Exports}
      */
-    function _mount(Component, { target, anchor, props = {}, events, context, intro = true }) {
+    function _mount(
+    	Component,
+    	{ target, anchor, props = {}, events, context, intro = true, transformError }
+    ) {
     	init_operations();
-
-    	/** @type {Set<string>} */
-    	var registered_events = new Set();
-
-    	/** @param {Array<string>} events */
-    	var event_handle = (events) => {
-    		for (var i = 0; i < events.length; i++) {
-    			var event_name = events[i];
-
-    			if (registered_events.has(event_name)) continue;
-    			registered_events.add(event_name);
-
-    			var passive = is_passive_event(event_name);
-
-    			// Add the event listener to both the container and the document.
-    			// The container listener ensures we catch events from within in case
-    			// the outer content stops propagation of the event.
-    			target.addEventListener(event_name, handle_event_propagation, { passive });
-
-    			var n = document_listeners.get(event_name);
-
-    			if (n === undefined) {
-    				// The document listener ensures we catch events that originate from elements that were
-    				// manually moved outside of the container (e.g. via manual portals).
-    				document.addEventListener(event_name, handle_event_propagation, { passive });
-    				document_listeners.set(event_name, 1);
-    			} else {
-    				document_listeners.set(event_name, n + 1);
-    			}
-    		}
-    	};
-
-    	event_handle(array_from(all_registered_events));
-    	root_event_handles.add(event_handle);
 
     	/** @type {Exports} */
     	// @ts-expect-error will be defined because the render effect runs synchronously
@@ -5066,11 +5863,9 @@
     				pending: () => {}
     			},
     			(anchor_node) => {
-    				if (context) {
-    					push({});
-    					var ctx = /** @type {ComponentContext} */ (component_context);
-    					ctx.c = context;
-    				}
+    				push({});
+    				var ctx = /** @type {ComponentContext} */ (component_context);
+    				if (context) ctx.c = context;
 
     				if (events) {
     					// We can't spread the object or else we'd lose the state proxy stuff, if it is one
@@ -5099,23 +5894,70 @@
     					}
     				}
 
-    				if (context) {
-    					pop();
+    				pop();
+    			},
+    			transformError
+    		);
+
+    		// Setup event delegation _after_ component is mounted - if an error would happen during mount, it would otherwise not be cleaned up
+    		/** @type {Set<string>} */
+    		var registered_events = new Set();
+
+    		/** @param {Array<string>} events */
+    		var event_handle = (events) => {
+    			for (var i = 0; i < events.length; i++) {
+    				var event_name = events[i];
+
+    				if (registered_events.has(event_name)) continue;
+    				registered_events.add(event_name);
+
+    				var passive = is_passive_event(event_name);
+
+    				// Add the event listener to both the container and the document.
+    				// The container listener ensures we catch events from within in case
+    				// the outer content stops propagation of the event.
+    				//
+    				// The document listener ensures we catch events that originate from elements that were
+    				// manually moved outside of the container (e.g. via manual portals).
+    				for (const node of [target, document]) {
+    					var counts = listeners.get(node);
+
+    					if (counts === undefined) {
+    						counts = new Map();
+    						listeners.set(node, counts);
+    					}
+
+    					var count = counts.get(event_name);
+
+    					if (count === undefined) {
+    						node.addEventListener(event_name, handle_event_propagation, { passive });
+    						counts.set(event_name, 1);
+    					} else {
+    						counts.set(event_name, count + 1);
+    					}
     				}
     			}
-    		);
+    		};
+
+    		event_handle(array_from(all_registered_events));
+    		root_event_handles.add(event_handle);
 
     		return () => {
     			for (var event_name of registered_events) {
-    				target.removeEventListener(event_name, handle_event_propagation);
+    				for (const node of [target, document]) {
+    					var counts = /** @type {Map<string, number>} */ (listeners.get(node));
+    					var count = /** @type {number} */ (counts.get(event_name));
 
-    				var n = /** @type {number} */ (document_listeners.get(event_name));
+    					if (--count == 0) {
+    						node.removeEventListener(event_name, handle_event_propagation);
+    						counts.delete(event_name);
 
-    				if (--n === 0) {
-    					document.removeEventListener(event_name, handle_event_propagation);
-    					document_listeners.delete(event_name);
-    				} else {
-    					document_listeners.set(event_name, n);
+    						if (counts.size === 0) {
+    							listeners.delete(node);
+    						}
+    					} else {
+    						counts.set(event_name, count);
+    					}
     				}
     			}
 
@@ -5228,9 +6070,10 @@
     		this.#transition = transition;
     	}
 
-    	#commit = () => {
-    		var batch = /** @type {Batch} */ (current_batch);
-
+    	/**
+    	 * @param {Batch} batch
+    	 */
+    	#commit = (batch) => {
     		// if this batch was made obsolete, bail
     		if (!this.#batches.has(batch)) return;
 
@@ -5247,6 +6090,8 @@
     			var offscreen = this.#offscreen.get(key);
 
     			if (offscreen) {
+    				// effect could have been outro'ed before through a prior batch — resume if necessary
+    				resume_effect(offscreen.effect);
     				this.#onscreen.set(key, offscreen.effect);
     				this.#offscreen.delete(key);
 
@@ -5360,17 +6205,17 @@
     		if (defer) {
     			for (const [k, effect] of this.#onscreen) {
     				if (k === key) {
-    					batch.skipped_effects.delete(effect);
+    					batch.unskip_effect(effect);
     				} else {
-    					batch.skipped_effects.add(effect);
+    					batch.skip_effect(effect);
     				}
     			}
 
     			for (const [k, branch] of this.#offscreen) {
     				if (k === key) {
-    					batch.skipped_effects.delete(branch.effect);
+    					batch.unskip_effect(branch.effect);
     				} else {
-    					batch.skipped_effects.add(branch.effect);
+    					batch.skip_effect(branch.effect);
     				}
     			}
 
@@ -5381,7 +6226,7 @@
     				this.anchor = hydrate_node;
     			}
 
-    			this.#commit();
+    			this.#commit(batch);
     		}
     	}
     }
@@ -5447,16 +6292,17 @@
 
     /** @import { TemplateNode } from '#client' */
 
-    // TODO reinstate https://github.com/sveltejs/svelte/pull/15250
-
     /**
      * @param {TemplateNode} node
-     * @param {(branch: (fn: (anchor: Node) => void, flag?: boolean) => void) => void} fn
+     * @param {(branch: (fn: (anchor: Node) => void, key?: number | false) => void) => void} fn
      * @param {boolean} [elseif] True if this is an `{:else if ...}` block rather than an `{#if ...}`, as that affects which transitions are considered 'local'
      * @returns {void}
      */
     function if_block(node, fn, elseif = false) {
+    	/** @type {TemplateNode | undefined} */
+    	var marker;
     	if (hydrating) {
+    		marker = hydrate_node;
     		hydrate_next();
     	}
 
@@ -5464,14 +6310,15 @@
     	var flags = elseif ? EFFECT_TRANSPARENT : 0;
 
     	/**
-    	 * @param {boolean} condition,
+    	 * @param {number | false} key
     	 * @param {null | ((anchor: Node) => void)} fn
     	 */
-    	function update_branch(condition, fn) {
+    	function update_branch(key, fn) {
     		if (hydrating) {
-    			const is_else = read_hydration_instruction(node) === HYDRATION_START_ELSE;
+    			var data = read_hydration_instruction(/** @type {TemplateNode} */ (marker));
 
-    			if (condition === is_else) {
+    			// "[n" = branch n, "[-1" = else
+    			if (key !== parseInt(data.substring(1))) {
     				// Hydration mismatch: remove everything inside the anchor and start fresh.
     				// This could happen with `{#if browser}...{/if}`, for example
     				var anchor = skip_nodes();
@@ -5480,26 +6327,26 @@
     				branches.anchor = anchor;
 
     				set_hydrating(false);
-    				branches.ensure(condition, fn);
+    				branches.ensure(key, fn);
     				set_hydrating(true);
 
     				return;
     			}
     		}
 
-    		branches.ensure(condition, fn);
+    		branches.ensure(key, fn);
     	}
 
     	block(() => {
     		var has_branch = false;
 
-    		fn((fn, flag = true) => {
+    		fn((fn, key = 0) => {
     			has_branch = true;
-    			update_branch(flag, fn);
+    			update_branch(key, fn);
     		});
 
     		if (!has_branch) {
-    			update_branch(false, null);
+    			update_branch(-1, null);
     		}
     	}, flags);
     }
@@ -5536,7 +6383,7 @@
     					if (group.pending.size === 0) {
     						var groups = /** @type {Set<EachOutroGroup>} */ (state.outrogroups);
 
-    						destroy_effects(array_from(group.done));
+    						destroy_effects(state, array_from(group.done));
     						groups.delete(group);
 
     						if (groups.size === 0) {
@@ -5567,7 +6414,7 @@
     			state.items.clear();
     		}
 
-    		destroy_effects(to_destroy, !fast_path);
+    		destroy_effects(state, to_destroy, !fast_path);
     	} else {
     		group = {
     			pending: new Set(to_destroy),
@@ -5579,14 +6426,36 @@
     }
 
     /**
+     * @param {EachState} state
      * @param {Effect[]} to_destroy
      * @param {boolean} remove_dom
      */
-    function destroy_effects(to_destroy, remove_dom = true) {
-    	// TODO only destroy effects if no pending batch needs them. otherwise,
-    	// just re-add the `EFFECT_OFFSCREEN` flag
+    function destroy_effects(state, to_destroy, remove_dom = true) {
+    	/** @type {Set<Effect> | undefined} */
+    	var preserved_effects;
+
+    	// The loop-in-a-loop isn't ideal, but we should only hit this in relatively rare cases
+    	if (state.pending.size > 0) {
+    		preserved_effects = new Set();
+
+    		for (const keys of state.pending.values()) {
+    			for (const key of keys) {
+    				preserved_effects.add(/** @type {EachItem} */ (state.items.get(key)).e);
+    			}
+    		}
+    	}
+
     	for (var i = 0; i < to_destroy.length; i++) {
-    		destroy_effect(to_destroy[i], remove_dom);
+    		var e = to_destroy[i];
+
+    		if (preserved_effects?.has(e)) {
+    			e.f |= EFFECT_OFFSCREEN;
+
+    			const fragment = document.createDocumentFragment();
+    			move_effect(e, fragment);
+    		} else {
+    			destroy_effect(to_destroy[i], remove_dom);
+    		}
     	}
     }
 
@@ -5638,9 +6507,21 @@
     	/** @type {V[]} */
     	var array;
 
+    	/** @type {Map<Batch, Set<any>>} */
+    	var pending = new Map();
+
     	var first_run = true;
 
-    	function commit() {
+    	/**
+    	 * @param {Batch} batch
+    	 */
+    	function commit(batch) {
+    		if ((state.effect.f & DESTROYED) !== 0) {
+    			return;
+    		}
+
+    		state.pending.delete(batch);
+
     		state.fallback = fallback;
     		reconcile(state, array, anchor, flags, get_key);
 
@@ -5661,6 +6542,13 @@
     				});
     			}
     		}
+    	}
+
+    	/**
+    	 * @param {Batch} batch
+    	 */
+    	function discard(batch) {
+    		state.pending.delete(batch);
     	}
 
     	var effect = block(() => {
@@ -5711,7 +6599,7 @@
     				if (item.i) internal_set(item.i, index);
 
     				if (defer) {
-    					batch.skipped_effects.delete(item.e);
+    					batch.unskip_effect(item.e);
     				}
     			} else {
     				item = create_item(
@@ -5744,25 +6632,32 @@
     			}
     		}
 
+    		if (length > keys.size) {
+    			{
+    				// in prod, the additional information isn't printed, so don't bother computing it
+    				each_key_duplicate();
+    			}
+    		}
+
     		// remove excess nodes
     		if (hydrating && length > 0) {
     			set_hydrate_node(skip_nodes());
     		}
 
     		if (!first_run) {
+    			pending.set(batch, keys);
+
     			if (defer) {
     				for (const [key, item] of items) {
     					if (!keys.has(key)) {
-    						batch.skipped_effects.add(item.e);
+    						batch.skip_effect(item.e);
     					}
     				}
 
     				batch.oncommit(commit);
-    				batch.ondiscard(() => {
-    					// TODO presumably we need to do something here?
-    				});
+    				batch.ondiscard(discard);
     			} else {
-    				commit();
+    				commit(batch);
     			}
     		}
 
@@ -5781,13 +6676,25 @@
     	});
 
     	/** @type {EachState} */
-    	var state = { effect, items, outrogroups: null, fallback };
+    	var state = { effect, items, pending, outrogroups: null, fallback };
 
     	first_run = false;
 
     	if (hydrating) {
     		anchor = hydrate_node;
     	}
+    }
+
+    /**
+     * Skip past any non-branch effects (which could be created with `createSubscriber`, for example) to find the next branch effect
+     * @param {Effect | null} effect
+     * @returns {Effect | null}
+     */
+    function skip_to_branch(effect) {
+    	while (effect !== null && (effect.f & BRANCH_EFFECT) === 0) {
+    		effect = effect.next;
+    	}
+    	return effect;
     }
 
     /**
@@ -5805,7 +6712,7 @@
 
     	var length = array.length;
     	var items = state.items;
-    	var current = state.effect.first;
+    	var current = skip_to_branch(state.effect.first);
 
     	/** @type {undefined | Set<Effect>} */
     	var seen;
@@ -5862,6 +6769,14 @@
     			}
     		}
 
+    		if ((effect.f & INERT) !== 0) {
+    			resume_effect(effect);
+    			if (is_animated) {
+    				effect.nodes?.a?.unfix();
+    				(to_animate ??= new Set()).delete(effect);
+    			}
+    		}
+
     		if ((effect.f & EFFECT_OFFSCREEN) !== 0) {
     			effect.f ^= EFFECT_OFFSCREEN;
 
@@ -5885,16 +6800,8 @@
     				matched = [];
     				stashed = [];
 
-    				current = prev.next;
+    				current = skip_to_branch(prev.next);
     				continue;
-    			}
-    		}
-
-    		if ((effect.f & INERT) !== 0) {
-    			resume_effect(effect);
-    			if (is_animated) {
-    				effect.nodes?.a?.unfix();
-    				(to_animate ??= new Set()).delete(effect);
     			}
     		}
 
@@ -5949,7 +6856,7 @@
     			while (current !== null && current !== effect) {
     				(seen ??= new Set()).add(current);
     				stashed.push(current);
-    				current = current.next;
+    				current = skip_to_branch(current.next);
     			}
 
     			if (current === null) {
@@ -5962,13 +6869,13 @@
     		}
 
     		prev = effect;
-    		current = effect.next;
+    		current = skip_to_branch(effect.next);
     	}
 
     	if (state.outrogroups !== null) {
     		for (const group of state.outrogroups) {
     			if (group.pending.size === 0) {
-    				destroy_effects(array_from(group.done));
+    				destroy_effects(state, array_from(group.done));
     				state.outrogroups?.delete(group);
     			}
     		}
@@ -5996,7 +6903,7 @@
     				to_destroy.push(current);
     			}
 
-    			current = current.next;
+    			current = skip_to_branch(current.next);
     		}
 
     		var destroy_length = to_destroy.length;
@@ -6111,25 +7018,59 @@
     }
 
     /** @import { Effect, TemplateNode } from '#client' */
+    /** @import {} from 'trusted-types' */
 
     /**
      * @param {Element | Text | Comment} node
-     * @param {() => string} get_value
+     * @param {() => string | TrustedHTML} get_value
+     * @param {boolean} [is_controlled]
      * @param {boolean} [svg]
      * @param {boolean} [mathml]
      * @param {boolean} [skip_warning]
      * @returns {void}
      */
-    function html(node, get_value, svg = false, mathml = false, skip_warning = false) {
+    function html(
+    	node,
+    	get_value,
+    	is_controlled = false,
+    	svg = false,
+    	mathml = false,
+    	skip_warning = false
+    ) {
     	var anchor = node;
 
+    	/** @type {string | TrustedHTML} */
     	var value = '';
+
+    	if (is_controlled) {
+    		var parent_node = /** @type {Element} */ (node);
+
+    		if (hydrating) {
+    			anchor = set_hydrate_node(get_first_child(parent_node));
+    		}
+    	}
 
     	template_effect(() => {
     		var effect = /** @type {Effect} */ (active_effect);
 
     		if (value === (value = get_value() ?? '')) {
     			if (hydrating) hydrate_next();
+    			return;
+    		}
+
+    		if (is_controlled && !hydrating) {
+    			// When @html is the only child, use innerHTML directly.
+    			// This also handles contenteditable, where the user may delete the anchor comment.
+    			effect.nodes = null;
+    			parent_node.innerHTML = /** @type {string} */ (value);
+
+    			if (value !== '') {
+    				assign_nodes(
+    					/** @type {TemplateNode} */ (get_first_child(parent_node)),
+    					/** @type {TemplateNode} */ (parent_node.lastChild)
+    				);
+    			}
+
     			return;
     		}
 
@@ -6167,18 +7108,18 @@
     			return;
     		}
 
-    		var html = value + '';
-    		if (svg) html = `<svg>${html}</svg>`;
-    		else if (mathml) html = `<math>${html}</math>`;
-
     		// Don't use create_fragment_with_script_from_html here because that would mean script tags are executed.
     		// @html is basically `.innerHTML = ...` and that doesn't execute scripts either due to security reasons.
-    		/** @type {DocumentFragment | Element} */
-    		var node = create_fragment_from_html(html);
+    		// Use a <template>, <svg>, or <math> wrapper depending on context. If value is a TrustedHTML object,
+    		// it will be assigned directly to innerHTML without coercion — this allows {@html policy.createHTML(...)} to work.
+    		var ns = svg ? NAMESPACE_SVG : mathml ? NAMESPACE_MATHML : undefined;
+    		var wrapper = /** @type {HTMLTemplateElement | SVGElement | MathMLElement} */ (
+    			create_element(svg ? 'svg' : mathml ? 'math' : 'template', ns)
+    		);
+    		wrapper.innerHTML = /** @type {any} */ (value);
 
-    		if (svg || mathml) {
-    			node = /** @type {Element} */ (get_first_child(node));
-    		}
+    		/** @type {DocumentFragment | Element} */
+    		var node = svg || mathml ? wrapper : /** @type {HTMLTemplateElement} */ (wrapper).content;
 
     		assign_nodes(
     			/** @type {TemplateNode} */ (get_first_child(node)),
@@ -6231,7 +7172,11 @@
      * @returns {void}
      */
     function component(node, get_component, render_fn) {
+    	/** @type {TemplateNode | undefined} */
+    	var hydration_start_node;
+
     	if (hydrating) {
+    		hydration_start_node = hydrate_node;
     		hydrate_next();
     	}
 
@@ -6239,6 +7184,28 @@
 
     	block(() => {
     		var component = get_component() ?? null;
+
+    		if (hydrating) {
+    			var data = read_hydration_instruction(/** @type {TemplateNode} */ (hydration_start_node));
+
+    			var server_had_component = data === HYDRATION_START;
+    			var client_has_component = component !== null;
+
+    			if (server_had_component !== client_has_component) {
+    				// Hydration mismatch: skip the server-rendered nodes and render fresh
+    				var anchor = skip_nodes();
+
+    				set_hydrate_node(anchor);
+    				branches.anchor = anchor;
+
+    				set_hydrating(false);
+    				branches.ensure(component, component && ((target) => render_fn(target, component)));
+    				set_hydrating(true);
+
+    				return;
+    			}
+    		}
+
     		branches.ensure(component, component && ((target) => render_fn(target, component)));
     	}, EFFECT_TRANSPARENT);
     }
@@ -6405,10 +7372,17 @@
     			) {
     				const options = get_fn()(this.element, { from, to }, get_params?.());
 
-    				animation = animate(this.element, options, undefined, 1, () => {
-    					animation?.abort();
-    					animation = undefined;
-    				});
+    				animation = animate(
+    					this.element,
+    					options,
+    					undefined,
+    					1,
+    					() => {},
+    					() => {
+    						animation?.abort();
+    						animation = undefined;
+    					}
+    				);
     			}
     		},
     		fix() {
@@ -6529,17 +7503,24 @@
     				intro?.abort();
     			}
 
-    			dispatch_event(element, 'introstart');
+    			intro = animate(
+    				element,
+    				get_options(),
+    				outro,
+    				1,
+    				() => {
+    					dispatch_event(element, 'introstart');
+    				},
+    				() => {
+    					dispatch_event(element, 'introend');
 
-    			intro = animate(element, get_options(), outro, 1, () => {
-    				dispatch_event(element, 'introend');
+    					// Ensure we cancel the animation to prevent leaking
+    					intro?.abort();
+    					intro = current_options = undefined;
 
-    				// Ensure we cancel the animation to prevent leaking
-    				intro?.abort();
-    				intro = current_options = undefined;
-
-    				element.style.overflow = overflow;
-    			});
+    					element.style.overflow = overflow;
+    				}
+    			);
     		},
     		out(fn) {
     			if (!is_outro) {
@@ -6550,12 +7531,19 @@
 
     			element.inert = true;
 
-    			dispatch_event(element, 'outrostart');
-
-    			outro = animate(element, get_options(), intro, 0, () => {
-    				dispatch_event(element, 'outroend');
-    				fn?.();
-    			});
+    			outro = animate(
+    				element,
+    				get_options(),
+    				intro,
+    				0,
+    				() => {
+    					dispatch_event(element, 'outrostart');
+    				},
+    				() => {
+    					dispatch_event(element, 'outroend');
+    					fn?.();
+    				}
+    			);
     		},
     		stop: () => {
     			intro?.abort();
@@ -6583,7 +7571,7 @@
     				}
     			}
 
-    			run = !block || (block.f & EFFECT_RAN) !== 0;
+    			run = !block || (block.f & REACTION_RAN) !== 0;
     		}
 
     		if (run) {
@@ -6600,10 +7588,11 @@
      * @param {AnimationConfig | ((opts: { direction: 'in' | 'out' }) => AnimationConfig)} options
      * @param {Animation | undefined} counterpart The corresponding intro/outro to this outro/intro
      * @param {number} t2 The target `t` value — `1` for intro, `0` for outro
+     * @param {(() => void)} on_begin Called just before beginning the animation
      * @param {(() => void)} on_finish Called after successfully completing the animation
      * @returns {Animation}
      */
-    function animate(element, options, counterpart, t2, on_finish) {
+    function animate(element, options, counterpart, t2, on_begin, on_finish) {
     	var is_intro = t2 === 1;
 
     	if (is_function(options)) {
@@ -6617,7 +7606,7 @@
     		queue_micro_task(() => {
     			if (aborted) return;
     			var o = options({ direction: is_intro ? 'in' : 'out' });
-    			a = animate(element, o, counterpart, t2, on_finish);
+    			a = animate(element, o, counterpart, t2, on_begin, on_finish);
     		});
 
     		// ...but we want to do so without using `async`/`await` everywhere, so
@@ -6635,7 +7624,8 @@
 
     	counterpart?.deactivate();
 
-    	if (!options?.duration) {
+    	if (!options?.duration && !options?.delay) {
+    		on_begin();
     		on_finish();
 
     		return {
@@ -6674,6 +7664,8 @@
     	animation.onfinish = () => {
     		// remove dummy animation from the stack to prevent conflict with main animation
     		animation.cancel();
+
+    		on_begin();
 
     		// for bidirectional transitions, we start from the current position,
     		// rather than doing a full intro/outro
@@ -6777,7 +7769,7 @@
     		// Always querying the DOM is roughly the same perf as additionally checking for presence in a map first assuming
     		// that you'll get cache hits half of the time, so we just always query the dom for simplicity and code savings.
     		if (!target.querySelector('#' + css.hash)) {
-    			const style = document.createElement('style');
+    			const style = create_element('style');
     			style.id = css.hash;
     			style.textContent = css.code;
 
@@ -6850,7 +7842,7 @@
     	}
 
     	if (directives) {
-    		for (var key in directives) {
+    		for (var key of Object.keys(directives)) {
     			if (directives[key]) {
     				classname = classname ? classname + ' ' + key : key;
     			} else if (classname.length) {
@@ -6885,7 +7877,7 @@
     	var separator = important ? ' !important;' : ';';
     	var css = '';
 
-    	for (var key in styles) {
+    	for (var key of Object.keys(styles)) {
     		var value = styles[key];
     		if (value != null && value !== '') {
     			css += ' ' + key + ': ' + value + separator;
@@ -7021,8 +8013,7 @@
      * @returns {Record<string, boolean> | undefined}
      */
     function set_class(dom, is_html, value, hash, prev_classes, next_classes) {
-    	// @ts-expect-error need to add __className to patched prototype
-    	var prev = dom.__className;
+    	var prev = /** @type {any} */ (dom)[CLASS_CACHE];
 
     	if (
     		hydrating ||
@@ -7045,8 +8036,7 @@
     			}
     		}
 
-    		// @ts-expect-error need to add __className to patched prototype
-    		dom.__className = value;
+    		/** @type {any} */ (dom)[CLASS_CACHE] = value;
     	} else if (next_classes && prev_classes !== next_classes) {
     		for (var key in next_classes) {
     			var is_present = !!next_classes[key];
@@ -7087,8 +8077,7 @@
      * @param {Record<string, any> | [Record<string, any>, Record<string, any>]} [next_styles]
      */
     function set_style(dom, value, prev_styles, next_styles) {
-    	// @ts-expect-error
-    	var prev = dom.__style;
+    	var prev = /** @type {any} */ (dom)[STYLE_CACHE];
 
     	if (hydrating || prev !== value) {
     		var next_style_attr = to_style(value, next_styles);
@@ -7101,8 +8090,7 @@
     			}
     		}
 
-    		// @ts-expect-error
-    		dom.__style = value;
+    		/** @type {any} */ (dom)[STYLE_CACHE] = value;
     	} else if (next_styles) {
     		if (Array.isArray(next_styles)) {
     			update_styles(dom, prev_styles?.[0], next_styles[0]);
@@ -7197,13 +8185,19 @@
     	}
     }
 
-    /** @import { Effect } from '#client' */
+    /** @import { Blocker, Effect } from '#client' */
 
     const CLASS = Symbol('class');
     const STYLE = Symbol('style');
 
     const IS_CUSTOM_ELEMENT = Symbol('is custom element');
     const IS_HTML = Symbol('is html');
+
+    const LINK_TAG = IS_XHTML ? 'link' : 'LINK';
+    const INPUT_TAG = IS_XHTML ? 'input' : 'INPUT';
+    const OPTION_TAG = IS_XHTML ? 'option' : 'OPTION';
+    const SELECT_TAG = IS_XHTML ? 'select' : 'SELECT';
+    const PROGRESS_TAG = IS_XHTML ? 'progress' : 'PROGRESS';
 
     /**
      * The value/checked attribute in the template actually corresponds to the defaultValue property, so we need
@@ -7238,8 +8232,7 @@
     		}
     	};
 
-    	// @ts-expect-error
-    	input.__on_r = remove_defaults;
+    	/** @type {any} */ (input)[FORM_RESET_HANDLER] = remove_defaults;
     	queue_micro_task(remove_defaults);
     	add_form_reset_listener();
     }
@@ -7258,7 +8251,7 @@
     				value ?? undefined) ||
     		// @ts-expect-error
     		// `progress` elements always need their value set when it's `0`
-    		(element.value === value && (value !== 0 || element.nodeName !== 'PROGRESS'))
+    		(element.value === value && (value !== 0 || element.nodeName !== PROGRESS_TAG))
     	) {
     		return;
     	}
@@ -7321,7 +8314,7 @@
     		if (
     			attribute === 'src' ||
     			attribute === 'srcset' ||
-    			(attribute === 'href' && element.nodeName === 'LINK')
+    			(attribute === 'href' && element.nodeName === LINK_TAG)
     		) {
 
     			// If we reset these attributes, they would result in another network request, which we want to avoid.
@@ -7367,7 +8360,7 @@
     	should_remove_defaults = false,
     	skip_warning = false
     ) {
-    	if (hydrating && should_remove_defaults && element.tagName === 'INPUT') {
+    	if (hydrating && should_remove_defaults && element.nodeName === INPUT_TAG) {
     		var input = /** @type {HTMLInputElement} */ (element);
     		var attribute = input.type === 'checkbox' ? 'defaultChecked' : 'defaultValue';
 
@@ -7389,7 +8382,7 @@
     	}
 
     	var current = prev || {};
-    	var is_option_element = element.tagName === 'OPTION';
+    	var is_option_element = element.nodeName === OPTION_TAG;
 
     	for (var key in prev) {
     		if (!(key in next)) {
@@ -7465,14 +8458,14 @@
     			const opts = {};
     			const event_handle_key = '$$' + key;
     			let event_name = key.slice(2);
-    			var delegated = can_delegate_event(event_name);
+    			var is_delegated = can_delegate_event(event_name);
 
     			if (is_capture_event(event_name)) {
     				event_name = event_name.slice(0, -7);
     				opts.capture = true;
     			}
 
-    			if (!delegated && prev_value) {
+    			if (!is_delegated && prev_value) {
     				// Listening to same event but different handler -> our handle function below takes care of this
     				// If we were to remove and add listeners in this case, it could happen that the event is "swallowed"
     				// (the browser seems to not know yet that a new one exists now) and doesn't reach the handler
@@ -7483,25 +8476,19 @@
     				current[event_handle_key] = null;
     			}
 
-    			if (value != null) {
-    				if (!delegated) {
-    					/**
-    					 * @this {any}
-    					 * @param {Event} evt
-    					 */
-    					function handle(evt) {
-    						current[key].call(this, evt);
-    					}
-
-    					current[event_handle_key] = create_event(event_name, element, handle, opts);
-    				} else {
-    					// @ts-ignore
-    					element[`__${event_name}`] = value;
-    					delegate([event_name]);
+    			if (is_delegated) {
+    				delegated(event_name, element, value);
+    				delegate([event_name]);
+    			} else if (value != null) {
+    				/**
+    				 * @this {any}
+    				 * @param {Event} evt
+    				 */
+    				function handle(evt) {
+    					current[key].call(this, evt);
     				}
-    			} else if (delegated) {
-    				// @ts-ignore
-    				element[`__${event_name}`] = undefined;
+
+    				current[event_handle_key] = create_event(event_name, element, handle, opts);
     			}
     		} else if (key === 'style') {
     			// avoid using the setter
@@ -7570,7 +8557,7 @@
      * @param {(...expressions: any) => Record<string | symbol, any>} fn
      * @param {Array<() => any>} sync
      * @param {Array<() => Promise<any>>} async
-     * @param {Array<Promise<void>>} blockers
+     * @param {Blocker[]} blockers
      * @param {string} [css_hash]
      * @param {boolean} [should_remove_defaults]
      * @param {boolean} [skip_warning]
@@ -7592,7 +8579,7 @@
     		/** @type {Record<symbol, Effect>} */
     		var effects = {};
 
-    		var is_select = element.nodeName === 'SELECT';
+    		var is_select = element.nodeName === SELECT_TAG;
     		var inited = false;
 
     		managed(() => {
@@ -7648,8 +8635,7 @@
      */
     function get_attributes(element) {
     	return /** @type {Record<string | symbol, unknown>} **/ (
-    		// @ts-expect-error
-    		element.__attributes ??= {
+    		/** @type {any} */ (element)[ATTRIBUTES_CACHE] ??= {
     			[IS_CUSTOM_ELEMENT]: element.nodeName.includes('-'),
     			[IS_HTML]: element.namespaceURI === NAMESPACE_HTML
     		}
@@ -7670,13 +8656,19 @@
     	var proto = element; // In the case of custom elements there might be setters on the instance
     	var element_proto = Element.prototype;
 
-    	// Stop at Element, from there on there's only unnecessary setters we're not interested in
-    	// Do not use contructor.name here as that's unreliable in some browser environments
+    	// Stop at Element, from there on there's only unnecessary (and dangerous, like innerHTML) setters we're not interested in
+    	// Do not use constructor.name here as that's unreliable in some browser environments
     	while (element_proto !== proto) {
     		descriptors = get_descriptors(proto);
 
     		for (var key in descriptors) {
-    			if (descriptors[key].set) {
+    			if (
+    				descriptors[key].set &&
+    				// better safe than sorry, we don't want spread attributes to mess with HTML content
+    				key !== 'innerHTML' &&
+    				key !== 'textContent' &&
+    				key !== 'innerText'
+    			) {
     				setters.push(key);
     			}
     		}
@@ -7688,9 +8680,8 @@
     }
 
     /**
-     * Resize observer singleton.
-     * One listener per element only!
-     * https://groups.google.com/a/chromium.org/g/blink-dev/c/z6ienONUb5A/m/F5-VcUZtBAAJ
+     * We create one listener for all elements
+     * @see {@link https://groups.google.com/a/chromium.org/g/blink-dev/c/z6ienONUb5A/m/F5-VcUZtBAAJ Explanation}
      */
     class ResizeObserverSingleton {
     	/** */
@@ -7768,6 +8759,8 @@
     	});
     }
 
+    /** @import { ComponentContext, Effect } from '#client' */
+
     /**
      * @param {any} bound_value
      * @param {Element} element_or_component
@@ -7788,6 +8781,9 @@
      * @returns {void}
      */
     function bind_this(element_or_component = {}, update, get_value, get_parts) {
+    	var component_effect = /** @type {ComponentContext} */ (component_context).r;
+    	var parent = /** @type {Effect} */ (active_effect);
+
     	effect(() => {
     		/** @type {unknown[]} */
     		var old_parts;
@@ -7801,7 +8797,7 @@
     			parts = [];
 
     			untrack(() => {
-    				if (element_or_component !== get_value(...parts)) {
+    				if (!is_bound_this(get_value(...parts), element_or_component)) {
     					update(element_or_component, ...parts);
     					// If this is an effect rerun (cause: each block context changes), then nullify the binding at
     					// the previous position if it isn't already taken over by a different effect.
@@ -7813,12 +8809,25 @@
     		});
 
     		return () => {
-    			// We cannot use effects in the teardown phase, we we use a microtask instead.
-    			queue_micro_task(() => {
+    			// When the bind:this effect is destroyed, we go up the effect parent chain until we find the last parent effect that is destroyed,
+    			// or the effect containing the component bind:this is in (whichever comes first). That way we can time the nulling of the binding
+    			// as close to user/developer expectation as possible.
+    			// TODO Svelte 6: Decide if we want to keep this logic or just always null the binding in the component effect's teardown
+    			// (which would be simpler, but less intuitive in some cases, and breaks the `ondestroy-before-cleanup` test)
+    			let p = parent;
+    			while (p !== component_effect && p.parent !== null && p.parent.f & DESTROYING) {
+    				p = p.parent;
+    			}
+    			const teardown = () => {
     				if (parts && is_bound_this(get_value(...parts), element_or_component)) {
     					update(null, ...parts);
     				}
-    			});
+    			};
+    			const original_teardown = p.teardown;
+    			p.teardown = () => {
+    				teardown();
+    				original_teardown?.();
+    			};
     		};
     	});
 
@@ -7903,36 +8912,7 @@
     	props();
     }
 
-    /** @import { StoreReferencesContainer } from '#client' */
-    /** @import { Store } from '#shared' */
-
-    /**
-     * Whether or not the prop currently being read is a store binding, as in
-     * `<Child bind:x={$y} />`. If it is, we treat the prop as mutable even in
-     * runes mode, and skip `binding_property_non_reactive` validation
-     */
-    let is_store_binding = false;
-
-    /**
-     * Returns a tuple that indicates whether `fn()` reads a prop that is a store binding.
-     * Used to prevent `binding_property_non_reactive` validation false positives and
-     * ensure that these props are treated as mutable even in runes mode
-     * @template T
-     * @param {() => T} fn
-     * @returns {[T, boolean]}
-     */
-    function capture_store_binding(fn) {
-    	var previous_is_store_binding = is_store_binding;
-
-    	try {
-    		is_store_binding = false;
-    		return [fn(), is_store_binding];
-    	} finally {
-    		is_store_binding = previous_is_store_binding;
-    	}
-    }
-
-    /** @import { Effect, Source } from './types.js' */
+    /** @import { Derived, Effect, Source } from './types.js' */
 
     /**
      * The proxy handler for rest props (i.e. `const { x, ...rest } = $props()`).
@@ -7998,8 +8978,14 @@
 
     	var fallback_value = /** @type {V} */ (fallback);
     	var fallback_dirty = true;
+    	var fallback_signal = /** @type {Derived<V> | undefined} */ (undefined);
 
     	var get_fallback = () => {
+    		if (lazy && runes) {
+    			fallback_signal ??= derived(/** @type {() => V} */ (fallback));
+    			return get(fallback_signal);
+    		}
+
     		if (fallback_dirty) {
     			fallback_dirty = false;
 
@@ -8012,7 +8998,7 @@
     	};
 
     	/** @type {((v: V) => void) | undefined} */
-    	var setter;
+    	let setter;
 
     	if (bindable) {
     		// Can be the case when someone does `mount(Component, props)` with `let props = $state({...})`
@@ -8024,6 +9010,7 @@
     			(is_entry_props && key in props ? (v) => (props[key] = v) : undefined);
     	}
 
+    	/** @type {V} */
     	var initial_value;
     	var is_store_sub = false;
 
@@ -8129,9 +9116,7 @@
 
     			// special case — avoid recalculating the derived if we're in a
     			// teardown function and the prop was overridden locally, or the
-    			// component was already destroyed (this latter part is necessary
-    			// because `bind:this` can read props after the component has
-    			// been destroyed. TODO simplify `bind:this`
+    			// component was already destroyed (people could access props in a timeout)
     			if ((is_destroying_effect && overridden) || (parent_effect.f & DESTROYED) !== 0) {
     				return d.v;
     			}
@@ -8222,7 +9207,8 @@
     			props,
     			context: options.context,
     			intro: options.intro ?? false,
-    			recover: options.recover
+    			recover: options.recover,
+    			transformError: options.transformError
     		});
 
     		// We don't flushSync for custom element wrappers or if the user doesn't want it,
@@ -8314,18 +9300,23 @@
     		$$l_u = new Map();
     		/** @type {any} The managed render effect for reflecting attributes */
     		$$me;
+    		/** @type {ShadowRoot | null} The ShadowRoot of the custom element */
+    		$$shadowRoot = null;
 
     		/**
     		 * @param {*} $$componentCtor
     		 * @param {*} $$slots
-    		 * @param {*} use_shadow_dom
+    		 * @param {ShadowRootInit | undefined} shadow_root_init
     		 */
-    		constructor($$componentCtor, $$slots, use_shadow_dom) {
+    		constructor($$componentCtor, $$slots, shadow_root_init) {
     			super();
     			this.$$ctor = $$componentCtor;
     			this.$$s = $$slots;
-    			if (use_shadow_dom) {
-    				this.attachShadow({ mode: 'open' });
+
+    			if (shadow_root_init) {
+    				// We need to store the reference to shadow root, because `closed` shadow root cannot be
+    				// accessed with `this.shadowRoot`.
+    				this.$$shadowRoot = this.attachShadow(shadow_root_init);
     			}
     		}
 
@@ -8377,7 +9368,7 @@
     					 * @param {Element} anchor
     					 */
     					return (anchor) => {
-    						const slot = document.createElement('slot');
+    						const slot = create_element('slot');
     						if (name !== 'default') slot.name = name;
 
     						append(anchor, slot);
@@ -8415,7 +9406,7 @@
     				}
     				this.$$c = createClassComponent({
     					component: this.$$ctor,
-    					target: this.shadowRoot || this,
+    					target: this.$$shadowRoot || this,
     					props: {
     						...this.$$d,
     						$$slots,
@@ -8556,7 +9547,7 @@
      * @param {Record<string, CustomElementPropDefinition>} props_definition  The props to observe
      * @param {string[]} slots  The slots to create
      * @param {string[]} exports  Explicitly exported values, other than props
-     * @param {boolean} use_shadow_dom  Whether to use shadow DOM
+     * @param {ShadowRootInit | undefined} shadow_root_init  Options passed to shadow DOM constructor
      * @param {(ce: new () => HTMLElement) => new () => HTMLElement} [extend]
      */
     function create_custom_element(
@@ -8564,12 +9555,12 @@
     	props_definition,
     	slots,
     	exports,
-    	use_shadow_dom,
+    	shadow_root_init,
     	extend
     ) {
     	let Class = class extends SvelteElement {
     		constructor() {
-    			super(Component, slots, use_shadow_dom);
+    			super(Component, slots, shadow_root_init);
     			this.$$p_d = props_definition;
     		}
     		static get observedAttributes() {
@@ -8614,7 +9605,7 @@
 
     const RUNTIME_CALLBACKS_CTX = Symbol('cv-runtime-callbacks');
 
-    /* icon-settings-store.svelte.ts generated by Svelte v5.46.1 */
+    /* icon-settings-store.svelte.ts generated by Svelte v5.55.10 */
 
     const COLLAPSED_KEY = 'cv-settings-icon-collapsed';
     const OFFSET_KEY = 'cv-settings-icon-offset';
@@ -8996,8 +9987,7 @@
     		var s = sources.get(key);
 
     		if (s === undefined) {
-    			var ret = super.get(key);
-    			if (ret !== undefined) {
+    			if (super.has(key)) {
     				s = this.#source(0);
 
     				sources.set(key, s);
@@ -9028,8 +10018,7 @@
     		var s = sources.get(key);
 
     		if (s === undefined) {
-    			var ret = super.get(key);
-    			if (ret !== undefined) {
+    			if (super.has(key)) {
     				s = this.#source(0);
 
     				sources.set(key, s);
@@ -9088,8 +10077,11 @@
 
     		if (s !== undefined) {
     			sources.delete(key);
-    			set(this.#size, super.size);
     			set(s, -1);
+    		}
+
+    		if (res) {
+    			set(this.#size, super.size);
     			increment(this.#version);
     		}
 
@@ -9155,7 +10147,7 @@
     	}
     }
 
-    /* placeholder-registry-store.svelte.ts generated by Svelte v5.46.1 */
+    /* placeholder-registry-store.svelte.ts generated by Svelte v5.55.10 */
 
     class PlaceholderRegistryStore {
     	// Reactivity: Map is deeply reactive in Svelte 5 with $state
@@ -9326,7 +10318,7 @@
         return CONFIG_SECTION_KEYS.includes(key);
     }
 
-    /* active-state-store.svelte.ts generated by Svelte v5.46.1 */
+    /* active-state-store.svelte.ts generated by Svelte v5.55.10 */
 
     class ActiveStateStore {
     	#config = /**
@@ -9486,7 +10478,6 @@
     			shownToggles: validatedShownToggles,
     			peekToggles: validatedPeekToggles,
     			tabs: { ...defaults.tabs ?? {}, ...validatedTabs },
-
     			// Use current state as base so adaptation defaults (layered before this call)
     			// are preserved; user-persisted values still win on top.
     			placeholders: { ...this.state.placeholders ?? {}, ...validatedPlaceholders }
@@ -9839,7 +10830,7 @@
 
     const activeStateStore = new ActiveStateStore();
 
-    /* element-store.svelte.ts generated by Svelte v5.46.1 */
+    /* element-store.svelte.ts generated by Svelte v5.55.10 */
 
     class ElementStore {
     	#detectedToggles = /**
@@ -9923,7 +10914,7 @@
 
     const elementStore = new ElementStore();
 
-    /* ui-store.svelte.ts generated by Svelte v5.46.1 */
+    /* ui-store.svelte.ts generated by Svelte v5.55.10 */
 
     class UIStore {
     	#uiOptions = state(proxy({
@@ -9984,7 +10975,7 @@
 
     const uiStore = new UIStore();
 
-    /* derived-store.svelte.ts generated by Svelte v5.46.1 */
+    /* derived-store.svelte.ts generated by Svelte v5.55.10 */
 
     class DerivedStateStore {
     	#menuToggles = user_derived(
@@ -10097,11 +11088,6 @@
     	var div_1 = child(div);
     	let styles;
     	var button = child(div_1);
-
-    	button.__click = function (...$$args) {
-    		onclose()?.apply(this, $$args);
-    	};
-
     	var p = sibling(button, 2);
     	var text = child(p, true);
 
@@ -10119,6 +11105,10 @@
     		});
 
     		set_text(text, message());
+    	});
+
+    	delegated('click', button, function (...$$args) {
+    		onclose()?.apply(this, $$args);
     	});
 
     	append($$anchor, div);
@@ -10367,15 +11357,8 @@
 
     	var div = root$w();
     	let classes;
-
-    	div.__mousedown = onMouseDown;
-    	div.__touchstart = onTouchStart;
-
     	let styles;
     	var button = child(div);
-
-    	button.__click = handleMainClick;
-
     	var span = child(button);
     	var node = child(span);
 
@@ -10384,12 +11367,6 @@
     	reset(button);
 
     	var button_1 = sibling(button, 2);
-
-    	button_1.__click = handleCollapse;
-    	button_1.__mousedown = (e) => e.stopPropagation();
-    	button_1.__touchstart = (e) => e.stopPropagation();
-    	button_1.__pointerdown = (e) => e.stopPropagation();
-
     	var text = child(button_1, true);
 
     	reset(button_1);
@@ -10400,15 +11377,16 @@
     		var consequent = ($$anchor) => {
     			var button_2 = root_1$i();
 
-    			button_2.__click = (e) => {
+    			template_effect(() => set_attribute(button_2, 'data-side', get(isRight) ? 'left' : 'right'));
+
+    			delegated('click', button_2, (e) => {
     				e.stopPropagation();
     				iconSettingsStore.dismiss();
-    			};
+    			});
 
-    			button_2.__mousedown = (e) => e.stopPropagation();
-    			button_2.__touchstart = (e) => e.stopPropagation();
-    			button_2.__pointerdown = (e) => e.stopPropagation();
-    			template_effect(() => set_attribute(button_2, 'data-side', get(isRight) ? 'left' : 'right'));
+    			delegated('mousedown', button_2, (e) => e.stopPropagation());
+    			delegated('touchstart', button_2, (e) => e.stopPropagation());
+    			delegated('pointerdown', button_2, (e) => e.stopPropagation());
     			append($$anchor, button_2);
     		};
 
@@ -10444,6 +11422,13 @@
     		]
     	);
 
+    	delegated('mousedown', div, onMouseDown);
+    	delegated('touchstart', div, onTouchStart);
+    	delegated('click', button, handleMainClick);
+    	delegated('click', button_1, handleCollapse);
+    	delegated('mousedown', button_1, (e) => e.stopPropagation());
+    	delegated('touchstart', button_1, (e) => e.stopPropagation());
+    	delegated('pointerdown', button_1, (e) => e.stopPropagation());
     	append($$anchor, div);
     	pop();
     }
@@ -11118,7 +12103,7 @@
         }
     }
 
-    /* toast-store.svelte.ts generated by Svelte v5.46.1 */
+    /* toast-store.svelte.ts generated by Svelte v5.55.10 */
 
     const TOAST_CLASS = 'cv-toast-notification';
 
@@ -11359,9 +12344,6 @@
 
     	each(div, 20, () => ['hide', 'peek', 'show'], (option) => option, ($$anchor, option) => {
     		var button = root_1$h();
-
-    		button.__click = () => onchange()(option);
-
     		var node = child(button);
 
     		{
@@ -11402,6 +12384,7 @@
     			]
     		);
 
+    		delegated('click', button, () => onchange()(option));
     		append($$anchor, button);
     	});
 
@@ -11418,7 +12401,7 @@
     }
 
     delegate(['click']);
-    create_custom_element(ToggleSegmentedControl, { value: {}, onchange: {}, ariaLabel: {}, standalone: {} }, [], [], true);
+    create_custom_element(ToggleSegmentedControl, { value: {}, onchange: {}, ariaLabel: {}, standalone: {} }, [], [], { mode: 'open' });
 
     var root_1$g = from_html(`<p class="description svelte-gwkhja"> </p>`);
     var root$l = from_html(`<div class="card svelte-gwkhja"><div class="content svelte-gwkhja"><div><p class="title svelte-gwkhja"> </p> <!></div> <!></div></div>`);
@@ -11533,8 +12516,6 @@
 
     	var select = sibling(div_1, 2);
 
-    	select.__change = onChange;
-
     	each(select, 21, () => $$props.group.tabs, (tab) => tab.tabId, ($$anchor, tab) => {
     		var option = root_2$b();
     		var text_2 = child(option, true);
@@ -11574,6 +12555,7 @@
     		}
     	});
 
+    	delegated('change', select, onChange);
     	append($$anchor, div);
     	pop();
     }
@@ -11649,7 +12631,6 @@
     	var input = child(div_2);
 
     	remove_input_defaults(input);
-    	input.__input = handleInput;
 
     	var span = sibling(input, 2);
     	var node_1 = child(span);
@@ -11667,6 +12648,7 @@
     		set_value(input, value());
     	});
 
+    	delegated('input', input, handleInput);
     	append($$anchor, div);
     	pop();
     }
@@ -11715,19 +12697,19 @@
     }
 
     var root_1$d = from_html(`<button type="button">Customize</button>`);
-    var root_3$7 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
+    var root_3$8 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
     var root_5$1 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Toggles</div> <div class="toggles-container svelte-16uy9h6"></div></div>`);
     var root_7$1 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Placeholders</div> <div class="placeholders-container svelte-16uy9h6"></div></div>`);
     var root_9 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Tab Groups</div> <div class="tabgroups-container svelte-16uy9h6"><div class="tabgroup-card header-card svelte-16uy9h6" role="group"><div class="tabgroup-row svelte-16uy9h6"><div class="logo-box svelte-16uy9h6" id="cv-nav-icon-box"><div class="nav-icon svelte-16uy9h6"><!></div></div> <div class="tabgroup-info svelte-16uy9h6"><div class="tabgroup-title-container"><p class="tabgroup-title svelte-16uy9h6">Show only the selected tab</p></div> <p class="tabgroup-description svelte-16uy9h6">Hide the navigation headers</p></div> <label class="toggle-switch nav-toggle svelte-16uy9h6"><input class="nav-pref-input svelte-16uy9h6" type="checkbox" aria-label="Show only the selected tab"/> <span class="switch-bg svelte-16uy9h6"></span> <span class="switch-knob svelte-16uy9h6"></span></label></div></div> <div class="tab-groups-list svelte-16uy9h6"></div></div></div>`);
-    var root_4$5 = from_html(`<!> <!> <!>`, 1);
+    var root_4$4 = from_html(`<!> <!> <!>`, 1);
     var root_2$a = from_html(`<div class="tab-content active svelte-16uy9h6"><!> <!></div>`);
-    var root_16 = from_html(`<button type="button" class="share-action-btn copy-url-btn svelte-16uy9h6"><span class="btn-icon svelte-16uy9h6"><!></span> <span><!></span></button>`);
+    var root_15 = from_html(`<button type="button" class="share-action-btn copy-url-btn svelte-16uy9h6"><span class="btn-icon svelte-16uy9h6"><!></span> <span><!></span></button>`);
 
-    var root_15 = from_html(`<div class="tab-content active svelte-16uy9h6"><div class="share-content svelte-16uy9h6"><div class="share-instruction svelte-16uy9h6">Create a shareable link for your current customization, or select specific parts of
+    var root_14 = from_html(`<div class="tab-content active svelte-16uy9h6"><div class="share-content svelte-16uy9h6"><div class="share-instruction svelte-16uy9h6">Create a shareable link for your current customization, or select specific parts of
               the page to share.</div> <button type="button" class="share-action-btn primary start-share-btn svelte-16uy9h6"><span class="btn-icon svelte-16uy9h6"><!></span> <span>Select elements to share</span></button> <!></div></div>`);
 
-    var root_21 = from_html(`<button type="button" class="reset-btn svelte-16uy9h6" title="Reset to Default">Reset</button>`);
-    var root_22 = from_html(`<div></div>`);
+    var root_20 = from_html(`<button type="button" class="reset-btn svelte-16uy9h6" title="Reset to Default">Reset</button>`);
+    var root_21 = from_html(`<div></div>`);
     var root$h = from_html(`<div class="modal-overlay svelte-16uy9h6" role="presentation"><div class="modal-box cv-custom-state-modal svelte-16uy9h6" role="dialog" aria-modal="true"><header class="header svelte-16uy9h6"><div class="header-content svelte-16uy9h6"><div class="modal-icon svelte-16uy9h6"><!></div> <div class="title svelte-16uy9h6"> </div></div> <button type="button" class="close-btn svelte-16uy9h6" aria-label="Close modal"><!></button></header> <main class="main svelte-16uy9h6"><div class="tabs svelte-16uy9h6"><!> <button type="button">Share</button></div> <!></main> <footer class="footer svelte-16uy9h6"><!> <div class="footer-attribution svelte-16uy9h6"><span class="footer-tagline svelte-16uy9h6">Browser-side page customisations provided by</span> <div class="footer-link-container svelte-16uy9h6"><a href="https://custardui.js.org" target="_blank" rel="noopener noreferrer" class="footer-link svelte-16uy9h6">custardui.js.org</a> <span class="footer-version svelte-16uy9h6"></span></div></div> <button type="button" class="done-btn svelte-16uy9h6">Done</button></footer></div></div>`);
 
     const $$css$l = {
@@ -11867,11 +12849,6 @@
     	}
 
     	var div = root$h();
-
-    	div.__click = (e) => {
-    		if (e.target === e.currentTarget) onclose()();
-    	};
-
     	var div_1 = child(div);
     	var header = child(div_1);
     	var div_2 = child(header);
@@ -11888,11 +12865,6 @@
     	reset(div_2);
 
     	var button = sibling(div_2, 2);
-
-    	button.__click = function (...$$args) {
-    		onclose()?.apply(this, $$args);
-    	};
-
     	var node_1 = child(button);
 
     	IconClose(node_1, {});
@@ -11908,8 +12880,8 @@
     		var consequent = ($$anchor) => {
     			var button_1 = root_1$d();
 
-    			button_1.__click = () => set(activeTab, 'customize');
     			template_effect(() => set_class(button_1, 1, `tab ${get(activeTab) === 'customize' ? 'active' : ''}`, 'svelte-16uy9h6'));
+    			delegated('click', button_1, () => set(activeTab, 'customize'));
     			append($$anchor, button_1);
     		};
 
@@ -11920,7 +12892,6 @@
 
     	var button_2 = sibling(node_2, 2);
 
-    	button_2.__click = () => set(activeTab, 'share');
     	reset(div_5);
 
     	var node_3 = sibling(div_5, 2);
@@ -11932,7 +12903,7 @@
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var p = root_3$7();
+    					var p = root_3$8();
     					var text_1 = child(p, true);
 
     					reset(p);
@@ -11948,7 +12919,7 @@
     			var node_5 = sibling(node_4, 2);
 
     			each(node_5, 16, () => get(sectionOrder), (section) => section, ($$anchor, section) => {
-    				var fragment = root_4$5();
+    				var fragment = root_4$4();
     				var node_6 = first_child(fragment);
 
     				{
@@ -11968,7 +12939,6 @@
     									get value() {
     										return get($0);
     									},
-
     									onchange: handleToggleChange
     								});
     							}
@@ -12003,7 +12973,6 @@
     									get value() {
     										return get($0);
     									},
-
     									onchange: handlePlaceholderChange
     								});
     							}
@@ -12036,33 +13005,16 @@
     								IconNavDashed($$anchor, {});
     							};
 
-    							var alternate_1 = ($$anchor) => {
-    								var fragment_4 = comment();
-    								var node_10 = first_child(fragment_4);
+    							var consequent_5 = ($$anchor) => {
+    								IconNavHeadingOn($$anchor, {});
+    							};
 
-    								{
-    									var consequent_5 = ($$anchor) => {
-    										IconNavHeadingOn($$anchor, {});
-    									};
-
-    									var alternate = ($$anchor) => {
-    										IconNavHeadingOff($$anchor, {});
-    									};
-
-    									if_block(
-    										node_10,
-    										($$render) => {
-    											if (get(areTabNavsVisible)) $$render(consequent_5); else $$render(alternate, false);
-    										},
-    										true
-    									);
-    								}
-
-    								append($$anchor, fragment_4);
+    							var alternate = ($$anchor) => {
+    								IconNavHeadingOff($$anchor, {});
     							};
 
     							if_block(node_9, ($$render) => {
-    								if (get(isNavHovering)) $$render(consequent_4); else $$render(alternate_1, false);
+    								if (get(isNavHovering)) $$render(consequent_4); else if (get(areTabNavsVisible)) $$render(consequent_5, 1); else $$render(alternate, -1);
     							});
     						}
 
@@ -12073,7 +13025,6 @@
     						var input = child(label);
 
     						remove_input_defaults(input);
-    						input.__change = handleNavToggle;
     						next(4);
     						reset(label);
     						reset(div_14);
@@ -12093,7 +13044,6 @@
     									get activeTabId() {
     										return get($0);
     									},
-
     									onchange: handleTabGroupChange
     								});
     							}
@@ -12105,6 +13055,7 @@
     						template_effect(() => set_checked(input, !get(areTabNavsVisible)));
     						event('mouseenter', div_13, () => handleNavHover(true));
     						event('mouseleave', div_13, () => handleNavHover(false));
+    						delegated('change', input, handleNavToggle);
     						append($$anchor, div_11);
     					};
 
@@ -12121,50 +13072,44 @@
     			append($$anchor, div_6);
     		};
 
-    		var alternate_4 = ($$anchor) => {
-    			var div_18 = root_15();
+    		var alternate_3 = ($$anchor) => {
+    			var div_18 = root_14();
     			var div_19 = child(div_18);
     			var button_3 = sibling(child(div_19), 2);
-
-    			button_3.__click = () => onstartShare()();
-
     			var span = child(button_3);
-    			var node_11 = child(span);
+    			var node_10 = child(span);
 
-    			IconShare(node_11, {});
+    			IconShare(node_10, {});
     			reset(span);
     			next(2);
     			reset(button_3);
 
-    			var node_12 = sibling(button_3, 2);
+    			var node_11 = sibling(button_3, 2);
 
     			{
     				var consequent_10 = ($$anchor) => {
-    					var button_4 = root_16();
-
-    					button_4.__click = copyShareUrl;
-
+    					var button_4 = root_15();
     					var span_1 = child(button_4);
-    					var node_13 = child(span_1);
+    					var node_12 = child(span_1);
 
     					{
     						var consequent_8 = ($$anchor) => {
     							IconCheck($$anchor, {});
     						};
 
-    						var alternate_2 = ($$anchor) => {
+    						var alternate_1 = ($$anchor) => {
     							IconCopy($$anchor, {});
     						};
 
-    						if_block(node_13, ($$render) => {
-    							if (get(copySuccess)) $$render(consequent_8); else $$render(alternate_2, false);
+    						if_block(node_12, ($$render) => {
+    							if (get(copySuccess)) $$render(consequent_8); else $$render(alternate_1, -1);
     						});
     					}
 
     					reset(span_1);
 
     					var span_2 = sibling(span_1, 2);
-    					var node_14 = child(span_2);
+    					var node_13 = child(span_2);
 
     					{
     						var consequent_9 = ($$anchor) => {
@@ -12173,66 +13118,68 @@
     							append($$anchor, text_2);
     						};
 
-    						var alternate_3 = ($$anchor) => {
+    						var alternate_2 = ($$anchor) => {
     							var text_3 = text('Copy Shareable URL of Settings');
 
     							append($$anchor, text_3);
     						};
 
-    						if_block(node_14, ($$render) => {
-    							if (get(copySuccess)) $$render(consequent_9); else $$render(alternate_3, false);
+    						if_block(node_13, ($$render) => {
+    							if (get(copySuccess)) $$render(consequent_9); else $$render(alternate_2, -1);
     						});
     					}
 
     					reset(span_2);
     					reset(button_4);
+    					delegated('click', button_4, copyShareUrl);
     					append($$anchor, button_4);
     				};
 
-    				if_block(node_12, ($$render) => {
+    				if_block(node_11, ($$render) => {
     					if (get(hasCustomizeContent)) $$render(consequent_10);
     				});
     			}
 
     			reset(div_19);
     			reset(div_18);
+    			delegated('click', button_3, () => onstartShare()());
     			transition(1, div_18, () => fade, () => ({ duration: 150 }));
     			append($$anchor, div_18);
     		};
 
     		if_block(node_3, ($$render) => {
-    			if (get(activeTab) === 'customize') $$render(consequent_7); else $$render(alternate_4, false);
+    			if (get(activeTab) === 'customize') $$render(consequent_7); else $$render(alternate_3, -1);
     		});
     	}
 
     	reset(main);
 
     	var footer = sibling(main, 2);
-    	var node_15 = child(footer);
+    	var node_14 = child(footer);
 
     	{
     		var consequent_11 = ($$anchor) => {
-    			var button_5 = root_21();
+    			var button_5 = root_20();
 
-    			button_5.__click = function (...$$args) {
+    			delegated('click', button_5, function (...$$args) {
     				onreset()?.apply(this, $$args);
-    			};
+    			});
 
     			append($$anchor, button_5);
     		};
 
-    		var alternate_5 = ($$anchor) => {
-    			var div_20 = root_22();
+    		var alternate_4 = ($$anchor) => {
+    			var div_20 = root_21();
 
     			append($$anchor, div_20);
     		};
 
-    		if_block(node_15, ($$render) => {
-    			if (get(showReset)) $$render(consequent_11); else $$render(alternate_5, false);
+    		if_block(node_14, ($$render) => {
+    			if (get(showReset)) $$render(consequent_11); else $$render(alternate_4, -1);
     		});
     	}
 
-    	var div_21 = sibling(node_15, 2);
+    	var div_21 = sibling(node_14, 2);
     	var div_22 = sibling(child(div_21), 2);
     	var span_3 = sibling(child(div_22), 2);
 
@@ -12241,10 +13188,6 @@
     	reset(div_21);
 
     	var button_6 = sibling(div_21, 2);
-
-    	button_6.__click = function (...$$args) {
-    		onclose()?.apply(this, $$args);
-    	};
 
     	reset(footer);
     	reset(div_1);
@@ -12260,7 +13203,21 @@
     		set_class(button_2, 1, `tab ${get(activeTab) === 'share' ? 'active' : ''}`, 'svelte-16uy9h6');
     	});
 
+    	delegated('click', div, (e) => {
+    		if (e.target === e.currentTarget) onclose()();
+    	});
+
+    	delegated('click', button, function (...$$args) {
+    		onclose()?.apply(this, $$args);
+    	});
+
+    	delegated('click', button_2, () => set(activeTab, 'share'));
     	bind_element_size(main, 'clientHeight', ($$value) => set(mainClientHeight, $$value));
+
+    	delegated('click', button_6, function (...$$args) {
+    		onclose()?.apply(this, $$args);
+    	});
+
     	transition(3, div_1, () => scale, () => ({ duration: 200, start: 0.9 }));
     	transition(3, div, () => fade, () => ({ duration: 200 }));
     	append($$anchor, div);
@@ -12802,7 +13759,7 @@
         return false;
     }
 
-    /* share-store.svelte.ts generated by Svelte v5.46.1 */
+    /* share-store.svelte.ts generated by Svelte v5.55.10 */
 
     class ShareStore {
     	#isActive = state(false);
@@ -13103,7 +14060,7 @@
 
     const shareStore = new ShareStore();
 
-    /* focus-store.svelte.ts generated by Svelte v5.46.1 */
+    /* focus-store.svelte.ts generated by Svelte v5.55.10 */
 
     class FocusStore {
     	#isActive = state(false);
@@ -13295,16 +14252,9 @@
     	var div = root$f();
     	var div_1 = child(div);
     	var button = child(div_1);
-
-    	button.__click = () => shareStore.setSelectionMode('highlight');
-
     	var button_1 = sibling(button, 2);
-
-    	button_1.__click = () => shareStore.setSelectionMode('show');
-
     	var button_2 = sibling(button_1, 2);
 
-    	button_2.__click = () => shareStore.setSelectionMode('hide');
     	reset(div_1);
 
     	var span = sibling(div_1, 4);
@@ -13313,20 +14263,10 @@
     	reset(span);
 
     	var button_3 = sibling(span, 2);
-
-    	button_3.__click = handleClear;
-
     	var button_4 = sibling(button_3, 2);
-
-    	button_4.__click = handlePreview;
-
     	var button_5 = sibling(button_4, 2);
-
-    	button_5.__click = handleGenerate;
-
     	var button_6 = sibling(button_5, 2);
 
-    	button_6.__click = handleExit;
     	reset(div);
 
     	template_effect(() => {
@@ -13343,6 +14283,13 @@
 			: shareStore.selectionMode === 'highlight' ? 'highlight' : 'hide'}`);
     	});
 
+    	delegated('click', button, () => shareStore.setSelectionMode('highlight'));
+    	delegated('click', button_1, () => shareStore.setSelectionMode('show'));
+    	delegated('click', button_2, () => shareStore.setSelectionMode('hide'));
+    	delegated('click', button_3, handleClear);
+    	delegated('click', button_4, handlePreview);
+    	delegated('click', button_5, handleGenerate);
+    	delegated('click', button_6, handleExit);
     	transition(3, div, () => fly, () => ({ y: 50, duration: 200 }));
     	append($$anchor, div);
     	pop();
@@ -13351,7 +14298,7 @@
     delegate(['click']);
 
     var root_2$9 = from_html(`<span class="id-badge svelte-64gpkh" title="ID detection active"> </span>`);
-    var root_3$6 = from_html(`<button type="button" class="action-btn up svelte-64gpkh" title="Select Parent">↰</button>`);
+    var root_3$7 = from_html(`<button type="button" class="action-btn up svelte-64gpkh" title="Select Parent">↰</button>`);
     var root_1$b = from_html(`<div class="hover-helper svelte-64gpkh"><div class="info svelte-64gpkh"><span class="tag svelte-64gpkh"> </span> <!></div> <button type="button"> </button> <!></div>`);
 
     const $$css$i = {
@@ -13487,9 +14434,6 @@
     			reset(div_1);
 
     			var button = sibling(div_1, 2);
-
-    			button.__click = handleSelect;
-
     			var text_2 = child(button, true);
 
     			reset(button);
@@ -13498,9 +14442,9 @@
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var button_1 = root_3$6();
+    					var button_1 = root_3$7();
 
-    					button_1.__click = handleSelectParent;
+    					delegated('click', button_1, handleSelectParent);
     					append($$anchor, button_1);
     				};
 
@@ -13519,6 +14463,7 @@
     				set_text(text_2, get(isSelected) ? '✕' : '✓');
     			});
 
+    			delegated('click', button, handleSelect);
     			bind_element_size(div, 'clientWidth', ($$value) => set(helperWidth, $$value));
     			transition(3, div, () => fade, () => ({ duration: 100 }));
     			append($$anchor, div);
@@ -13609,9 +14554,6 @@
     	let topY = user_derived(() => get(rect).top);
     	var div = root$e();
     	var button = child(div);
-
-    	button.__click = handleTriggerClick;
-
     	var span = child(button);
 
     	reset(button);
@@ -13626,9 +14568,6 @@
     				var button_1 = root_2$8();
     				let classes;
 
-    				button_1.__click = (e) => handleSwatchClick(e, get(color).key);
-    				button_1.__dblclick = (e) => handleSwatchDblClick(e, get(color).key);
-
     				template_effect(() => {
     					classes = set_class(button_1, 1, 'cv-color-swatch svelte-1r78n4c', null, classes, { active: get(currentColorKey) === get(color).key });
     					set_style(button_1, `background: ${get(color).hex ?? ''};`);
@@ -13637,6 +14576,8 @@
     					set_attribute(button_1, 'aria-pressed', get(currentColorKey) === get(color).key);
     				});
 
+    				delegated('click', button_1, (e) => handleSwatchClick(e, get(color).key));
+    				delegated('dblclick', button_1, (e) => handleSwatchDblClick(e, get(color).key));
     				append($$anchor, button_1);
     			});
 
@@ -13657,6 +14598,7 @@
     		set_style(span, `background: ${get(currentHex) ?? ''};`);
     	});
 
+    	delegated('click', button, handleTriggerClick);
     	append($$anchor, div);
     	pop();
     }
@@ -13665,8 +14607,8 @@
 
     var root_1$9 = from_html(`<span class="cv-annotation-tab-preview svelte-1r1spmr"> </span>`);
     var root_2$7 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
-    var root_4$4 = from_html(`<button type="button"> </button>`);
-    var root_3$5 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
+    var root_4$3 = from_html(`<button type="button"> </button>`);
+    var root_3$6 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
     var root$d = from_html(`<div class="cv-annotation-editor svelte-1r1spmr" role="none"><button type="button" aria-label="Annotation"><!></button> <!></div>`);
 
     const $$css$g = {
@@ -13756,9 +14698,6 @@
     	var div = root$d();
     	var button = child(div);
     	let classes;
-
-    	button.__click = handleTabClick;
-
     	var node = child(button);
 
     	{
@@ -13781,7 +14720,7 @@
     		};
 
     		if_block(node, ($$render) => {
-    			if (get(preview)) $$render(consequent); else $$render(alternate, false);
+    			if (get(preview)) $$render(consequent); else $$render(alternate, -1);
     		});
     	}
 
@@ -13791,11 +14730,10 @@
 
     	{
     		var consequent_1 = ($$anchor) => {
-    			var div_1 = root_3$5();
+    			var div_1 = root_3$6();
     			var textarea = child(div_1);
 
     			remove_textarea_child(textarea);
-    			textarea.__input = handleInput;
 
     			var div_2 = sibling(textarea, 2);
     			var div_3 = child(div_2);
@@ -13803,14 +14741,8 @@
     			each(div_3, 21, () => CORNER_ICONS, ({ key, icon }) => key, ($$anchor, $$item) => {
     				let key = () => get($$item).key;
     				let icon = () => get($$item).icon;
-    				var button_1 = root_4$4();
+    				var button_1 = root_4$3();
     				let classes_1;
-
-    				button_1.__click = (e) => {
-    					e.stopPropagation();
-    					setCorner(key());
-    				};
-
     				var text_2 = child(button_1, true);
 
     				reset(button_1);
@@ -13821,6 +14753,11 @@
     					set_attribute(button_1, 'aria-label', `Anchor to ${key() ?? ''}`);
     					set_attribute(button_1, 'aria-pressed', get(localCorner) === key());
     					set_text(text_2, icon());
+    				});
+
+    				delegated('click', button_1, (e) => {
+    					e.stopPropagation();
+    					setCorner(key());
     				});
 
     				append($$anchor, button_1);
@@ -13841,6 +14778,7 @@
     				set_text(text_3, MAX_ANNOTATION_LENGTH - get(localText).length);
     			});
 
+    			delegated('input', textarea, handleInput);
     			append($$anchor, div_1);
     		};
 
@@ -13858,6 +14796,7 @@
     		set_attribute(button, 'aria-expanded', get(isExpanded));
     	});
 
+    	delegated('click', button, handleTabClick);
     	append($$anchor, div);
     	pop();
     }
@@ -13865,7 +14804,7 @@
     delegate(['click', 'input']);
 
     var root_2$6 = from_html(`<!> <!>`, 1);
-    var root_3$4 = from_html(`<div><span class="selection-label svelte-1dbf58w"> </span></div>`);
+    var root_3$5 = from_html(`<div><span class="selection-label svelte-1dbf58w"> </span></div>`);
     var root$c = from_html(`<div class="share-overlay-ui"><!> <!> <!> <!></div>`);
 
     const $$css$f = {
@@ -14161,7 +15100,7 @@
 
     	{
     		var consequent_1 = ($$anchor) => {
-    			var div_1 = root_3$4();
+    			var div_1 = root_3$5();
     			var span = child(div_1);
     			var text = child(span, true);
 
@@ -14224,9 +15163,9 @@
     			var div_1 = child(div);
     			var button = sibling(child(div_1), 2);
 
-    			button.__click = handleExit;
     			reset(div_1);
     			reset(div);
+    			delegated('click', button, handleExit);
     			transition(3, div, () => slide, () => ({ duration: 250 }));
     			append($$anchor, div);
     		};
@@ -14356,7 +15295,7 @@
         }
     }
 
-    /* url-action-router.svelte.ts generated by Svelte v5.46.1 */
+    /* url-action-router.svelte.ts generated by Svelte v5.55.10 */
 
     class UrlActionRouter {
     	options;
@@ -14397,7 +15336,7 @@
     	}
     }
 
-    /* intro-manager.svelte.ts generated by Svelte v5.46.1 */
+    /* intro-manager.svelte.ts generated by Svelte v5.55.10 */
 
     class IntroManager {
     	#showCallout = // UI State
@@ -14464,7 +15403,7 @@
     	}
     }
 
-    /* color-scheme-store.svelte.ts generated by Svelte v5.46.1 */
+    /* color-scheme-store.svelte.ts generated by Svelte v5.55.10 */
 
     class ColorSchemeStore {
     	#isDark = state(false);
@@ -14650,7 +15589,6 @@
     					get textColor() {
     						return get($3);
     					},
-
     					onclose: () => introManager.dismiss()
     				});
     			}
@@ -14711,9 +15649,7 @@
     					get pulse() {
     						return introManager.showPulse;
     					},
-
     					onclick: openModal,
-
     					get iconColor() {
     						return get($0);
     					},
@@ -15147,14 +16083,12 @@
     	}
 
     	var div = root$a();
-
-    	div.__click = handleClick;
-    	div.__keydown = (e) => e.key === 'Enter' && handleClick();
-
     	var text = child(div);
 
     	reset(div);
     	template_effect(() => set_text(text, `... ${hiddenCount() ?? ''} section${hiddenCount() > 1 ? 's' : ''} hidden (Click to expand) ...`));
+    	delegated('click', div, handleClick);
+    	delegated('keydown', div, (e) => e.key === 'Enter' && handleClick());
     	append($$anchor, div);
     	pop();
     }
@@ -15279,13 +16213,13 @@
         return groups;
     }
 
-    var root_4$3 = from_html(`<span>▾</span>`);
-    var root_3$3 = from_html(`<!> <span class="cv-ribbon-text cv-ribbon-text--right svelte-1asb212"> </span> <span class="cv-ribbon-grip svelte-1asb212" aria-hidden="true"><span class="svelte-1asb212"></span><span class="svelte-1asb212"></span> <span class="svelte-1asb212"></span><span class="svelte-1asb212"></span> <span class="svelte-1asb212"></span><span class="svelte-1asb212"></span></span>`, 1);
+    var root_4$2 = from_html(`<span>▾</span>`);
+    var root_3$4 = from_html(`<!> <span class="cv-ribbon-text cv-ribbon-text--right svelte-1asb212"> </span> <span class="cv-ribbon-grip svelte-1asb212" aria-hidden="true"><span class="svelte-1asb212"></span><span class="svelte-1asb212"></span> <span class="svelte-1asb212"></span><span class="svelte-1asb212"></span> <span class="svelte-1asb212"></span><span class="svelte-1asb212"></span></span>`, 1);
     var root_6 = from_html(`<span>▾</span>`);
     var root_5 = from_html(`<span class="cv-ribbon-grip svelte-1asb212" aria-hidden="true"><span class="svelte-1asb212"></span><span class="svelte-1asb212"></span> <span class="svelte-1asb212"></span><span class="svelte-1asb212"></span> <span class="svelte-1asb212"></span><span class="svelte-1asb212"></span></span> <span class="cv-ribbon-text svelte-1asb212"> </span> <!>`, 1);
     var root_1$7 = from_html(`<button type="button"><!></button>`);
     var root_7 = from_html(`<div class="cv-annotation-card svelte-1asb212" role="region" aria-label="Annotation"><button type="button" class="cv-card-close svelte-1asb212" aria-label="Collapse annotation">✕</button> <span class="cv-card-text svelte-1asb212"> </span></div>`);
-    var root$9 = from_html(`<div><!></div>`);
+    var root$9 = from_html(`<div role="presentation"><!></div>`);
 
     const $$css$b = {
     	hash: 'svelte-1asb212',
@@ -15464,20 +16398,12 @@
 
     	var div = root$9();
     	let classes;
-
-    	div.__pointerdown = onPointerDown;
-    	div.__pointermove = onPointerMove;
-    	div.__pointerup = onPointerUp;
-
     	var node = child(div);
 
     	{
     		var consequent_4 = ($$anchor) => {
     			var button = root_1$7();
     			let classes_1;
-
-    			button.__click = handleInteraction;
-
     			var node_1 = child(button);
 
     			{
@@ -15487,12 +16413,12 @@
 
     					{
     						var consequent_1 = ($$anchor) => {
-    							var fragment_1 = root_3$3();
+    							var fragment_1 = root_3$4();
     							var node_3 = first_child(fragment_1);
 
     							{
     								var consequent = ($$anchor) => {
-    									var span = root_4$3();
+    									var span = root_4$2();
     									let classes_2;
 
     									template_effect(() => classes_2 = set_class(span, 1, 'cv-ribbon-chevron svelte-1asb212', null, classes_2, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
@@ -15552,7 +16478,7 @@
     						};
 
     						if_block(node_2, ($$render) => {
-    							if (get(isRightCorner)) $$render(consequent_1); else $$render(alternate, false);
+    							if (get(isRightCorner)) $$render(consequent_1); else $$render(alternate, -1);
     						});
     					}
 
@@ -15587,6 +16513,7 @@
     				[() => getRibbonClipPath(get(corner))]
     			);
 
+    			delegated('click', button, handleInteraction);
     			event('animationend', button, onIntroAnimationEnd);
     			append($$anchor, button);
     		};
@@ -15594,20 +16521,18 @@
     		var alternate_1 = ($$anchor) => {
     			var div_1 = root_7();
     			var button_1 = child(div_1);
-
-    			button_1.__click = handleInteraction;
-
     			var span_4 = sibling(button_1, 2);
     			var text_2 = child(span_4, true);
 
     			reset(span_4);
     			reset(div_1);
     			template_effect(() => set_text(text_2, $$props.annotation));
+    			delegated('click', button_1, handleInteraction);
     			append($$anchor, div_1);
     		};
 
     		if_block(node, ($$render) => {
-    			if (!get(expanded)) $$render(consequent_4); else $$render(alternate_1, false);
+    			if (!get(expanded)) $$render(consequent_4); else $$render(alternate_1, -1);
     		});
     	}
 
@@ -15622,6 +16547,9 @@
     		[() => getPositionStyle(get(corner))]
     	);
 
+    	delegated('pointerdown', div, onPointerDown);
+    	delegated('pointermove', div, onPointerMove);
+    	delegated('pointerup', div, onPointerUp);
     	event('pointercancel', div, onPointerCancel);
     	append($$anchor, div);
     	pop();
@@ -15707,7 +16635,6 @@
     			let classes;
     			var button = sibling(div_1, 2);
 
-    			button.__click = () => set(dismissed, true);
     			reset(div);
 
     			template_effect(
@@ -15731,6 +16658,7 @@
     			);
 
     			event('animationend', div_1, onIntroAnimationEnd);
+    			delegated('click', button, () => set(dismissed, true));
     			append($$anchor, div);
     		};
 
@@ -15780,19 +16708,16 @@
     				var fragment = root_2$5();
     				var button = first_child(fragment);
     				let classes;
-
-    				button.__click = () => scrollToRect(get(rects)[get(i) - 1]);
-
     				var button_1 = sibling(button, 2);
     				let classes_1;
-
-    				button_1.__click = () => scrollToRect(get(rects)[get(i) + 1]);
 
     				template_effect(() => {
     					classes = set_class(button, 1, 'cv-nav-arrow cv-nav-arrow--up svelte-1mz0neo', null, classes, { 'cv-nav-arrow--hidden': get(i) === 0 });
     					classes_1 = set_class(button_1, 1, 'cv-nav-arrow cv-nav-arrow--down svelte-1mz0neo', null, classes_1, { 'cv-nav-arrow--hidden': get(i) === get(rects).length - 1 });
     				});
 
+    				delegated('click', button, () => scrollToRect(get(rects)[get(i) - 1]));
+    				delegated('click', button_1, () => scrollToRect(get(rects)[get(i) + 1]));
     				append($$anchor, fragment);
     			};
 
@@ -15825,7 +16750,7 @@
     			};
 
     			if_block(node_1, ($$render) => {
-    				if (get(rect).annotation !== undefined && get(rect).annotation.length > 0) $$render(consequent_1); else $$render(alternate, false);
+    				if (get(rect).annotation !== undefined && get(rect).annotation.length > 0) $$render(consequent_1); else $$render(alternate, -1);
     			});
     		}
 
@@ -15962,7 +16887,7 @@
         resultList.push(rect);
     }
 
-    /* highlight-service.svelte.ts generated by Svelte v5.46.1 */
+    /* highlight-service.svelte.ts generated by Svelte v5.55.10 */
 
     const BODY_HIGHLIGHT_CLASS = 'cv-highlight-mode';
 
@@ -16180,7 +17105,7 @@
     	}
     }
 
-    /* focus-service.svelte.ts generated by Svelte v5.46.1 */
+    /* focus-service.svelte.ts generated by Svelte v5.55.10 */
 
     const BODY_SHOW_CLASS = 'cv-show-mode';
     const HIDDEN_CLASS = 'cv-hidden';
@@ -16457,10 +17382,8 @@
 
     		const app = mount(FocusDivider, {
     			target: wrapper,
-
     			props: {
     				hiddenCount: count,
-
     				onExpand: () => {
     					this.expandContext(insertBeforeEl, count, app, wrapper);
     				}
@@ -16553,7 +17476,7 @@
     	}
     }
 
-    /* label-registry-store.svelte.ts generated by Svelte v5.46.1 */
+    /* label-registry-store.svelte.ts generated by Svelte v5.55.10 */
 
     class LabelRegistryStore {
     	_labels = new SvelteMap();
@@ -16892,7 +17815,7 @@
         }
     }
 
-    /* adaptation-store.svelte.ts generated by Svelte v5.46.1 */
+    /* adaptation-store.svelte.ts generated by Svelte v5.55.10 */
 
     class AdaptationStore {
     	#activeConfig = state(null);
@@ -16912,7 +17835,7 @@
 
     const adaptationStore = new AdaptationStore();
 
-    /* runtime.svelte.ts generated by Svelte v5.46.1 */
+    /* runtime.svelte.ts generated by Svelte v5.55.10 */
 
     function stripSiteManaged(state) {
     	// Strip siteManaged toggle values
@@ -17212,8 +18135,8 @@
     }
 
     var root_1$4 = from_html(`<div class="cv-toggle-label svelte-1ka2eec"> </div>`);
-    var root_3$2 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show less</span>`, 1);
-    var root_4$2 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show more</span>`, 1);
+    var root_3$3 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show less</span>`, 1);
+    var root_4$1 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show more</span>`, 1);
     var root_2$4 = from_html(`<button type="button" class="cv-expand-btn svelte-1ka2eec"><!></button>`);
     var root$5 = from_html(`<div><!> <div class="cv-toggle-content svelte-1ka2eec"><div class="cv-toggle-inner svelte-1ka2eec"><!></div></div> <!></div>`);
 
@@ -17463,14 +18386,11 @@
     	{
     		var consequent_2 = ($$anchor) => {
     			var button = root_2$4();
-
-    			button.__click = toggleExpand;
-
     			var node_3 = child(button);
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var fragment = root_3$2();
+    					var fragment = root_3$3();
     					var node_4 = first_child(fragment);
 
     					IconChevronUp(node_4, {});
@@ -17479,7 +18399,7 @@
     				};
 
     				var alternate = ($$anchor) => {
-    					var fragment_1 = root_4$2();
+    					var fragment_1 = root_4$1();
     					var node_5 = first_child(fragment_1);
 
     					IconChevronDown(node_5, {});
@@ -17488,12 +18408,13 @@
     				};
 
     				if_block(node_3, ($$render) => {
-    					if (get(localExpanded)) $$render(consequent_1); else $$render(alternate, false);
+    					if (get(localExpanded)) $$render(consequent_1); else $$render(alternate, -1);
     				});
     			}
 
     			reset(button);
     			template_effect(() => set_attribute(button, 'aria-label', get(localExpanded) ? 'Show less' : 'Show more'));
+    			delegated('click', button, toggleExpand);
     			append($$anchor, button);
     		};
 
@@ -17529,23 +18450,21 @@
     	Toggle,
     	{
     		toggleId: { attribute: 'toggle-id', reflect: true, type: 'String' },
-
     		showPeekBorder: {
     			attribute: 'show-peek-border',
     			reflect: true,
     			type: 'Boolean'
     		},
-
     		showLabel: { attribute: 'show-label', reflect: true, type: 'Boolean' },
     		placeholderId: { attribute: 'placeholder-id', reflect: true, type: 'String' },
     		inline: { attribute: 'inline', reflect: true, type: 'Boolean' }
     	},
     	['default'],
     	[],
-    	true
+    	{ mode: 'open' }
     ));
 
-    var root_3$1 = from_html(`<p class="description svelte-1lfe2lv"> </p>`);
+    var root_3$2 = from_html(`<p class="description svelte-1lfe2lv"> </p>`);
     var root_2$3 = from_html(`<div class="card svelte-1lfe2lv"><div class="content svelte-1lfe2lv"><div><p class="label svelte-1lfe2lv"> </p> <!></div> <!></div></div>`);
 
     const $$css$7 = {
@@ -17627,7 +18546,7 @@
 
     					{
     						var consequent = ($$anchor) => {
-    							var p_1 = root_3$1();
+    							var p_1 = root_3$2();
     							var text_1 = child(p_1, true);
 
     							reset(p_1);
@@ -17651,9 +18570,7 @@
     							get value() {
     								return get(currentState);
     							},
-
     							onchange: (v) => activeStateStore.updateToggleState(toggleId(), v),
-
     							get ariaLabel() {
     								return get($0);
     							}
@@ -17674,20 +18591,17 @@
     							get value() {
     								return get(currentState);
     							},
-
     							onchange: (v) => activeStateStore.updateToggleState(toggleId(), v),
-
     							get ariaLabel() {
     								return get($0);
     							},
-
     							standalone: true
     						});
     					}
     				};
 
     				if_block(node_1, ($$render) => {
-    					if (!inline()) $$render(consequent_1); else $$render(alternate, false);
+    					if (!inline()) $$render(consequent_1); else $$render(alternate, -1);
     				});
     			}
 
@@ -17712,7 +18626,7 @@
     	},
     	[],
     	[],
-    	true
+    	{ mode: 'open' }
     ));
 
     var root$4 = from_html(`<div><!></div>`);
@@ -17763,7 +18677,7 @@
     	},
     	['default'],
     	[],
-    	true
+    	{ mode: 'open' }
     ));
 
     var root_1$3 = from_svg(`<path d="M4 2v13l4-2.5L12 15V2H4z"></path>`);
@@ -17805,7 +18719,7 @@
     		};
 
     		if_block(node, ($$render) => {
-    			if (isMarked()) $$render(consequent); else $$render(alternate, false);
+    			if (isMarked()) $$render(consequent); else $$render(alternate, -1);
     		});
     	}
 
@@ -17813,10 +18727,10 @@
     	append($$anchor, svg);
     }
 
-    var root_2$1 = from_html(`<li class="cv-tabgroup-item svelte-1ujqpe3"><div><a role="tab" title="Double-click a tab to 'mark' it in all similar tab groups."><span class="cv-tab-header-text svelte-1ujqpe3"><!></span></a> <button type="button"><!></button></div></li>`);
+    var root_2$1 = from_html(`<li class="cv-tabgroup-item svelte-1ujqpe3"><div><a role="tab" title="Double-click a tab to 'mark' it in all similar tab groups."><span class="cv-tab-header-text svelte-1ujqpe3"></span></a> <button type="button"><!></button></div></li>`);
     var root_1$2 = from_html(`<ul class="cv-tabgroup-nav svelte-1ujqpe3" role="tablist"></ul>`);
-    var root_3 = from_html(`<link rel="stylesheet"/>`);
-    var root_4$1 = from_html(`<div class="cv-tabgroup-bottom-border svelte-1ujqpe3"></div>`);
+    var root_3$1 = from_html(`<link rel="stylesheet"/>`);
+    var root_4 = from_html(`<div class="cv-tabgroup-bottom-border svelte-1ujqpe3"></div>`);
     var root$2 = from_html(`<div class="cv-tabgroup-container svelte-1ujqpe3"><!> <!> <div class="cv-tabgroup-content"><!></div> <!></div>`);
 
     const $$css$5 = {
@@ -18070,29 +18984,17 @@
     				let classes;
     				var a = child(div_1);
     				let classes_1;
-
-    				a.__click = (e) => handleTabClick(get(tab).id, e);
-    				a.__dblclick = (e) => handleTabDoubleClick(get(tab).id, e);
-
     				var span = child(a);
-    				var node_1 = child(span);
 
-    				html(node_1, () => get(tab).header);
+    				html(span, () => get(tab).header, true);
     				reset(span);
     				reset(a);
 
     				var button = sibling(a, 2);
     				let classes_2;
+    				var node_1 = child(button);
 
-    				button.__click = (e) => handleMarkClick(get(tab).id, e);
-
-    				button.__dblclick = (e) => {
-    					e.stopPropagation();
-    				};
-
-    				var node_2 = child(button);
-
-    				IconMark(node_2, {
+    				IconMark(node_1, {
     					get isMarked() {
     						return get(isMarked);
     					}
@@ -18116,6 +19018,14 @@
     					set_attribute(button, 'aria-pressed', !!get(isMarked));
     				});
 
+    				delegated('click', a, (e) => handleTabClick(get(tab).id, e));
+    				delegated('dblclick', a, (e) => handleTabDoubleClick(get(tab).id, e));
+    				delegated('click', button, (e) => handleMarkClick(get(tab).id, e));
+
+    				delegated('dblclick', button, (e) => {
+    					e.stopPropagation();
+    				});
+
     				append($$anchor, li);
     			});
 
@@ -18128,32 +19038,32 @@
     		});
     	}
 
-    	var node_3 = sibling(node, 2);
+    	var node_2 = sibling(node, 2);
 
-    	each(node_3, 16, () => Array.from(document.querySelectorAll('link[rel="stylesheet"]')), (link) => link.href, ($$anchor, link) => {
-    		var link_1 = root_3();
+    	each(node_2, 16, () => Array.from(document.querySelectorAll('link[rel="stylesheet"]')), (link) => link.href, ($$anchor, link) => {
+    		var link_1 = root_3$1();
 
     		template_effect(() => set_attribute(link_1, 'href', link.href));
     		append($$anchor, link_1);
     	});
 
-    	var div_2 = sibling(node_3, 2);
-    	var node_4 = child(div_2);
+    	var div_2 = sibling(node_2, 2);
+    	var node_3 = child(div_2);
 
-    	slot(node_4, $$props, 'default', {});
+    	slot(node_3, $$props, 'default', {});
     	reset(div_2);
     	bind_this(div_2, ($$value) => set(contentWrapper, $$value), () => get(contentWrapper));
 
-    	var node_5 = sibling(div_2, 2);
+    	var node_4 = sibling(div_2, 2);
 
     	{
     		var consequent_1 = ($$anchor) => {
-    			var div_3 = root_4$1();
+    			var div_3 = root_4();
 
     			append($$anchor, div_3);
     		};
 
-    		if_block(node_5, ($$render) => {
+    		if_block(node_4, ($$render) => {
     			if (get(tabs).length > 0 && get(navHeadingVisible)) $$render(consequent_1);
     		});
     	}
@@ -18171,7 +19081,6 @@
     	TabGroup,
     	{
     		groupId: { attribute: 'group-id', reflect: true, type: 'String' },
-
     		stabilizeScroll: {
     			attribute: 'stabilize-scroll',
     			reflect: true,
@@ -18180,7 +19089,7 @@
     	},
     	['default'],
     	[],
-    	true
+    	{ mode: 'open' }
     ));
 
     const $$css$4 = {
@@ -18199,7 +19108,7 @@
     	// No logic needed, just a container
     }
 
-    customElements.define('cv-tab-header', create_custom_element(TabHeader, {}, ['default'], [], true));
+    customElements.define('cv-tab-header', create_custom_element(TabHeader, {}, ['default'], [], { mode: 'open' }));
 
     const $$css$3 = { hash: 'svelte-eizj8y', code: ':host {display:block;}' };
 
@@ -18214,7 +19123,7 @@
     	// No logic needed, just a container
     }
 
-    customElements.define('cv-tab-body', create_custom_element(TabBody, {}, ['default'], [], true));
+    customElements.define('cv-tab-body', create_custom_element(TabBody, {}, ['default'], [], { mode: 'open' }));
 
     var root$1 = from_html(`<span class="cv-var"> </span>`);
     const $$css$2 = { hash: 'svelte-1tffxwo', code: ':host {display:inline;}' };
@@ -18342,12 +19251,12 @@
     	},
     	[],
     	[],
-    	true
+    	{ mode: 'open' }
     ));
 
     var root_2 = from_html(`<p class="placeholder-description svelte-dpk3ag"> </p>`);
     var root_1$1 = from_html(`<div class="label-group svelte-dpk3ag"><label class="placeholder-label svelte-dpk3ag"> </label> <!></div>`);
-    var root_4 = from_html(`<label class="placeholder-label svelte-dpk3ag"> </label>`);
+    var root_3 = from_html(`<label class="placeholder-label svelte-dpk3ag"> </label>`);
     var root = from_html(`<div><!> <div class="input-container svelte-dpk3ag"><input type="text"/> <span class="edit-icon svelte-dpk3ag" aria-hidden="true"><!></span></div></div>`);
 
     const $$css$1 = {
@@ -18503,39 +19412,22 @@
     			append($$anchor, div_1);
     		};
 
-    		var alternate = ($$anchor) => {
-    			var fragment = comment();
-    			var node_2 = first_child(fragment);
+    		var consequent_2 = ($$anchor) => {
+    			var label_2 = root_3();
+    			var text_2 = child(label_2, true);
 
-    			{
-    				var consequent_2 = ($$anchor) => {
-    					var label_2 = root_4();
-    					var text_2 = child(label_2, true);
+    			reset(label_2);
 
-    					reset(label_2);
+    			template_effect(() => {
+    				set_attribute(label_2, 'for', `cv-input-${get(sanitizedId) ?? ''}`);
+    				set_text(text_2, get(effectiveLabel));
+    			});
 
-    					template_effect(() => {
-    						set_attribute(label_2, 'for', `cv-input-${get(sanitizedId) ?? ''}`);
-    						set_text(text_2, get(effectiveLabel));
-    					});
-
-    					append($$anchor, label_2);
-    				};
-
-    				if_block(
-    					node_2,
-    					($$render) => {
-    						if (get(effectiveLayout) !== 'inline' && get(effectiveLabel)) $$render(consequent_2);
-    					},
-    					true
-    				);
-    			}
-
-    			append($$anchor, fragment);
+    			append($$anchor, label_2);
     		};
 
     		if_block(node, ($$render) => {
-    			if (get(effectiveLayout) === 'card' && get(effectiveLabel)) $$render(consequent_1); else $$render(alternate, false);
+    			if (get(effectiveLayout) === 'card' && get(effectiveLabel)) $$render(consequent_1); else if (get(effectiveLayout) !== 'inline' && get(effectiveLabel)) $$render(consequent_2, 1);
     		});
     	}
 
@@ -18543,12 +19435,11 @@
     	var input = child(div_2);
 
     	remove_input_defaults(input);
-    	input.__input = handleInput;
 
     	var span = sibling(input, 2);
-    	var node_3 = child(span);
+    	var node_2 = child(span);
 
-    	IconPencil(node_3, {});
+    	IconPencil(node_2, {});
     	reset(span);
     	reset(div_2);
     	reset(div);
@@ -18568,6 +19459,7 @@
     		set_attribute(input, 'size', get(inputSize));
     	});
 
+    	delegated('input', input, handleInput);
     	append($$anchor, div);
 
     	return pop($$exports);
@@ -18587,7 +19479,7 @@
     	},
     	[],
     	[],
-    	true
+    	{ mode: 'open' }
     ));
 
     /**
@@ -18724,7 +19616,7 @@
     				};
 
     				if_block(node_1, ($$render) => {
-    					if (get(labelDef)?.value) $$render(consequent); else $$render(alternate, false);
+    					if (get(labelDef)?.value) $$render(consequent); else $$render(alternate, -1);
     				});
     			}
 
@@ -18742,7 +19634,7 @@
     		};
 
     		if_block(node, ($$render) => {
-    			if (get(labelDef)?.value || get(hasSlotContent)) $$render(consequent_1); else $$render(alternate_1, false);
+    			if (get(labelDef)?.value || get(hasSlotContent)) $$render(consequent_1); else $$render(alternate_1, -1);
     		});
     	}
 
@@ -18759,7 +19651,7 @@
     	},
     	['default'],
     	[],
-    	true
+    	{ mode: 'open' }
     ));
 
     // --- No Public API Exports ---
