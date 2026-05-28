@@ -17209,7 +17209,7 @@
 
     const $$css$8 = {
     	hash: 'svelte-1ka2eec',
-    	code: ':host {display:block;position:relative;z-index:1;overflow:visible;}\n\n  /* Host visibility control */:host([hidden]) {display:none;}.cv-toggle-wrapper.svelte-1ka2eec {position:relative;width:100%;transition:margin-bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1);margin-bottom:4px;}.cv-toggle-wrapper.hidden.svelte-1ka2eec {margin-bottom:0;}.cv-toggle-wrapper.peek-mode.svelte-1ka2eec {margin-bottom:28px;}.cv-toggle-content.svelte-1ka2eec {overflow:hidden;transition:max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),\n      opacity 0.3s ease,\n      overflow 0s 0s;}.cv-toggle-inner.svelte-1ka2eec {display:flow-root; /* Ensures margins of children are contained */}\n\n  /* Hidden State */.hidden.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec) {opacity:0;pointer-events:none;}\n\n  /* Bordered State */.has-border.svelte-1ka2eec {box-sizing:border-box;border:2px dashed rgba(0, 0, 0, 0.15);border-bottom:none;box-shadow:0 2px 8px rgba(0, 0, 0, 0.05),\n      inset 0 -15px 10px -10px rgba(0, 0, 0, 0.1);border-radius:8px 8px 0 0;padding:12px 0 0 0;margin-top:4px;}\n\n  /* Visible / Expanded State */.expanded.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec) {opacity:1;transform:translateY(0);overflow:visible;transition:max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),\n      opacity 0.3s ease,\n      overflow 0s 0.35s;}\n\n  /* When expanded, complete the border */.has-border.expanded.svelte-1ka2eec {border-bottom:2px dashed rgba(0, 0, 0, 0.15);border-radius:8px;padding-bottom:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.05);}\n\n  /* Peek State — smoother gradient */.peeking.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec) {opacity:1;mask-image:linear-gradient(to bottom, black 30%, rgba(0,0,0,0.5) 70%, transparent 100%);-webkit-mask-image:linear-gradient(to bottom, black 30%, rgba(0,0,0,0.5) 70%, transparent 100%);}\n\n  /* Label Style */.cv-toggle-label.svelte-1ka2eec {position:absolute;top:-12px;left:0;background:#e0e0e0;color:#333;font-size:0.75rem;font-weight:600;padding:2px 8px;border-radius:4px;z-index:10;pointer-events:auto;box-shadow:0 1px 2px rgba(0, 0, 0, 0.1);}\n\n  /* Adjust label position if bordered */.has-border.svelte-1ka2eec .cv-toggle-label:where(.svelte-1ka2eec) {top:-10px;left:0;}\n\n  /* Expand Button — upgraded to pill style */.cv-expand-btn.svelte-1ka2eec {position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:rgba(0, 0, 0, 0.04);border:1px solid rgba(0, 0, 0, 0.08);border-radius:999px;padding:3px 12px;cursor:pointer;z-index:100;color:#666;font-size:0.7rem;font-weight:500;font-family:inherit;line-height:1;transition:all 0.2s ease;}.cv-expand-btn.svelte-1ka2eec:hover {background:rgba(0, 0, 0, 0.08);border-color:rgba(0, 0, 0, 0.15);color:#333;transform:translateX(-50%) scale(1.02);}.cv-expand-btn.svelte-1ka2eec svg {display:block;width:14px;height:14px;opacity:0.6;flex-shrink:0;}.cv-expand-btn.svelte-1ka2eec:hover svg {opacity:1;}.cv-expand-label.svelte-1ka2eec {white-space:nowrap;}'
+    	code: ':host {display:block;position:relative;z-index:1;overflow:visible;}\n\n  /* Inline mode: renders the host as inline so it flows with surrounding text */:host([inline]) {display:inline;vertical-align:baseline;}\n\n  /* Host visibility control */:host([hidden]) {display:none;}.cv-toggle-wrapper.svelte-1ka2eec {position:relative;width:100%;transition:margin-bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1);margin-bottom:4px;}\n\n  /* In inline mode, don\'t force block-level width or margins */.cv-toggle-wrapper.inline-mode.svelte-1ka2eec {display:inline;width:auto;margin-bottom:0;vertical-align:baseline;}.cv-toggle-wrapper.inline-mode.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec),\n  .cv-toggle-wrapper.inline-mode.svelte-1ka2eec .cv-toggle-inner:where(.svelte-1ka2eec) {display:inline;}.cv-toggle-wrapper.hidden.svelte-1ka2eec {margin-bottom:0;}.cv-toggle-wrapper.hidden.inline-mode.svelte-1ka2eec {display:none;}.cv-toggle-wrapper.peek-mode.svelte-1ka2eec {margin-bottom:28px;}.cv-toggle-content.svelte-1ka2eec {overflow:hidden;transition:max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),\n      opacity 0.3s ease,\n      overflow 0s 0s;}.cv-toggle-inner.svelte-1ka2eec {display:flow-root; /* Ensures margins of children are contained */}\n\n  /* Hidden State */.hidden.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec) {opacity:0;pointer-events:none;}\n\n  /* Bordered State */.has-border.svelte-1ka2eec {box-sizing:border-box;border:2px dashed rgba(0, 0, 0, 0.15);border-bottom:none;box-shadow:0 2px 8px rgba(0, 0, 0, 0.05),\n      inset 0 -15px 10px -10px rgba(0, 0, 0, 0.1);border-radius:8px 8px 0 0;padding:12px 0 0 0;margin-top:4px;}\n\n  /* Visible / Expanded State */.expanded.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec) {opacity:1;transform:translateY(0);overflow:visible;transition:max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),\n      opacity 0.3s ease,\n      overflow 0s 0.35s;}\n\n  /* When expanded, complete the border */.has-border.expanded.svelte-1ka2eec {border-bottom:2px dashed rgba(0, 0, 0, 0.15);border-radius:8px;padding-bottom:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.05);}\n\n  /* Peek State — smoother gradient */.peeking.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec) {opacity:1;mask-image:linear-gradient(to bottom, black 30%, rgba(0, 0, 0, 0.5) 70%, transparent 100%);-webkit-mask-image:linear-gradient(\n      to bottom,\n      black 30%,\n      rgba(0, 0, 0, 0.5) 70%,\n      transparent 100%\n    );}\n\n  /* Label Style */.cv-toggle-label.svelte-1ka2eec {position:absolute;top:-12px;left:0;background:#e0e0e0;color:#333;font-size:0.75rem;font-weight:600;padding:2px 8px;border-radius:4px;z-index:10;pointer-events:auto;box-shadow:0 1px 2px rgba(0, 0, 0, 0.1);}\n\n  /* Adjust label position if bordered */.has-border.svelte-1ka2eec .cv-toggle-label:where(.svelte-1ka2eec) {top:-10px;left:0;}\n\n  /* Expand Button — upgraded to pill style */.cv-expand-btn.svelte-1ka2eec {position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:rgba(0, 0, 0, 0.04);border:1px solid rgba(0, 0, 0, 0.08);border-radius:999px;padding:3px 12px;cursor:pointer;z-index:100;color:#666;font-size:0.7rem;font-weight:500;font-family:inherit;line-height:1;transition:all 0.2s ease;}.cv-expand-btn.svelte-1ka2eec:hover {background:rgba(0, 0, 0, 0.08);border-color:rgba(0, 0, 0, 0.15);color:#333;transform:translateX(-50%) scale(1.02);}.cv-expand-btn.svelte-1ka2eec svg {display:block;width:14px;height:14px;opacity:0.6;flex-shrink:0;}.cv-expand-btn.svelte-1ka2eec:hover svg {opacity:1;}.cv-expand-label.svelte-1ka2eec {white-space:nowrap;}'
     };
 
     function Toggle($$anchor, $$props) {
@@ -17220,7 +17220,8 @@
     	let toggleId = prop($$props, 'toggleId', 7, ''),
     		showPeekBorder = prop($$props, 'showPeekBorder', 7, false),
     		showLabel = prop($$props, 'showLabel', 7, false),
-    		placeholderId = prop($$props, 'placeholderId', 7, '');
+    		placeholderId = prop($$props, 'placeholderId', 7, ''),
+    		inline = prop($$props, 'inline', 7, false);
 
     	// Derive toggle IDs from toggle-id prop (can have multiple space-separated IDs)
     	let toggleIds = user_derived(() => (toggleId() || '').split(/\s+/).filter(Boolean));
@@ -17405,6 +17406,15 @@
     		set placeholderId($$value = '') {
     			placeholderId($$value);
     			flushSync();
+    		},
+
+    		get inline() {
+    			return inline();
+    		},
+
+    		set inline($$value = false) {
+    			inline($$value);
+    			flushSync();
     		}
     	};
 
@@ -17490,7 +17500,8 @@
     			peeking: get(showPeekContent),
     			'peek-mode': get(peekState) && !get(isSmallContent),
     			hidden: get(isHidden),
-    			'has-border': showPeekBorder() && get(peekState)
+    			'has-border': showPeekBorder() && get(peekState),
+    			'inline-mode': inline()
     		});
 
     		styles = set_style(div_2, '', styles, { 'max-height': get(currentMaxHeight) });
@@ -17516,7 +17527,8 @@
     		},
 
     		showLabel: { attribute: 'show-label', reflect: true, type: 'Boolean' },
-    		placeholderId: { attribute: 'placeholder-id', reflect: true, type: 'String' }
+    		placeholderId: { attribute: 'placeholder-id', reflect: true, type: 'String' },
+    		inline: { attribute: 'inline', reflect: true, type: 'Boolean' }
     	},
     	['default'],
     	[],

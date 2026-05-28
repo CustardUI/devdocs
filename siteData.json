@@ -197,6 +197,7 @@
         "toggle-peek-mode": "Toggle Peek Mode",
         "multi-id-toggles": "Multi-ID Toggles",
         "placeholder-driven-toggles": "Placeholder-Driven Toggles",
+        "inline-toggles": "Inline Toggles",
         "attributes-of-cv-toggle": "Attributes of &lt;cv-toggle&gt;",
         "toggle-control": "Toggle Control",
         "attributes-of-cv-toggle-control": "Attributes of &lt;cv-toggle-control&gt;",
