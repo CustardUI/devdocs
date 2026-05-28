@@ -27,6 +27,52 @@
         const cleanPath = path.startsWith('/') ? path : '/' + path;
         return cleanbaseUrl + cleanPath;
     }
+    /**
+     * Checks if a URL value starts with any of the specified dangerous protocols.
+     * Strips all ASCII control and whitespace characters before matching to prevent bypasses.
+     */
+    function hasDangerousProtocol(value, blockedProtocols = ['javascript', 'vbscript']) {
+        // eslint-disable-next-line no-control-regex
+        const normalized = value.replace(/[\x00-\x1F\x7F\s]/g, '');
+        const pattern = new RegExp(`^(${blockedProtocols.join('|')}):`, 'i');
+        return pattern.test(normalized);
+    }
+    /**
+     * Sanitizes HTML sourced from cv-tab-header innerHTML or header attribute.
+     * Strips script, style, link, and all inline event handler attributes (on*)
+     * and javascript:/vbscript:/data: URLs from href/src/action, preserving safe rich formatting.
+     * Uses DOMParser — no external dependencies.
+     */
+    function sanitizeTabHeader(rawHtml) {
+        if (typeof DOMParser === 'undefined') {
+            // Return rawHtml if DOMParser is not available (e.g., SSR or node context without jsdom),
+            // though in our actual runtime it's browser-only.
+            return rawHtml;
+        }
+        const doc = new DOMParser().parseFromString(rawHtml, 'text/html');
+        // Remove entirely unsafe elements
+        doc
+            .querySelectorAll('script, style, link, object, embed, iframe, form')
+            .forEach((el) => el.remove());
+        // Walk all remaining elements and strip dangerous attributes
+        doc.body.querySelectorAll('*').forEach((el) => {
+            for (const attr of Array.from(el.attributes)) {
+                // Strip all on* event handler attributes
+                if (/^on/i.test(attr.name)) {
+                    el.removeAttribute(attr.name);
+                    continue;
+                }
+                // Strip javascript: / vbscript: / data: from URL-bearing attributes (literal or namespaced, e.g. href, xlink:href, src, action)
+                // Also handles bypasses where control/whitespace characters are embedded (e.g. ja\tvascript:)
+                if (/(^|:)(href|src|action|formaction)$/i.test(attr.name)) {
+                    if (hasDangerousProtocol(attr.value, ['javascript', 'vbscript', 'data'])) {
+                        el.removeAttribute(attr.name);
+                    }
+                }
+            }
+        });
+        return doc.body.innerHTML;
+    }
 
     const SCRIPT_ATTRIBUTE_DEFAULTS = {
         baseURL: '/',
@@ -15982,7 +16028,17 @@
                 return;
             // Inject CSS variables onto :root
             if (theme.cssVariables) {
+                const CUSTOM_PROP = /^--[a-zA-Z0-9_-]+$/;
+                const DANGEROUS_VALUE = /url\s*\(|expression\s*\(|javascript:/i;
                 for (const [property, value] of Object.entries(theme.cssVariables)) {
+                    if (!CUSTOM_PROP.test(property)) {
+                        console.warn(`[CustardUI] Ignoring non-custom CSS property in adaptation theme: "${property}"`);
+                        continue;
+                    }
+                    if (DANGEROUS_VALUE.test(value)) {
+                        console.warn(`[CustardUI] Ignoring suspicious CSS value for "${property}" in adaptation theme.`);
+                        continue;
+                    }
                     document.documentElement.style.setProperty(property, value);
                 }
             }
@@ -17602,7 +17658,7 @@
             // Attribute Scanning (Opt-in)
             const candidates = root.querySelectorAll('.cv-bind, [data-cv-bind]');
             candidates.forEach((el) => {
-                if (el instanceof HTMLElement) {
+                if (el instanceof Element) {
                     PlaceholderBinder.processElementAttributes(el);
                 }
             });
@@ -17658,7 +17714,7 @@
             }
         }
         static processElementAttributes(el) {
-            if (el.dataset.cvAttrTemplates)
+            if (el.hasAttribute('data-cv-attr-templates'))
                 return; // Already processed
             const templates = {};
             let hasBindings = false;
@@ -17670,13 +17726,22 @@
                     attr.name === 'class') {
                     continue;
                 }
+                // Block placeholder binding into event handler attributes (on*).
+                // The entire value of an event handler is a script execution context —
+                // there is no safe way to interpolate untrusted user input into it.
+                if (/^on/i.test(attr.name)) {
+                    if (VAR_TESTER.test(attr.value)) {
+                        console.warn(`[CustardUI] Placeholder binding into event handler attribute "${attr.name}" is blocked for security. Remove the placeholder from this attribute.`);
+                    }
+                    continue;
+                }
                 if (VAR_TESTER.test(attr.value)) {
                     templates[attr.name] = attr.value;
                     hasBindings = true;
                 }
             }
             if (hasBindings) {
-                el.dataset.cvAttrTemplates = JSON.stringify(templates);
+                el.setAttribute('data-cv-attr-templates', JSON.stringify(templates));
                 const matcher = new RegExp(VAR_REGEX.source, 'g');
                 Object.values(templates).forEach((tmpl) => {
                     matcher.lastIndex = 0; // Reset regex state for each template
@@ -17695,11 +17760,16 @@
         static updateAttributeBindings(values) {
             const attrElements = document.querySelectorAll('[data-cv-attr-templates]');
             attrElements.forEach((el) => {
-                if (el instanceof HTMLElement) {
+                if (el instanceof Element) {
                     try {
-                        const templates = JSON.parse(el.dataset.cvAttrTemplates || '{}');
+                        const templates = JSON.parse(el.getAttribute('data-cv-attr-templates') || '{}');
                         Object.entries(templates).forEach(([attrName, template]) => {
-                            const newValue = PlaceholderBinder.interpolateString(template, values, attrName);
+                            let newValue = PlaceholderBinder.interpolateString(template, values, attrName);
+                            if (attrName && /(^|:)(href|src|action|formaction)$/i.test(attrName)) {
+                                if (hasDangerousProtocol(newValue)) {
+                                    newValue = '';
+                                }
+                            }
                             el.setAttribute(attrName, newValue);
                         });
                     }
@@ -17793,7 +17863,9 @@
                     if (val === undefined)
                         return ifUnset ?? '';
                     // URL-encode the value component (same as regular placeholders)
-                    if (attrName && (attrName === 'href' || attrName === 'src')) {
+                    if (attrName && /(^|:)(href|src|action|formaction)$/i.test(attrName)) {
+                        if (hasDangerousProtocol(val))
+                            return '';
                         if (!PlaceholderBinder.isFullUrl(val) && !PlaceholderBinder.isRelativeUrl(val)) {
                             val = encodeURIComponent(val);
                         }
@@ -17804,7 +17876,10 @@
                 if (val === undefined)
                     return `[[${name}]]`;
                 // Context-aware encoding for URL attributes
-                if (attrName && (attrName === 'href' || attrName === 'src')) {
+                if (attrName && /(^|:)(href|src|action|formaction)$/i.test(attrName)) {
+                    // Block dangerous protocols before any further URL handling
+                    if (hasDangerousProtocol(val))
+                        return '';
                     // Don't encode full URLs or relative URLs - only encode URL components
                     if (!PlaceholderBinder.isFullUrl(val) && !PlaceholderBinder.isRelativeUrl(val)) {
                         val = encodeURIComponent(val);
@@ -18766,6 +18841,17 @@
     		return groupId() && tabs$[groupId()] ? tabs$[groupId()] : null;
     	});
 
+    	// Precompute tab active/marked states reactively to avoid template {@const} preprocessor bugs
+    	let derivedTabs = user_derived(() => {
+    		return get(tabs).map((tab) => {
+    			const splitIds = splitTabIds(tab.rawId);
+    			const isActive = splitIds.includes(get(localActiveTabId));
+    			const isMarked = !!(get(markedTab) && splitIds.includes(get(markedTab)));
+
+    			return { ...tab, isActive, isMarked };
+    		});
+    	});
+
     	// Track the last seen store state to detect real changes
     	let lastSeenStoreState = state(null);
 
@@ -18841,12 +18927,14 @@
     				const headerEl = element.querySelector('cv-tab-header');
 
     				if (headerEl) {
-    					header = headerEl.innerHTML.trim();
+    					header = sanitizeTabHeader(headerEl.innerHTML.trim());
     				} else {
-    					// Attribute syntax
-    					header = element.header || element.getAttribute('header') || '';
+    					// Attribute syntax — also supports raw HTML (e.g. <i> icons), so sanitize too
+    					const rawAttrHeader = element.header || element.getAttribute('header') || '';
 
-    					if (!header) {
+    					if (rawAttrHeader) {
+    						header = sanitizeTabHeader(rawAttrHeader);
+    					} else {
     						// Fallback to tab-id or default
     						header = element.getAttribute('tab-id') ? primaryId : `Tab ${index + 1}`;
     					}
@@ -18975,10 +19063,7 @@
     		var consequent = ($$anchor) => {
     			var ul = root_1$2();
 
-    			each(ul, 21, () => get(tabs), (tab) => tab.id, ($$anchor, tab) => {
-    				const splitIds = user_derived(() => splitTabIds(get(tab).rawId));
-    				const isActive = user_derived(() => get(splitIds).includes(get(localActiveTabId)));
-    				const isMarked = user_derived(() => get(markedTab) && get(splitIds).includes(get(markedTab)));
+    			each(ul, 21, () => get(derivedTabs), (tab) => tab.id, ($$anchor, tab) => {
     				var li = root_2$1();
     				var div_1 = child(li);
     				let classes;
@@ -18996,7 +19081,7 @@
 
     				IconMark(node_1, {
     					get isMarked() {
-    						return get(isMarked);
+    						return get(tab).isMarked;
     					}
     				});
 
@@ -19005,17 +19090,17 @@
     				reset(li);
 
     				template_effect(() => {
-    					classes = set_class(div_1, 1, 'cv-tab-wrapper svelte-1ujqpe3', null, classes, { active: get(isActive) });
-    					classes_1 = set_class(a, 1, 'cv-tabgroup-link svelte-1ujqpe3', null, classes_1, { active: get(isActive) });
+    					classes = set_class(div_1, 1, 'cv-tab-wrapper svelte-1ujqpe3', null, classes, { active: get(tab).isActive });
+    					classes_1 = set_class(a, 1, 'cv-tabgroup-link svelte-1ujqpe3', null, classes_1, { active: get(tab).isActive });
     					set_attribute(a, 'href', '#' + get(tab).id);
-    					set_attribute(a, 'aria-selected', get(isActive));
+    					set_attribute(a, 'aria-selected', get(tab).isActive);
     					set_attribute(a, 'data-tab-id', get(tab).id);
     					set_attribute(a, 'data-raw-tab-id', get(tab).rawId);
     					set_attribute(a, 'data-group-id', groupId());
-    					classes_2 = set_class(button, 1, 'cv-tab-marked-icon svelte-1ujqpe3', null, classes_2, { 'is-marked': get(isMarked) });
-    					set_attribute(button, 'title', get(isMarked) ? 'Unmark this tab' : 'Mark this tab');
-    					set_attribute(button, 'aria-label', get(isMarked) ? 'Unmark this tab' : 'Mark this tab');
-    					set_attribute(button, 'aria-pressed', !!get(isMarked));
+    					classes_2 = set_class(button, 1, 'cv-tab-marked-icon svelte-1ujqpe3', null, classes_2, { 'is-marked': get(tab).isMarked });
+    					set_attribute(button, 'title', get(tab).isMarked ? 'Unmark this tab' : 'Mark this tab');
+    					set_attribute(button, 'aria-label', get(tab).isMarked ? 'Unmark this tab' : 'Mark this tab');
+    					set_attribute(button, 'aria-pressed', get(tab).isMarked);
     				});
 
     				delegated('click', a, (e) => handleTabClick(get(tab).id, e));
