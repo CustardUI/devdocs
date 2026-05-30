@@ -341,9 +341,38 @@
     },
     {
       "src": "devGuide/devGuide.md",
-      "title": "Developer Guide",
+      "title": "Contributing",
       "headings": {
-        "developer-guide": "Developer Guide"
+        "developer-guide": "Developer guide",
+        "contributing": "Contributing"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/development/settingUp.md",
+      "title": "Setting up",
+      "headings": {
+        "setting-up": "Setting up",
+        "prerequisites": "Prerequisites",
+        "setting-up-the-dev-environment": "Setting up the dev environment",
+        "development-workflow-and-amp-commands": "Development Workflow &amp; Commands",
+        "previewing-changes": "Previewing Changes"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/development/workflowAndRelease.md",
+      "title": "Developer Guide - Project Workflow and Releases",
+      "headings": {
+        "release-and-workflow-guide": "Release and Workflow Guide",
+        "branching-strategy": "Branching Strategy",
+        "core-branches": "Core Branches",
+        "the-development-lifecycle": "The Development Lifecycle",
+        "a-feature-development": "A. Feature Development",
+        "b-beta-releases-from-develop-branch": "B. Beta Releases (from develop branch)",
+        "c-production-release-from-main-branch": "C. Production Release (from main branch)",
+        "d-hotfix-releases-from-main-branch": "D. Hotfix Releases (from main branch)",
+        "cdn-usage": "CDN Usage"
       },
       "headingKeywords": {}
     },
@@ -422,22 +451,6 @@
         "tabs": "Tabs",
         "fruits-tabs": "Fruits Tabs",
         "color-schemes": "Color Schemes"
-      },
-      "headingKeywords": {}
-    },
-    {
-      "src": "devGuide/workflowAndRelease.md",
-      "title": "Developer Guide - Project Workflow and Releases",
-      "headings": {
-        "release-and-workflow-guide": "Release and Workflow Guide",
-        "branching-strategy": "Branching Strategy",
-        "core-branches": "Core Branches",
-        "the-development-lifecycle": "The Development Lifecycle",
-        "a-feature-development": "A. Feature Development",
-        "b-beta-releases-from-develop-branch": "B. Beta Releases (from develop branch)",
-        "c-production-release-from-main-branch": "C. Production Release (from main branch)",
-        "d-hotfix-releases-from-main-branch": "D. Hotfix Releases (from main branch)",
-        "cdn-usage": "CDN Usage"
       },
       "headingKeywords": {}
     },
