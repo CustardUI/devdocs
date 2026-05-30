@@ -36,6 +36,7 @@
         "how-it-works": "How It Works",
         "quick-start": "Quick Start",
         "file-placement": "File Placement",
+        "configuring-the-adaptations-path": "Configuring the Adaptations Path",
         "per-page-activation": "Per-Page Activation",
         "activation-landing-page": "Activation Landing Page",
         "clearing-an-adaptation": "Clearing an Adaptation"
@@ -55,7 +56,7 @@
         "site-managed-placeholders": "Site-Managed Placeholders",
         "site-managed-toggles": "Site-Managed Toggles",
         "state-layering-precedence": "State Layering Precedence",
-        "example-institution-adaptation-of-this-site": "Example: Institution Adaptation of this Site",
+        "example-adaptation-of-this-site": "Example: Adaptation of this Site",
         "placeholder-adaptation-configurations-sitemanaged": "Placeholder Adaptation Configurations (siteManaged)",
         "toggle-adaptation-configurations-sitemanaged": "Toggle Adaptation Configurations (siteManaged)",
         "label-adaptation-configurations": "Label Adaptation Configurations",
@@ -291,6 +292,7 @@
       "title": "Changelog",
       "headings": {
         "changelog": "Changelog",
+        "v3-0": "v3.0.*",
         "v2-3": "v2.3.*",
         "v2-2": "v2.2.*",
         "v2-1": "v2.1.*",
@@ -466,52 +468,12 @@
       "headingKeywords": {}
     },
     {
-      "src": "markbindSyntaxReference.md",
-      "headings": {
-        "markbind-comprehensive-syntax-reference": "MarkBind Comprehensive Syntax Reference",
-        "1-structure-and-amp-metadata": "1. Structure &amp; Metadata",
-        "frontmatter": "Frontmatter",
-        "variables": "Variables",
-        "includes": "Includes",
-        "2-basic-formatting": "2. Basic Formatting",
-        "text-styles": "Text Styles",
-        "headings": "Headings",
-        "lists": "Lists",
-        "tables": "Tables",
-        "3-components-and-amp-layout": "3. Components &amp; Layout",
-        "badges": "Badges",
-        "blockquotes": "Blockquotes",
-        "boxes": "Boxes",
-        "panels": "Panels",
-        "tabs": "Tabs",
-        "cardstacks": "CardStacks",
-        "4-navigation-and-amp-search": "4. Navigation &amp; Search",
-        "navbars-and-amp-site-menus": "Navbars &amp; Site Menus",
-        "page-navigation-and-amp-tools": "Page Navigation &amp; Tools",
-        "5-media-and-amp-diagrams": "5. Media &amp; Diagrams",
-        "images-pictures-and-amp-thumbnails": "Images, Pictures &amp; Thumbnails",
-        "annotations": "Annotations",
-        "diagrams-plantuml": "Diagrams (PlantUML)",
-        "embeds": "Embeds",
-        "6-interactive-features": "6. Interactive Features",
-        "modals-popovers-and-amp-tooltips": "Modals, Popovers &amp; Tooltips",
-        "questions-and-amp-quizzes": "Questions &amp; Quizzes",
-        "7-advanced-syntax": "7. Advanced Syntax",
-        "classes-and-amp-attributes": "Classes &amp; Attributes",
-        "math-formulae": "Math Formulae",
-        "footnotes": "Footnotes",
-        "tree-view": "Tree View",
-        "tags": "Tags"
-      },
-      "headingKeywords": {}
-    },
-    {
-      "src": "nus/index.md",
+      "src": "versions/nus/index.md",
       "headings": {},
       "headingKeywords": {}
     },
     {
-      "src": "sample/index.md",
+      "src": "versions/sample/index.md",
       "headings": {},
       "headingKeywords": {}
     }
