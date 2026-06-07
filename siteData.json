@@ -146,24 +146,6 @@
       "headingKeywords": {}
     },
     {
-      "src": "authorGuide/components/share.md",
-      "title": "Author Guide - Sharing",
-      "headings": {
-        "focused-views": "Focused Views",
-        "share-mode": "Share Mode",
-        "types-of-sharing": "Types of Sharing",
-        "toggling-share-mode": "Toggling Share Mode",
-        "selecting-elements": "Selecting Elements",
-        "generating-share-link": "Generating Share Link",
-        "exiting-share-mode": "Exiting Share Mode",
-        "focus-mode": "Focus Mode",
-        "configurations": "Configurations",
-        "using-custardui-without-the-settings-dialog": "Using CustardUI without the Settings Dialog",
-        "customizing-share-behavior-wip": "Customizing Share Behavior ( WIP )"
-      },
-      "headingKeywords": {}
-    },
-    {
       "src": "authorGuide/components/tabs.md",
       "title": "Author Guide - Tabs",
       "headings": {
@@ -223,6 +205,50 @@
         "settings-configuration-in-config-json-settings": "Settings Configuration in config.json: (settings)",
         "global-options-in-custardui-config-json": "Global Options in custardui.config.json",
         "script-tag-attributes": "Script Tag Attributes"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/focusedViews/highlightModes.md",
+      "title": "Author Guide - Highlighting Modes",
+      "headings": {
+        "highlighting-modes": "Highlighting Modes",
+        "1-boxed-element-highlighting-cv-box": "1. Boxed Element Highlighting (cv-box)",
+        "features": "Features",
+        "url-parameter": "URL Parameter",
+        "2-text-highlighting-cv-highlight": "2. Text Highlighting (cv-highlight)",
+        "key-visual-and-amp-ux-features": "Key Visual &amp; UX Features",
+        "step-by-step-guide-creating-a-text-highlight": "Step-by-Step Guide: Creating a Text Highlight"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/focusedViews/shareModes.md",
+      "title": "Author Guide - Sharing",
+      "headings": {
+        "focused-views": "Focused Views",
+        "share-mode": "Share Mode",
+        "types-of-sharing": "Types of Sharing",
+        "toggling-share-mode": "Toggling Share Mode",
+        "selecting-elements": "Selecting Elements",
+        "generating-share-link": "Generating Share Link",
+        "exiting-share-mode": "Exiting Share Mode",
+        "focus-mode": "Focus Mode",
+        "configurations": "Configurations",
+        "using-custardui-without-the-settings-dialog": "Using CustardUI without the Settings Dialog",
+        "customizing-share-behavior-wip": "Customizing Share Behavior ( WIP )"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "authorGuide/focusedViews/showHideModes.md",
+      "title": "Author Guide - Sharing",
+      "headings": {
+        "show-and-hide-modes": "Show and Hide Modes",
+        "the-two-modes": "The Two Modes",
+        "viewer-experience-focus-view": "Viewer Experience (Focus View)",
+        "step-by-step-guide-creating-a-show-hide-link": "Step-by-Step Guide: Creating a Show/Hide Link",
+        "manual-url-construction": "Manual URL Construction"
       },
       "headingKeywords": {}
     },
@@ -312,23 +338,6 @@
       "headingKeywords": {}
     },
     {
-      "src": "devGuide/components/anchor.md",
-      "title": "Developer Guide - DOM Element Locator and Anchors",
-      "headings": {
-        "overview": "Overview",
-        "generating-an-anchor-descriptor": "Generating an Anchor Descriptor",
-        "stable-text-and-amp-placeholder-awareness": "Stable Text &amp; Placeholder Awareness",
-        "serialization": "Serialization",
-        "resolving-an-anchor-descriptor": "Resolving an Anchor Descriptor",
-        "resolution-algorithm": "Resolution Algorithm",
-        "scoring-thresholds": "Scoring thresholds",
-        "data-flow": "Data Flow",
-        "key-considerations": "Key Considerations",
-        "inspiration-and-future-work": "Inspiration and Future Work"
-      },
-      "headingKeywords": {}
-    },
-    {
       "src": "devGuide/components/tabLogic.md",
       "title": "Developer Guide - Tab Logic",
       "headings": {
@@ -375,6 +384,37 @@
         "c-production-release-from-main-branch": "C. Production Release (from main branch)",
         "d-hotfix-releases-from-main-branch": "D. Hotfix Releases (from main branch)",
         "cdn-usage": "CDN Usage"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/focusedViews/anchor.md",
+      "title": "Developer Guide - DOM Element Locator and Anchors",
+      "headings": {
+        "overview": "Overview",
+        "generating-an-anchor-descriptor": "Generating an Anchor Descriptor",
+        "stable-text-and-amp-placeholder-awareness": "Stable Text &amp; Placeholder Awareness",
+        "serialization": "Serialization",
+        "resolving-an-anchor-descriptor": "Resolving an Anchor Descriptor",
+        "resolution-algorithm": "Resolution Algorithm",
+        "scoring-thresholds": "Scoring thresholds",
+        "data-flow": "Data Flow",
+        "key-considerations": "Key Considerations",
+        "inspiration-and-future-work": "Inspiration and Future Work"
+      },
+      "headingKeywords": {}
+    },
+    {
+      "src": "devGuide/focusedViews/urlEncoding.md",
+      "title": "Developer Guide - URL Encoding",
+      "headings": {
+        "overview": "Overview",
+        "text-highlighting-cv-highlight": "Text Highlighting (?cv-highlight=)",
+        "1-element-id-format-e": "1. Element ID Format (e:)",
+        "2-container-id-format-c": "2. Container ID Format (c:)",
+        "3-fallback-format-base64-json": "3. Fallback Format (Base64 JSON)",
+        "encoding-safety": "Encoding Safety",
+        "resolution-flow-on-load": "Resolution Flow on Load"
       },
       "headingKeywords": {}
     },

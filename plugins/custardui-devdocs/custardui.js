@@ -6400,6 +6400,18 @@
     /** @import { EachItem, EachOutroGroup, EachState, Effect, EffectNodes, MaybeSource, Source, TemplateNode, TransitionManager, Value } from '#client' */
     /** @import { Batch } from '../../reactivity/batch.js'; */
 
+    // When making substantive changes to this file, validate them with the each block stress test:
+    // https://svelte.dev/playground/1972b2cf46564476ad8c8c6405b23b7b
+    // This test also exists in this repo, as `packages/svelte/tests/manual/each-stress-test`
+
+    /**
+     * @param {any} _
+     * @param {number} i
+     */
+    function index(_, i) {
+    	return i;
+    }
+
     /**
      * Pause multiple effects simultaneously, and coordinate their
      * subsequent destruction. Used in each blocks
@@ -11179,7 +11191,7 @@
     	append($$anchor, svg);
     }
 
-    var root_1$i = from_html(`<button type="button" class="cv-dismiss-btn svelte-122ln5" aria-label="Dismiss settings icon">✕</button>`);
+    var root_1$j = from_html(`<button type="button" class="cv-dismiss-btn svelte-122ln5" aria-label="Dismiss settings icon">✕</button>`);
     var root$w = from_html(`<div role="none"><button type="button" class="cv-settings-main-btn svelte-122ln5"><span class="cv-gear svelte-122ln5"><!></span></button> <button type="button" class="cv-collapse-btn svelte-122ln5" aria-label="Collapse settings icon"> </button> <!></div>`);
 
     const $$css$q = {
@@ -11421,7 +11433,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var button_2 = root_1$i();
+    			var button_2 = root_1$j();
 
     			template_effect(() => set_attribute(button_2, 'data-side', get(isRight) ? 'left' : 'right'));
 
@@ -11750,6 +11762,7 @@
     const PARAM_PH = 'ph';
     const PARAM_CV_SHOW = 'cv-show';
     const PARAM_CV_HIDE = 'cv-hide';
+    const PARAM_CV_BOX = 'cv-box';
     const PARAM_CV_HIGHLIGHT = 'cv-highlight';
     /** Parameters owned by URLStateManager */
     const MANAGED_PARAMS = [
@@ -12327,8 +12340,8 @@
     	append($$anchor, svg);
     }
 
-    var root_2$c = from_html(`<span class="segment-icon svelte-1osj0o5"><!></span>`);
-    var root_1$h = from_html(`<button type="button"><!> <span class="segment-label svelte-1osj0o5"> </span></button>`);
+    var root_2$d = from_html(`<span class="segment-icon svelte-1osj0o5"><!></span>`);
+    var root_1$i = from_html(`<button type="button"><!> <span class="segment-label svelte-1osj0o5"> </span></button>`);
     var root$m = from_html(`<div role="group"></div>`);
 
     const $$css$p = {
@@ -12389,13 +12402,13 @@
     	let classes;
 
     	each(div, 20, () => ['hide', 'peek', 'show'], (option) => option, ($$anchor, option) => {
-    		var button = root_1$h();
+    		var button = root_1$i();
     		var node = child(button);
 
     		{
     			var consequent = ($$anchor) => {
     				const Icon = user_derived(() => icons[option]);
-    				var span = root_2$c();
+    				var span = root_2$d();
     				var node_1 = child(span);
 
     				component(node_1, () => get(Icon), ($$anchor, Icon_1) => {
@@ -12449,7 +12462,7 @@
     delegate(['click']);
     create_custom_element(ToggleSegmentedControl, { value: {}, onchange: {}, ariaLabel: {}, standalone: {} }, [], [], { mode: 'open' });
 
-    var root_1$g = from_html(`<p class="description svelte-gwkhja"> </p>`);
+    var root_1$h = from_html(`<p class="description svelte-gwkhja"> </p>`);
     var root$l = from_html(`<div class="card svelte-gwkhja"><div class="content svelte-gwkhja"><div><p class="title svelte-gwkhja"> </p> <!></div> <!></div></div>`);
 
     const $$css$o = {
@@ -12476,7 +12489,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var p_1 = root_1$g();
+    			var p_1 = root_1$h();
     			var text_1 = child(p_1, true);
 
     			reset(p_1);
@@ -12511,8 +12524,8 @@
     	pop();
     }
 
-    var root_1$f = from_html(`<p class="description svelte-uub3h8"> </p>`);
-    var root_2$b = from_html(`<option> </option>`);
+    var root_1$g = from_html(`<p class="description svelte-uub3h8"> </p>`);
+    var root_2$c = from_html(`<option> </option>`);
     var root$k = from_html(`<div class="root svelte-uub3h8"><div class="header svelte-uub3h8"><label class="label svelte-uub3h8"> </label> <!></div> <select class="select svelte-uub3h8"></select></div>`);
 
     const $$css$n = {
@@ -12545,7 +12558,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var p = root_1$f();
+    			var p = root_1$g();
     			var text_1 = child(p, true);
 
     			reset(p);
@@ -12563,7 +12576,7 @@
     	var select = sibling(div_1, 2);
 
     	each(select, 21, () => $$props.group.tabs, (tab) => tab.tabId, ($$anchor, tab) => {
-    		var option = root_2$b();
+    		var option = root_2$c();
     		var text_2 = child(option, true);
 
     		reset(option);
@@ -12624,7 +12637,7 @@
     	append($$anchor, svg);
     }
 
-    var root_1$e = from_html(`<p class="placeholder-description svelte-1vp05mb"> </p>`);
+    var root_1$f = from_html(`<p class="placeholder-description svelte-1vp05mb"> </p>`);
     var root$i = from_html(`<div class="placeholder-item svelte-1vp05mb"><div class="label-group svelte-1vp05mb"><label class="placeholder-label svelte-1vp05mb"> </label> <!></div> <div class="input-container svelte-1vp05mb"><input class="placeholder-input svelte-1vp05mb" type="text"/> <span class="edit-icon svelte-1vp05mb" aria-hidden="true"><!></span></div></div>`);
 
     const $$css$m = {
@@ -12658,7 +12671,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var p = root_1$e();
+    			var p = root_1$f();
     			var text_1 = child(p, true);
 
     			reset(p);
@@ -12742,13 +12755,13 @@
         }
     }
 
-    var root_1$d = from_html(`<button type="button">Customize</button>`);
-    var root_3$8 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
+    var root_1$e = from_html(`<button type="button">Customize</button>`);
+    var root_3$7 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
     var root_5$1 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Toggles</div> <div class="toggles-container svelte-16uy9h6"></div></div>`);
     var root_7$1 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Placeholders</div> <div class="placeholders-container svelte-16uy9h6"></div></div>`);
     var root_9 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Tab Groups</div> <div class="tabgroups-container svelte-16uy9h6"><div class="tabgroup-card header-card svelte-16uy9h6" role="group"><div class="tabgroup-row svelte-16uy9h6"><div class="logo-box svelte-16uy9h6" id="cv-nav-icon-box"><div class="nav-icon svelte-16uy9h6"><!></div></div> <div class="tabgroup-info svelte-16uy9h6"><div class="tabgroup-title-container"><p class="tabgroup-title svelte-16uy9h6">Show only the selected tab</p></div> <p class="tabgroup-description svelte-16uy9h6">Hide the navigation headers</p></div> <label class="toggle-switch nav-toggle svelte-16uy9h6"><input class="nav-pref-input svelte-16uy9h6" type="checkbox" aria-label="Show only the selected tab"/> <span class="switch-bg svelte-16uy9h6"></span> <span class="switch-knob svelte-16uy9h6"></span></label></div></div> <div class="tab-groups-list svelte-16uy9h6"></div></div></div>`);
     var root_4$4 = from_html(`<!> <!> <!>`, 1);
-    var root_2$a = from_html(`<div class="tab-content active svelte-16uy9h6"><!> <!></div>`);
+    var root_2$b = from_html(`<div class="tab-content active svelte-16uy9h6"><!> <!></div>`);
     var root_15 = from_html(`<button type="button" class="share-action-btn copy-url-btn svelte-16uy9h6"><span class="btn-icon svelte-16uy9h6"><!></span> <span><!></span></button>`);
 
     var root_14 = from_html(`<div class="tab-content active svelte-16uy9h6"><div class="share-content svelte-16uy9h6"><div class="share-instruction svelte-16uy9h6">Create a shareable link for your current customization, or select specific parts of
@@ -12924,7 +12937,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var button_1 = root_1$d();
+    			var button_1 = root_1$e();
 
     			template_effect(() => set_class(button_1, 1, `tab ${get(activeTab) === 'customize' ? 'active' : ''}`, 'svelte-16uy9h6'));
     			delegated('click', button_1, () => set(activeTab, 'customize'));
@@ -12944,12 +12957,12 @@
 
     	{
     		var consequent_7 = ($$anchor) => {
-    			var div_6 = root_2$a();
+    			var div_6 = root_2$b();
     			var node_4 = child(div_6);
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var p = root_3$8();
+    					var p = root_3$7();
     					var text_1 = child(p, true);
 
     					reset(p);
@@ -13272,7 +13285,7 @@
 
     delegate(['click', 'change']);
 
-    const HIGHLIGHT_COLORS = [
+    const BOX_COLORS = [
         { key: 'yellow', label: 'Yellow', hex: '#f5f521' },
         { key: 'blue', label: 'Blue', hex: '#3b82f6' },
         { key: 'red', label: 'Red', hex: '#ef4444' },
@@ -13281,6 +13294,12 @@
     ];
     const DEFAULT_COLOR_KEY = 'red';
 
+    /**
+     * Shared annotation types and constants.
+     *
+     * This is the single source of truth for annotation-related types used across
+     * box mode, text highlights, and any future annotation hosts.
+     */
     const ANNOTATION_CORNERS = ['tl', 'tr', 'bl', 'br'];
     const CORNER_ICONS = [
         { key: 'tl', icon: '◤' },
@@ -13289,7 +13308,10 @@
         { key: 'br', icon: '◢' },
     ];
     const DEFAULT_ANNOTATION_CORNER = 'tl';
+    // ─── Shared limits ────────────────────────────────────────────────────────────
+    /** Maximum number of characters allowed in any annotation note. */
     const MAX_ANNOTATION_LENGTH = 280;
+    /** Characters shown in the collapsed ribbon preview. */
     const ANNOTATION_PREVIEW_LENGTH = 40;
 
     /**
@@ -13428,8 +13450,8 @@
     }
 
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    const COLOR_KEYS = new Set(HIGHLIGHT_COLORS.map((c) => c.key));
-    const CORNER_KEYS = new Set(ANNOTATION_CORNERS);
+    const COLOR_KEYS$1 = new Set(BOX_COLORS.map((c) => c.key));
+    const CORNER_KEYS$1 = new Set(ANNOTATION_CORNERS);
     /**
      * Serializes a list of AnchorDescriptors into a URL-safe string.
      */
@@ -13569,9 +13591,9 @@
                 const colorSeg = segs[1];
                 const cornerSeg = segs[2];
                 const noteSeg = segs.slice(3).join(':'); // re-join in case of extra colons
-                if (COLOR_KEYS.has(colorSeg))
+                if (COLOR_KEYS$1.has(colorSeg))
                     color = colorSeg;
-                annotationCorner = CORNER_KEYS.has(cornerSeg)
+                annotationCorner = CORNER_KEYS$1.has(cornerSeg)
                     ? cornerSeg
                     : DEFAULT_ANNOTATION_CORNER;
                 try {
@@ -13586,15 +13608,15 @@
                 id = segs[0];
                 const colorSeg = segs[1];
                 const cornerSeg = segs[2];
-                if (COLOR_KEYS.has(colorSeg))
+                if (COLOR_KEYS$1.has(colorSeg))
                     color = colorSeg;
-                if (CORNER_KEYS.has(cornerSeg))
+                if (CORNER_KEYS$1.has(cornerSeg))
                     annotationCorner = cornerSeg;
             }
             else if (segs.length === 2) {
                 // "id:color"
                 const colorSeg = segs[1];
-                if (COLOR_KEYS.has(colorSeg)) {
+                if (COLOR_KEYS$1.has(colorSeg)) {
                     id = segs[0];
                     color = colorSeg;
                 }
@@ -13706,11 +13728,11 @@
     const CV_CUSTOM_ELEMENTS = 'cv-tabgroup, cv-toggle';
     const SHAREABLE_SELECTOR = 'div, p, blockquote, pre, li, h1, h2, h3, h4, h5, h6, table, span, tr, ' + CV_CUSTOM_ELEMENTS;
     const SELECTED_CLASS = 'cv-share-selected';
-    const HIGHLIGHT_TARGET_CLASS = 'cv-highlight-target';
+    const BOX_TARGET_CLASS = 'cv-box-target';
     const HIDE_SELECTED_CLASS = 'cv-share-selected-hide';
-    const HIDE_HIGHLIGHT_TARGET_CLASS = 'cv-highlight-target-hide';
-    const HIGHLIGHT_SELECTED_CLASS = 'cv-share-selected-highlight';
-    const HIGHLIGHT_TARGET_MODE_CLASS = 'cv-highlight-target-mode';
+    const HIDE_BOX_TARGET_CLASS = 'cv-box-target-hide';
+    const BOX_SELECTED_CLASS = 'cv-share-selected-box';
+    const BOX_TARGET_MODE_CLASS = 'cv-box-target-mode';
     // IDs that should be treated as generic wrappers even if they are unique
     const GENERIC_WRAPPER_IDS = ['flex-body', 'content-wrapper', 'app'];
     /**
@@ -13805,6 +13827,1181 @@
         return false;
     }
 
+    /** Max characters stored for the start/end text snippet anchors. */
+    const SNIPPET_LENGTH = 16;
+
+    // ─── Constants ───────────────────────────────────────────────────────────────
+    const COLOR_KEYS = new Set(BOX_COLORS.map((c) => c.key));
+    const CORNER_KEYS = new Set(ANNOTATION_CORNERS);
+    const FIELD_SEP = ':';
+    const DESC_SEP = ',';
+    /**
+     * URL format (human-readable):
+     *
+     * elementId anchor  →  e:<startEnc>:<endEnc>:<textLen>:<elementId>:<containerHash>:<textHash>[:<color>][:<corner>:<note>]
+     * containerId anchor → c:<startEnc>:<endEnc>:<textLen>:<containerId>:<containerTag>:<containerIndex>:<containerHash>:<textHash>[:<color>][:<corner>:<note>]
+     *
+     * Field separator is ':'. Text fields are percent-encoded so colons in text become %3A.
+     * Spaces in text snippets are left as literal spaces so URLSearchParams encodes them as '+'.
+     * Multiple descriptors are comma-separated.
+     * Fallback (no id available): base64-encoded minified JSON.
+     *
+     * Annotation suffix (when present): :<corner>:<encodedNote>
+     *   corner = 'tl' | 'tr' | 'bl' | 'br'
+     *   note   = encodeURIComponent(annotation text)
+     */
+    // ─── Public API ──────────────────────────────────────────────────────────────
+    function serializeTextHighlights(descriptors) {
+        return descriptors.map(serializeOne).filter(Boolean).join(DESC_SEP);
+    }
+    function deserializeTextHighlights(encoded) {
+        if (!encoded)
+            return [];
+        return encoded
+            .split(DESC_SEP)
+            .map(parseOne)
+            .filter((d) => d !== null);
+    }
+    // ─── Serialise ────────────────────────────────────────────────────────────────
+    function buildAnnotationSuffix(desc) {
+        if (!desc.annotation)
+            return '';
+        const corner = desc.annotationCorner ?? DEFAULT_ANNOTATION_CORNER;
+        return `${FIELD_SEP}${corner}${FIELD_SEP}${encodeURIComponent(desc.annotation)}`;
+    }
+    function serializeOne(desc) {
+        // We replace %20 with a literal space ' ' so that when URLSearchParams
+        // serializes it into the final URL, it converts the ' ' into a '+' for readability.
+        const s = encodeURIComponent(desc.startText).replace(/%20/g, ' ');
+        // If endText is identical to startText (short highlights), omit it to prevent duplication
+        const e = desc.startText === desc.endText ? '' : encodeURIComponent(desc.endText).replace(/%20/g, ' ');
+        const colorSuffix = desc.color && desc.color !== 'yellow' ? FIELD_SEP + desc.color : '';
+        const annotationSuffix = buildAnnotationSuffix(desc);
+        if (desc.elementId) {
+            // e:<startEnc>:<endEnc>:<textLen>:<elementId>:<containerHash>:<textHash>[:<color>][:<anchor>:<corner>:<note>]
+            return (`e${FIELD_SEP}${s}${FIELD_SEP}${e}${FIELD_SEP}${desc.textLength}` +
+                `${FIELD_SEP}${desc.elementId}${FIELD_SEP}${desc.containerHash}${FIELD_SEP}${desc.textHash}${colorSuffix}${annotationSuffix}`);
+        }
+        if (desc.containerId) {
+            // c:<startEnc>:<endEnc>:<textLen>:<containerId>:<containerTag>:<containerIndex>:<containerHash>:<textHash>[:<color>][:<anchor>:<corner>:<note>]
+            return (`c${FIELD_SEP}${s}${FIELD_SEP}${e}${FIELD_SEP}${desc.textLength}` +
+                `${FIELD_SEP}${desc.containerId}${FIELD_SEP}${desc.containerTag}${FIELD_SEP}${desc.containerIndex}` +
+                `${FIELD_SEP}${desc.containerHash}${FIELD_SEP}${desc.textHash}${colorSuffix}${annotationSuffix}`);
+        }
+        // Fallback: base64 JSON
+        return serializeBase64(desc);
+    }
+    function serializeBase64(desc) {
+        const obj = {
+            ct: desc.containerTag,
+            ci: desc.containerIndex,
+            ch: desc.containerHash,
+            s: desc.startText,
+            th: desc.textHash,
+            tl: desc.textLength,
+        };
+        if (desc.startText !== desc.endText)
+            obj['e'] = desc.endText;
+        if (desc.color)
+            obj['c'] = desc.color;
+        if (desc.annotation) {
+            obj['n'] = desc.annotation;
+            obj['nc'] = desc.annotationCorner ?? DEFAULT_ANNOTATION_CORNER;
+        }
+        try {
+            return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+        }
+        catch {
+            return '';
+        }
+    }
+    // ─── Deserialise ─────────────────────────────────────────────────────────────
+    function parseOne(part) {
+        if (!part)
+            return null;
+        if (part.startsWith('e:'))
+            return parseElementId(part.slice(2));
+        if (part.startsWith('c:'))
+            return parseContainerId(part.slice(2));
+        // Base64 fallback: only A-Za-z0-9+/= characters
+        if (/^[A-Za-z0-9+/]*={0,2}$/.test(part)) {
+            return parseBase64(part);
+        }
+        return null;
+    }
+    /**
+     * Extracts annotation fields from trailing fields after the known fixed fields.
+     * Annotation suffix format: <corner>:<encodedNote...>
+     * Returns null if no annotation is present.
+     */
+    function parseAnnotationSuffix(fields, annotationStartIndex) {
+        if (fields.length <= annotationStartIndex)
+            return null;
+        const corner = fields[annotationStartIndex];
+        const noteParts = fields.slice(annotationStartIndex + 1);
+        if (!corner || noteParts.length === 0)
+            return null;
+        if (!CORNER_KEYS.has(corner))
+            return null;
+        try {
+            const annotation = decodeURIComponent(noteParts.join(FIELD_SEP));
+            return {
+                annotation,
+                annotationCorner: corner,
+            };
+        }
+        catch {
+            return null;
+        }
+    }
+    /**
+     * Parse: <startEnc>:<endEnc>:<textLen>:<elementId>:<containerHash>:<textHash>[:<color>][:<anchor>:<corner>:<note>]
+     * Fixed fields: 0=start, 1=end, 2=len, 3=elementId, 4=containerHash, 5=textHash
+     * Optional field 6: color
+     * Optional fields 7+: anchor, corner, note
+     */
+    function parseElementId(rest) {
+        try {
+            const fields = rest.split(FIELD_SEP);
+            if (fields.length < 6)
+                return null;
+            const startText = decodeURIComponent(fields[0]);
+            const endText = fields[1] === '' ? startText : decodeURIComponent(fields[1]);
+            const textLength = parseInt(fields[2], 10);
+            const elementId = fields[3];
+            const containerHash = parseInt(fields[4], 10);
+            const textHash = parseInt(fields[5], 10);
+            if (!elementId || isNaN(containerHash) || isNaN(textHash) || isNaN(textLength))
+                return null;
+            // Field 6: optional color
+            const color = fields[6] && COLOR_KEYS.has(fields[6]) ? fields[6] : undefined;
+            const annotationStartIdx = color ? 7 : 6;
+            const desc = {
+                elementId,
+                containerTag: '', // not needed — resolved directly via elementId
+                containerIndex: 0,
+                containerHash,
+                startText,
+                endText,
+                textHash,
+                textLength,
+            };
+            if (color)
+                desc.color = color;
+            const ann = parseAnnotationSuffix(fields, annotationStartIdx);
+            if (ann) {
+                desc.annotation = ann.annotation;
+                desc.annotationCorner = ann.annotationCorner;
+            }
+            return desc;
+        }
+        catch {
+            return null;
+        }
+    }
+    /**
+     * Parse: <startEnc>:<endEnc>:<textLen>:<containerId>:<containerTag>:<containerIndex>:<containerHash>:<textHash>[:<color>][:<corner>:<note>]
+     * Fixed fields: 0=start, 1=end, 2=len, 3=containerId, 4=tag, 5=index, 6=containerHash, 7=textHash
+     * Optional field 8: color
+     * Optional fields 9+: corner, note
+     */
+    function parseContainerId(rest) {
+        try {
+            const fields = rest.split(FIELD_SEP);
+            if (fields.length < 8)
+                return null;
+            const startText = decodeURIComponent(fields[0]);
+            const endText = fields[1] === '' ? startText : decodeURIComponent(fields[1]);
+            const textLength = parseInt(fields[2], 10);
+            const containerId = fields[3];
+            const containerTag = fields[4].toUpperCase();
+            const containerIndex = parseInt(fields[5], 10);
+            const containerHash = parseInt(fields[6], 10);
+            const textHash = parseInt(fields[7], 10);
+            if (!containerId ||
+                !containerTag ||
+                isNaN(containerIndex) ||
+                isNaN(containerHash) ||
+                isNaN(textHash) ||
+                isNaN(textLength))
+                return null;
+            // Field 8: optional color
+            const color = fields[8] && COLOR_KEYS.has(fields[8]) ? fields[8] : undefined;
+            const annotationStartIdx = color ? 9 : 8;
+            const desc = {
+                containerId,
+                containerTag,
+                containerIndex,
+                containerHash,
+                startText,
+                endText,
+                textHash,
+                textLength,
+            };
+            if (color)
+                desc.color = color;
+            const ann = parseAnnotationSuffix(fields, annotationStartIdx);
+            if (ann) {
+                desc.annotation = ann.annotation;
+                desc.annotationCorner = ann.annotationCorner;
+            }
+            return desc;
+        }
+        catch {
+            return null;
+        }
+    }
+    function parseBase64(encoded) {
+        try {
+            const json = decodeURIComponent(escape(atob(encoded)));
+            const obj = JSON.parse(json);
+            const ct = obj['ct'];
+            const ci = obj['ci'];
+            const ch = obj['ch'];
+            const s = obj['s'];
+            const e = obj['e'];
+            const th = obj['th'];
+            const tl = obj['tl'];
+            if (typeof ct !== 'string' ||
+                typeof ci !== 'number' ||
+                typeof ch !== 'number' ||
+                typeof s !== 'string' ||
+                (e !== undefined && typeof e !== 'string') ||
+                typeof th !== 'number' ||
+                typeof tl !== 'number')
+                return null;
+            const desc = {
+                containerTag: obj.ct,
+                containerIndex: obj.ci,
+                containerHash: obj.ch,
+                startText: obj.s,
+                endText: obj.e || obj.s,
+                textHash: obj.th,
+                textLength: obj.tl,
+            };
+            if (typeof obj['c'] === 'string' && COLOR_KEYS.has(obj['c'])) {
+                desc.color = obj['c'];
+            }
+            if (typeof obj['n'] === 'string') {
+                desc.annotation = obj['n'];
+                desc.annotationCorner = CORNER_KEYS.has(obj['nc'])
+                    ? obj['nc']
+                    : DEFAULT_ANNOTATION_CORNER;
+            }
+            return desc;
+        }
+        catch {
+            return null;
+        }
+    }
+
+    /**
+     * Resolves a TextRangeDescriptor back to a live DOM Range.
+     */
+    function resolveDescriptor(desc) {
+        const container = findContainer(desc);
+        if (!container)
+            return { range: null, verified: false };
+        const { entries, rawText } = buildTextNodeMap(container);
+        if (!rawText || entries.length === 0)
+            return { range: null, verified: false };
+        const span = findTextSpan(rawText, desc);
+        if (!span)
+            return { range: null, verified: false };
+        const { rawStart, rawEnd } = span;
+        // Verify by normalising the raw slice
+        const rawSlice = rawText.slice(rawStart, rawEnd);
+        const normalised = rawSlice.trim().replace(/\s+/g, ' ');
+        const verified = hashCode(normalised) === desc.textHash && normalised.length === desc.textLength;
+        const startPos = rawToNodeOffset(entries, rawStart);
+        const endPos = rawToNodeOffset(entries, rawEnd);
+        if (!startPos || !endPos)
+            return { range: null, verified };
+        try {
+            const range = document.createRange();
+            range.setStart(startPos.node, startPos.offset);
+            range.setEnd(endPos.node, endPos.offset);
+            return { range, verified };
+        }
+        catch {
+            return { range: null, verified };
+        }
+    }
+    // ---------------------------------------------------------------------------
+    // Container resolution
+    // ---------------------------------------------------------------------------
+    function findContainer(desc) {
+        // ── Direct element-id lookup ──────────────────────────────────────────────
+        if (desc.elementId) {
+            const el = document.getElementById(desc.elementId);
+            if (el instanceof HTMLElement) {
+                // Verify hash if we have one; if it doesn't match, still use the element
+                // (content may have changed slightly but the id is the best anchor we have)
+                return el;
+            }
+        }
+        // ── Scope to nearest ancestor id ─────────────────────────────────────────
+        const scope = (desc.containerId ? document.getElementById(desc.containerId) : null) ??
+            document.body;
+        if (!desc.containerTag)
+            return null;
+        const candidates = Array.from(scope.querySelectorAll(desc.containerTag));
+        if (candidates.length === 0)
+            return null;
+        // ── Try exact index + hash match ─────────────────────────────────────────
+        const byIndex = candidates[desc.containerIndex];
+        if (byIndex) {
+            const hash = hashCode(getStableNormalizedText(byIndex));
+            if (hash === desc.containerHash)
+                return byIndex;
+        }
+        // ── Fuzzy: scan all candidates for matching hash ──────────────────────────
+        for (const c of candidates) {
+            if (hashCode(getStableNormalizedText(c)) === desc.containerHash)
+                return c;
+        }
+        // ── Last resort: use the index regardless of hash ─────────────────────────
+        // (content may have changed; try anyway — text search will verify)
+        return byIndex ?? candidates[0] ?? null;
+    }
+    function buildTextNodeMap(container) {
+        const entries = [];
+        let pos = 0;
+        const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+        let node = walker.nextNode();
+        while (node) {
+            const raw = node.nodeValue ?? '';
+            entries.push({ node, start: pos, end: pos + raw.length });
+            pos += raw.length;
+            node = walker.nextNode();
+        }
+        return {
+            entries,
+            rawText: entries.map((e) => e.node.nodeValue ?? '').join(''),
+        };
+    }
+    function findTextSpan(rawText, desc) {
+        const { startText, endText, textLength } = desc;
+        // ── 1. Exact search ───────────────────────────────────────────────────────
+        let rawStart = rawText.indexOf(startText);
+        // ── 2. Normalise-both fallback ────────────────────────────────────────────
+        if (rawStart === -1) {
+            const normHaystack = rawText.replace(/\s+/g, ' ').trim();
+            const normNeedle = startText.replace(/\s+/g, ' ').trim();
+            const normIdx = normHaystack.indexOf(normNeedle);
+            if (normIdx !== -1) {
+                rawStart = normToRaw(rawText, normIdx);
+            }
+        }
+        if (rawStart === -1)
+            return null;
+        // ── Compute rawEnd ────────────────────────────────────────────────────────
+        let rawEnd;
+        if (startText === endText) {
+            // Short selection (≤ SNIPPET_LENGTH): advance by ~textLength raw chars
+            rawEnd = advanceByNormLength(rawText, rawStart, textLength);
+        }
+        else {
+            // Long selection: endText should appear near rawStart + textLength
+            const searchFrom = rawStart + Math.max(0, textLength - endText.length - 5);
+            let found = rawText.indexOf(endText, Math.max(rawStart + startText.length - endText.length, searchFrom));
+            if (found === -1) {
+                // Normalise-both fallback for endText
+                const normHaystack = rawText.replace(/\s+/g, ' ').trim();
+                const normNeedle = endText.replace(/\s+/g, ' ').trim();
+                const rawSearchFrom = Math.max(rawStart, searchFrom);
+                const normSearchFrom = rawToNorm(rawText, rawSearchFrom);
+                const normIdx = normHaystack.indexOf(normNeedle, normSearchFrom);
+                if (normIdx !== -1) {
+                    found = normToRaw(rawText, normIdx);
+                }
+            }
+            rawEnd =
+                found !== -1
+                    ? found + endText.length
+                    : advanceByNormLength(rawText, rawStart, textLength);
+        }
+        return { rawStart, rawEnd: Math.min(rawEnd, rawText.length) };
+    }
+    /**
+     * Given a raw string and a normalized index (treating whitespace-runs as 1),
+     * return the corresponding raw string index.
+     */
+    function normToRaw(raw, normTarget) {
+        let normCount = 0;
+        let rawIdx = 0;
+        // Skip leading whitespace (mirrors .trimStart())
+        while (rawIdx < raw.length && /\s/.test(raw[rawIdx]))
+            rawIdx++;
+        let prevWasSpace = false;
+        while (rawIdx < raw.length && normCount < normTarget) {
+            const ch = raw[rawIdx];
+            if (/\s/.test(ch)) {
+                if (!prevWasSpace) {
+                    normCount++;
+                    prevWasSpace = true;
+                }
+            }
+            else {
+                normCount++;
+                prevWasSpace = false;
+            }
+            rawIdx++;
+        }
+        return rawIdx;
+    }
+    /** Inverse: given a raw index, return the approximately equivalent normalised index. */
+    function rawToNorm(raw, rawTarget) {
+        let normCount = 0;
+        let rawIdx = 0;
+        while (rawIdx < raw.length && /\s/.test(raw[rawIdx]))
+            rawIdx++; // skip leading ws
+        let prevWasSpace = false;
+        while (rawIdx < raw.length && rawIdx < rawTarget) {
+            const ch = raw[rawIdx];
+            if (/\s/.test(ch)) {
+                if (!prevWasSpace) {
+                    normCount++;
+                    prevWasSpace = true;
+                }
+            }
+            else {
+                normCount++;
+                prevWasSpace = false;
+            }
+            rawIdx++;
+        }
+        return normCount;
+    }
+    /**
+     * From rawStart, advance approximately `normLen` normalised characters
+     * (treating whitespace runs as 1) and return the resulting raw position.
+     */
+    function advanceByNormLength(raw, rawStart, normLen) {
+        let count = 0;
+        let i = rawStart;
+        let prevWasSpace = false;
+        while (i < raw.length && count < normLen) {
+            const ch = raw[i];
+            if (/\s/.test(ch)) {
+                if (!prevWasSpace) {
+                    count++;
+                    prevWasSpace = true;
+                }
+            }
+            else {
+                count++;
+                prevWasSpace = false;
+            }
+            i++;
+        }
+        return i;
+    }
+    // ---------------------------------------------------------------------------
+    // Map raw position → (Text node, in-node offset)
+    // ---------------------------------------------------------------------------
+    function rawToNodeOffset(entries, rawPos) {
+        for (const entry of entries) {
+            if (rawPos >= entry.start && rawPos <= entry.end) {
+                return { node: entry.node, offset: rawPos - entry.start };
+            }
+        }
+        // Clamp to last node end
+        const last = entries[entries.length - 1];
+        if (last)
+            return { node: last.node, offset: last.node.nodeValue?.length ?? 0 };
+        return null;
+    }
+
+    var root_4$3 = from_html(`<span>▾</span>`);
+    var root_3$6 = from_html(`<!> <span class="cv-ribbon-text cv-ribbon-text--right svelte-1h9hx7h"> </span> <span class="cv-ribbon-grip svelte-1h9hx7h" aria-hidden="true"><span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span> <span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span> <span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span></span>`, 1);
+    var root_6$1 = from_html(`<span>▾</span>`);
+    var root_5 = from_html(`<span class="cv-ribbon-grip svelte-1h9hx7h" aria-hidden="true"><span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span> <span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span> <span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span></span> <span class="cv-ribbon-text svelte-1h9hx7h"> </span> <!>`, 1);
+    var root_1$d = from_html(`<button type="button"><!></button>`);
+    var root_7 = from_html(`<div class="cv-annotation-card svelte-1h9hx7h" role="region" aria-label="Annotation"><button type="button" class="cv-card-close svelte-1h9hx7h" aria-label="Collapse annotation">✕</button> <span class="cv-card-text svelte-1h9hx7h"> </span></div>`);
+    var root$g = from_html(`<div role="presentation"><!></div>`);
+
+    const $$css$k = {
+    	hash: 'svelte-1h9hx7h',
+    	code: '\n  /* ==============================\n     CONTAINER (position, drag, opacity)\n     ============================== */.cv-annotation-container.svelte-1h9hx7h {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;cursor:default;opacity:0.88;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-1h9hx7h:hover {opacity:1;z-index:110;}\n\n  /* ==============================\n     RIBBON (home-plate)\n     ============================== */.cv-annotation-ribbon.svelte-1h9hx7h {border:none;padding:6px 20px 6px 8px;min-width:28px;min-height:24px;background:var(--cv-box-color);cursor:default;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);display:flex;align-items:center;justify-content:flex-start;gap:5px;transform-origin:center center;}.cv-annotation-ribbon--intro.svelte-1h9hx7h {\n    animation: svelte-1h9hx7h-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-annotation-ribbon--periodic.svelte-1h9hx7h {\n    animation: svelte-1h9hx7h-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-annotation-ribbon--right.svelte-1h9hx7h {padding:6px 8px 6px 20px;justify-content:flex-end;}.cv-annotation-ribbon--empty.svelte-1h9hx7h {min-width:24px;padding:6px 16px 6px 8px;}.cv-annotation-ribbon--expandable.svelte-1h9hx7h {cursor:pointer;}.cv-annotation-ribbon--expandable.svelte-1h9hx7h:hover {filter:brightness(1.1);}\n\n  /* ==============================\n     RIBBON TEXT (single line)\n     ============================== */.cv-ribbon-text.svelte-1h9hx7h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;color:#fff;text-shadow:0 1px 3px rgba(0, 0, 0, 0.25);}.cv-ribbon-text--right.svelte-1h9hx7h {text-align:right;}.cv-ribbon-chevron.svelte-1h9hx7h {font-size:22px;opacity:1;flex-shrink:0;line-height:1;color:#fff;text-shadow:0 1px 4px rgba(0, 0, 0, 0.4);}.cv-ribbon-chevron--bounce.svelte-1h9hx7h {\n    animation: svelte-1h9hx7h-cv-chevron-bounce 3s ease-in-out infinite;}\n\n  /* ==============================\n     DRAG GRIP (6-dot grid on flat side)\n     ============================== */.cv-ribbon-grip.svelte-1h9hx7h {display:grid;grid-template-columns:repeat(2, 3px);gap:3px;flex-shrink:0;opacity:0.7;cursor:grab;padding:2px;}.cv-ribbon-grip.svelte-1h9hx7h:active {cursor:grabbing;}.cv-ribbon-grip.svelte-1h9hx7h > span:where(.svelte-1h9hx7h) {width:3px;height:3px;border-radius:50%;background:rgba(255, 255, 255, 0.9);box-shadow:0 0 1px rgba(0, 0, 0, 0.4);}\n\n  /* ==============================\n     CARD (sticky note)\n     ============================== */.cv-annotation-card.svelte-1h9hx7h {background:#fffdf5;border:1.5px solid var(--cv-box-color);border-radius:4px;padding:10px 12px;max-width:280px;min-width:120px;box-shadow:0 4px 20px rgba(0, 0, 0, 0.18);position:relative;\n    animation: svelte-1h9hx7h-cv-cardPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}.cv-card-close.svelte-1h9hx7h {position:absolute;top:3px;right:5px;border:none;background:transparent;cursor:pointer;font-size:12px;color:#aaa;padding:2px 4px;line-height:1;font-family:sans-serif;}.cv-card-close.svelte-1h9hx7h:hover {color:#555;}.cv-card-text.svelte-1h9hx7h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:600;color:#333;line-height:1.45;word-break:break-word;white-space:pre-wrap;padding-right:15px;}\n\n  /* ==============================\n     ANIMATIONS\n     ============================== */\n  @keyframes svelte-1h9hx7h-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-1h9hx7h-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }\n\n  @keyframes svelte-1h9hx7h-cv-cardPop {\n    from {\n      opacity: 0;\n      transform: scale(0.9) translateY(5px);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) translateY(0);\n    }\n  }\n\n  @keyframes svelte-1h9hx7h-cv-chevron-bounce {\n    0%,\n    70%,\n    100% {\n      transform: translateY(0);\n    }\n    78% {\n      transform: translateY(-3px);\n    }\n    86% {\n      transform: translateY(1px);\n    }\n    93% {\n      transform: translateY(-1.5px);\n    }\n  }'
+    };
+
+    function BoxAnnotation($$anchor, $$props) {
+    	push($$props, true);
+    	append_styles$1($$anchor, $$css$k);
+
+    	const corner = user_derived(() => $$props.annotationCorner ?? DEFAULT_ANNOTATION_CORNER);
+    	const hasText = user_derived(() => $$props.annotation.length > 0);
+    	const isShort = user_derived(() => $$props.annotation.length <= ANNOTATION_PREVIEW_LENGTH);
+    	const isRightCorner = user_derived(() => get(corner) === 'tr' || get(corner) === 'br');
+    	let expanded = state(false);
+
+    	// --- Intro wiggle state ---
+    	let introAnimationDone = state(false);
+
+    	function onIntroAnimationEnd(e) {
+    		if (e.target !== e.currentTarget) return;
+
+    		set(introAnimationDone, true);
+    	}
+
+    	// --- Drag-to-move state ---
+    	let dragOffsetX = state(0);
+
+    	let dragOffsetY = state(0);
+    	let isDragging = false;
+    	let isPointerDown = false;
+    	let dragStartX = 0;
+    	let dragStartY = 0;
+    	let dragStartOffsetX = 0;
+    	let dragStartOffsetY = 0;
+    	let containerEl;
+
+    	function toggle() {
+    		if (get(isShort)) return;
+
+    		set(expanded, !get(expanded));
+    	}
+
+    	function handleInteraction(e) {
+    		e.stopPropagation();
+
+    		if (!isDragging) toggle();
+    	}
+
+    	function onPointerDown(e) {
+    		// Only initiate drag when the pointer starts on the grip handle.
+    		if (!e.target.closest('.cv-ribbon-grip')) return;
+
+    		isPointerDown = true;
+    		isDragging = false;
+    		dragStartX = e.clientX;
+    		dragStartY = e.clientY;
+    		dragStartOffsetX = get(dragOffsetX);
+    		dragStartOffsetY = get(dragOffsetY);
+    	}
+
+    	// Hard clamp so the element can never leave the viewport.
+    	function clampToViewport(newX, newY) {
+    		if (!containerEl) return { x: newX, y: newY };
+
+    		const rect = containerEl.getBoundingClientRect();
+    		const pad = 8;
+    		const vw = window.innerWidth;
+    		const vh = window.innerHeight;
+    		const origLeft = rect.left - get(dragOffsetX);
+    		const origTop = rect.top - get(dragOffsetY);
+    		const newLeft = origLeft + newX;
+    		const newTop = origTop + newY;
+    		let x = newX;
+    		let y = newY;
+
+    		if (newLeft < pad) x += pad - newLeft;
+    		if (newLeft + rect.width > vw - pad) x -= newLeft + rect.width - (vw - pad);
+    		if (newTop < pad) y += pad - newTop;
+    		if (newTop + rect.height > vh - pad) y -= newTop + rect.height - (vh - pad);
+
+    		return { x, y };
+    	}
+
+    	function onPointerMove(e) {
+    		if (!isPointerDown) return;
+
+    		const dx = e.clientX - dragStartX;
+    		const dy = e.clientY - dragStartY;
+
+    		if (!isDragging && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
+    			isDragging = true;
+    			e.currentTarget.setPointerCapture(e.pointerId);
+    		}
+
+    		if (isDragging) {
+    			const rawX = dragStartOffsetX + dx;
+    			const rawY = dragStartOffsetY + dy;
+    			const clamped = clampToViewport(rawX, rawY);
+
+    			set(dragOffsetX, clamped.x, true);
+    			set(dragOffsetY, clamped.y, true);
+    		}
+    	}
+
+    	function onPointerUp(e) {
+    		if (!isPointerDown) return;
+
+    		isPointerDown = false;
+
+    		if (isDragging) {
+    			e.currentTarget.releasePointerCapture(e.pointerId);
+
+    			setTimeout(
+    				() => {
+    					isDragging = false;
+    				},
+    				50
+    			);
+    		}
+    	}
+
+    	// Cancel (e.g. touch interrupted by scroll) — reset all drag state cleanly.
+    	function onPointerCancel() {
+    		isPointerDown = false;
+    		isDragging = false;
+    	}
+
+    	// Nudge annotation back in-bounds when the viewport shrinks.
+    	user_effect(() => {
+    		function onResize() {
+    			const clamped = clampToViewport(get(dragOffsetX), get(dragOffsetY));
+
+    			set(dragOffsetX, clamped.x, true);
+    			set(dragOffsetY, clamped.y, true);
+    		}
+
+    		window.addEventListener('resize', onResize);
+
+    		return () => window.removeEventListener('resize', onResize);
+    	});
+
+    	/**
+    	 * Returns CSS positioning based on the annotation corner.
+    	 */
+    	function getPositionStyle(c) {
+    		switch (c) {
+    			case 'tr':
+    				return 'top: -6px; right: -6px;';
+
+    			case 'bl':
+    				return 'bottom: -6px; left: -6px;';
+
+    			case 'br':
+    				return 'bottom: -6px; right: -6px;';
+
+    			case 'tl':
+
+    			default:
+    				return 'top: -6px; left: -6px;';
+    		}
+    	}
+
+    	/**
+    	 * Returns the ribbon clip-path. The point faces inward toward the content.
+    	 */
+    	function getRibbonClipPath(c) {
+    		const pointsRight = c === 'tl' || c === 'bl';
+
+    		if (pointsRight) {
+    			return 'polygon(0% 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 0% 100%)';
+    		} else {
+    			return 'polygon(14px 0%, 100% 0%, 100% 100%, 14px 100%, 0% 50%)';
+    		}
+    	}
+
+    	var div = root$g();
+    	let classes;
+    	var node = child(div);
+
+    	{
+    		var consequent_4 = ($$anchor) => {
+    			var button = root_1$d();
+    			let classes_1;
+    			var node_1 = child(button);
+
+    			{
+    				var consequent_3 = ($$anchor) => {
+    					var fragment = comment();
+    					var node_2 = first_child(fragment);
+
+    					{
+    						var consequent_1 = ($$anchor) => {
+    							var fragment_1 = root_3$6();
+    							var node_3 = first_child(fragment_1);
+
+    							{
+    								var consequent = ($$anchor) => {
+    									var span = root_4$3();
+    									let classes_2;
+
+    									template_effect(() => classes_2 = set_class(span, 1, 'cv-ribbon-chevron svelte-1h9hx7h', null, classes_2, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
+    									append($$anchor, span);
+    								};
+
+    								if_block(node_3, ($$render) => {
+    									if (!get(isShort)) $$render(consequent);
+    								});
+    							}
+
+    							var span_1 = sibling(node_3, 2);
+    							var text = child(span_1, true);
+
+    							reset(span_1);
+    							next(2);
+
+    							template_effect(($0) => set_text(text, $0), [
+    								() => get(isShort)
+    									? $$props.annotation
+    									: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH) + '…'
+    							]);
+
+    							append($$anchor, fragment_1);
+    						};
+
+    						var alternate = ($$anchor) => {
+    							var fragment_2 = root_5();
+    							var span_2 = sibling(first_child(fragment_2), 2);
+    							var text_1 = child(span_2, true);
+
+    							reset(span_2);
+
+    							var node_4 = sibling(span_2, 2);
+
+    							{
+    								var consequent_2 = ($$anchor) => {
+    									var span_3 = root_6$1();
+    									let classes_3;
+
+    									template_effect(() => classes_3 = set_class(span_3, 1, 'cv-ribbon-chevron svelte-1h9hx7h', null, classes_3, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
+    									append($$anchor, span_3);
+    								};
+
+    								if_block(node_4, ($$render) => {
+    									if (!get(isShort)) $$render(consequent_2);
+    								});
+    							}
+
+    							template_effect(($0) => set_text(text_1, $0), [
+    								() => get(isShort)
+    									? $$props.annotation
+    									: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH) + '…'
+    							]);
+
+    							append($$anchor, fragment_2);
+    						};
+
+    						if_block(node_2, ($$render) => {
+    							if (get(isRightCorner)) $$render(consequent_1); else $$render(alternate, -1);
+    						});
+    					}
+
+    					append($$anchor, fragment);
+    				};
+
+    				if_block(node_1, ($$render) => {
+    					if (get(hasText)) $$render(consequent_3);
+    				});
+    			}
+
+    			reset(button);
+
+    			template_effect(
+    				($0) => {
+    					classes_1 = set_class(button, 1, 'cv-annotation-ribbon svelte-1h9hx7h', null, classes_1, {
+    						'cv-annotation-ribbon--empty': !get(hasText),
+    						'cv-annotation-ribbon--right': get(isRightCorner),
+    						'cv-annotation-ribbon--expandable': !get(isShort),
+    						'cv-annotation-ribbon--intro': !get(introAnimationDone),
+    						'cv-annotation-ribbon--periodic': get(introAnimationDone)
+    					});
+
+    					set_style(button, `clip-path: ${$0 ?? ''};`);
+
+    					set_attribute(button, 'aria-label', get(hasText)
+    						? get(isShort) ? $$props.annotation : 'Expand annotation'
+    						: 'Annotation marker');
+
+    					set_attribute(button, 'aria-expanded', get(isShort) ? undefined : get(expanded));
+    				},
+    				[() => getRibbonClipPath(get(corner))]
+    			);
+
+    			delegated('click', button, handleInteraction);
+    			event('animationend', button, onIntroAnimationEnd);
+    			append($$anchor, button);
+    		};
+
+    		var alternate_1 = ($$anchor) => {
+    			var div_1 = root_7();
+    			var button_1 = child(div_1);
+    			var span_4 = sibling(button_1, 2);
+    			var text_2 = child(span_4, true);
+
+    			reset(span_4);
+    			reset(div_1);
+    			template_effect(() => set_text(text_2, $$props.annotation));
+    			delegated('click', button_1, handleInteraction);
+    			append($$anchor, div_1);
+    		};
+
+    		if_block(node, ($$render) => {
+    			if (!get(expanded)) $$render(consequent_4); else $$render(alternate_1, -1);
+    		});
+    	}
+
+    	reset(div);
+    	bind_this(div, ($$value) => containerEl = $$value, () => containerEl);
+
+    	template_effect(
+    		($0) => {
+    			classes = set_class(div, 1, 'cv-annotation-container svelte-1h9hx7h', null, classes, { 'cv-annotation-container--expanded': get(expanded) });
+    			set_style(div, `${$0 ?? ''} transform: translate(${get(dragOffsetX) ?? ''}px, ${get(dragOffsetY) ?? ''}px);`);
+    		},
+    		[() => getPositionStyle(get(corner))]
+    	);
+
+    	delegated('pointerdown', div, onPointerDown);
+    	delegated('pointermove', div, onPointerMove);
+    	delegated('pointerup', div, onPointerUp);
+    	event('pointercancel', div, onPointerCancel);
+    	append($$anchor, div);
+    	pop();
+    }
+
+    delegate(['pointerdown', 'pointermove', 'pointerup', 'click']);
+
+    /* text-highlight-service.svelte.ts generated by Svelte v5.55.10 */
+
+    const CSS_HIGHLIGHT_SUPPORTED = typeof CSS !== 'undefined' && 'highlights' in CSS;
+
+    function getHighlightRegistry() {
+    	if (!CSS_HIGHLIGHT_SUPPORTED) return null;
+
+    	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    	return CSS.highlights;
+    }
+
+    function createHighlight() {
+    	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    	if (typeof globalThis.Highlight === 'undefined') return null;
+
+    	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    	return new globalThis.Highlight();
+    }
+
+    // ─── Styles ───────────────────────────────────────────────────────────────────
+    const HIGHLIGHT_CSS = `
+::highlight(cv-hl-yellow) {
+  background-color: transparent;
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: 16px;
+  text-decoration-color: oklch(78% 0.25 96 / 0.95);
+  text-underline-offset: -12px;
+  text-shadow:
+    5px 2px 10px oklch(72% 0.24 90 / 0.45),
+    -5px -2px 10px oklch(72% 0.24 90 / 0.32),
+    0 0 16px oklch(72% 0.24 90 / 0.22);
+}
+::highlight(cv-hl-blue) {
+  background-color: transparent;
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: 16px;
+  text-decoration-color: oklch(62% 0.22 240 / 0.9);
+  text-underline-offset: -12px;
+  text-shadow:
+    5px 2px 10px oklch(55% 0.2 240 / 0.4),
+    -5px -2px 10px oklch(55% 0.2 240 / 0.3),
+    0 0 16px oklch(50% 0.18 242 / 0.2);
+}
+::highlight(cv-hl-red) {
+  background-color: transparent;
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: 16px;
+  text-decoration-color: oklch(65% 0.22 20 / 0.9);
+  text-underline-offset: -12px;
+  text-shadow:
+    5px 2px 10px oklch(58% 0.2 20 / 0.4),
+    -5px -2px 10px oklch(58% 0.2 20 / 0.3),
+    0 0 16px oklch(52% 0.18 22 / 0.2);
+}
+::highlight(cv-hl-green) {
+  background-color: transparent;
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-thickness: 16px;
+  text-decoration-color: oklch(65% 0.22 145 / 0.9);
+  text-underline-offset: -12px;
+  text-shadow:
+    5px 2px 10px oklch(58% 0.2 148 / 0.4),
+    -5px -2px 10px oklch(58% 0.2 148 / 0.3),
+    0 0 16px oklch(52% 0.18 150 / 0.2);
+}
+::highlight(cv-hl-black) {
+  background-color: oklch(10% 0 0 / 0.95);
+  color: oklch(97% 0 0);
+  text-shadow: 4px 1px 8px rgba(0,0,0,0.6), -4px -1px 8px rgba(0,0,0,0.5);
+}
+`.trim();
+
+    const FALLBACK_CSS = `
+.cv-hl-fallback {
+  border-radius: 2px;
+  padding: 2px 2px;
+  clip-path: polygon(3px 0%, 100% 2px, calc(100% - 3px) 100%, 0% calc(100% - 2px));
+  mix-blend-mode: multiply;
+}
+.cv-hl-fallback--yellow {
+  background-color: rgba(230, 190, 0, 0.88);
+  color: inherit;
+  text-shadow: 5px 2px 10px rgba(180, 140, 0, 0.35), -5px -2px 10px rgba(180, 140, 0, 0.25);
+}
+.cv-hl-fallback--blue {
+  background-color: rgba(37, 99, 235, 0.72);
+  color: #fff;
+  text-shadow: 5px 2px 10px rgba(20, 60, 180, 0.35), -5px -2px 10px rgba(20, 60, 180, 0.25);
+}
+.cv-hl-fallback--red {
+  background-color: rgba(220, 38, 38, 0.72);
+  color: #fff;
+  text-shadow: 5px 2px 10px rgba(150, 20, 20, 0.35), -5px -2px 10px rgba(150, 20, 20, 0.25);
+}
+.cv-hl-fallback--green {
+  background-color: rgba(22, 163, 74, 0.72);
+  color: #fff;
+  text-shadow: 5px 2px 10px rgba(10, 110, 40, 0.35), -5px -2px 10px rgba(10, 110, 40, 0.25);
+}
+.cv-hl-fallback--black {
+  background-color: rgba(18, 18, 18, 0.92);
+  color: #f5f5f5;
+  text-shadow: 4px 1px 8px rgba(0,0,0,0.45), -4px -1px 8px rgba(0,0,0,0.35);
+  mix-blend-mode: normal;
+}
+`.trim();
+
+    let styleInjected = false;
+
+    function ensureStyle() {
+    	if (styleInjected) return;
+
+    	styleInjected = true;
+
+    	const el = document.createElement('style');
+
+    	el.id = 'cv-text-highlight-styles';
+    	el.textContent = CSS_HIGHLIGHT_SUPPORTED ? HIGHLIGHT_CSS : FALLBACK_CSS;
+    	document.head.appendChild(el);
+    }
+
+    // ─── Service ──────────────────────────────────────────────────────────────────
+    class TextHighlightService {
+    	hlMap = new SvelteMap();
+    	marks = [];
+    	active = false;
+
+    	get isActive() {
+    		return this.active;
+    	}
+
+    	/** Resolved ranges indexed by descriptor position, for annotation positioning. */
+    	resolvedRanges = [];
+
+    	/** Mounted BoxAnnotation overlay wrappers. */
+    	annotationWrappers = [];
+
+    	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+    	annotationComponents = [];
+
+    	/**
+    	 * Parse an encoded string (from ?cv-highlight=…) and apply highlights.
+    	 * Returns the first resolved Range for scrolling.
+    	 */
+    	applyEncoded(encoded) {
+    		const descriptors = deserializeTextHighlights(encoded);
+
+    		if (descriptors.length === 0) {
+    			showToast('No text highlights found in link.');
+
+    			return null;
+    		}
+
+    		return this.applyDescriptors(descriptors);
+    	}
+
+    	/**
+    	 * Apply a list of TextRangeDescriptors directly (e.g. from the float bar).
+    	 */
+    	applyDescriptors(descriptors, hideAnnotations = false) {
+    		this.clear();
+    		ensureStyle();
+
+    		let firstRange = null;
+    		let unverifiedCount = 0;
+    		const registry = getHighlightRegistry();
+
+    		this.resolvedRanges = [];
+
+    		for (const desc of descriptors) {
+    			const { range, verified } = resolveDescriptor(desc);
+
+    			this.resolvedRanges.push(range);
+
+    			if (!range) continue;
+    			if (!verified) unverifiedCount++;
+    			if (!firstRange) firstRange = range;
+
+    			const colorKey = desc.color ?? 'yellow';
+
+    			if (registry) {
+    				// CSS Custom Highlight API path
+    				if (!this.hlMap.has(colorKey)) {
+    					const hl = createHighlight();
+
+    					if (!hl) continue;
+
+    					registry.set(`cv-hl-${colorKey}`, hl);
+    					this.hlMap.set(colorKey, hl);
+    				}
+
+    				this.hlMap.get(colorKey).add(range);
+    			} else {
+    				// DOM <mark> fallback
+    				this._injectMark(range, colorKey);
+    			}
+
+    			// Mount annotation overlay if this descriptor has a note
+    			if (desc.annotation && !hideAnnotations) {
+    				this._mountAnnotation(desc, range);
+    			}
+    		}
+
+    		if (unverifiedCount > 0) {
+    			showToast('Some highlighted text may have changed since this link was created.');
+    		}
+
+    		this.active = true;
+
+    		return firstRange;
+    	}
+
+    	/**
+    	 * Returns the resolved Range for the descriptor at the given index.
+    	 * Used by ShareOverlay to check if a range exists before rendering an annotation editor.
+    	 */
+    	getRange(index) {
+    		return this.resolvedRanges[index] ?? null;
+    	}
+
+    	/**
+    	 * Returns the anchor DOMRect for the descriptor at the given index.
+    	 * Uses the highlight range's overall bounding rect.
+    	 */
+    	getAnchorRect(index) {
+    		const range = this.resolvedRanges[index];
+
+    		if (!range) return null;
+
+    		return range.getBoundingClientRect();
+    	}
+
+    	_lastDescriptors = [];
+
+    	clear() {
+    		if (!this.active) return;
+
+    		const registry = getHighlightRegistry();
+
+    		if (registry) {
+    			for (const key of this.hlMap.keys()) {
+    				registry.delete(`cv-hl-${key}`);
+    			}
+    		} else {
+    			for (const mark of this.marks) {
+    				const parent = mark.parentNode;
+
+    				if (parent) {
+    					while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+
+    					parent.removeChild(mark);
+    				}
+    			}
+    		}
+
+    		// Remove annotation overlays
+    		for (const comp of this.annotationComponents) {
+    			try {
+    				unmount(comp);
+    			} catch {
+    				/* ignore */
+    			}
+    		}
+
+    		for (const wrapper of this.annotationWrappers) {
+    			wrapper.remove();
+    		}
+
+    		this.annotationComponents = [];
+    		this.annotationWrappers = [];
+    		this.hlMap.clear();
+    		this.marks = [];
+    		this.resolvedRanges = [];
+    		this._lastDescriptors = [];
+    		this.active = false;
+    	}
+
+    	_injectMark(range, color) {
+    		try {
+    			const mark = document.createElement('mark');
+
+    			mark.className = `cv-hl-fallback cv-hl-fallback--${color}`;
+    			range.surroundContents(mark);
+    			this.marks.push(mark);
+    		} catch {
+    			// Range spans element boundaries — skip gracefully
+    		}
+    	}
+
+    	_mountAnnotation(desc, range) {
+    		const corner = desc.annotationCorner ?? DEFAULT_ANNOTATION_CORNER;
+    		const rect = range.getBoundingClientRect();
+
+    		// Wrapper div to host the Svelte component. We position it exactly over the highlighted text,
+    		// using absolute positioning so it scrolls with the document natively.
+    		const wrapper = document.createElement('div');
+
+    		wrapper.style.cssText = `
+      position: absolute;
+      z-index: 9300;
+      pointer-events: none;
+      top: ${rect.top + window.scrollY}px;
+      left: ${rect.left + window.scrollX}px;
+      width: ${rect.width}px;
+      height: ${rect.height}px;
+    `;
+
+    		document.body.appendChild(wrapper);
+    		this.annotationWrappers.push(wrapper);
+
+    		// Get the color for the box-color CSS variable
+    		const colorKey = desc.color ?? 'yellow';
+
+    		const colorMap = {
+    			yellow: '#facc15',
+    			blue: '#60a5fa',
+    			red: '#f87171',
+    			green: '#4ade80',
+    			black: '#4b5563'
+    		};
+
+    		wrapper.style.setProperty('--cv-box-color', colorMap[colorKey] ?? colorMap['yellow']);
+
+    		const component = mount(BoxAnnotation, {
+    			target: wrapper,
+    			props: { annotation: desc.annotation ?? '', annotationCorner: corner }
+    		});
+
+    		this.annotationComponents.push(component);
+
+    		// Track descriptor for getAnchorRect
+    		this._lastDescriptors.push(desc);
+    	}
+    }
+
+    const textHighlightService = new TextHighlightService();
+
     /* share-store.svelte.ts generated by Svelte v5.55.10 */
 
     class ShareStore {
@@ -13818,7 +15015,7 @@
     		set(this.#isActive, value, true);
     	}
 
-    	#selectionMode = state('highlight');
+    	#selectionMode = state('box');
 
     	get selectionMode() {
     		return get(this.#selectionMode);
@@ -13848,16 +15045,32 @@
     		set(this.#currentHoverTarget, value, true);
     	}
 
-    	highlightColors = new SvelteMap();
-    	highlightAnnotations = new SvelteMap();
-    	#shareCount = user_derived(() => this.selectedElements.size);
+    	boxColors = new SvelteMap();
+    	boxAnnotations = new SvelteMap();
+    	#textHighlights = state(proxy([]));
 
-    	get shareCount() {
-    		return get(this.#shareCount);
+    	get textHighlights() {
+    		return get(this.#textHighlights);
     	}
 
-    	set shareCount(value) {
-    		set(this.#shareCount, value);
+    	set textHighlights(value) {
+    		set(this.#textHighlights, value, true);
+    	}
+
+    	#selectedTextColor = state('yellow');
+
+    	get selectedTextColor() {
+    		return get(this.#selectedTextColor);
+    	}
+
+    	set selectedTextColor(value) {
+    		set(this.#selectedTextColor, value, true);
+    	}
+
+    	get shareCount() {
+    		return this.selectionMode === 'highlight'
+    			? this.textHighlights.length
+    			: this.selectedElements.size;
     	}
 
     	toggleActive(active) {
@@ -13868,14 +15081,14 @@
     			this.clearAllSelections();
 
     			if (this.currentHoverTarget) {
-    				this._removeHighlightClass(this.currentHoverTarget);
+    				this._removeBoxHoverClass(this.currentHoverTarget);
     			}
 
     			// Reset state
     			this.isActive = false;
 
     			this.currentHoverTarget = null;
-    			document.body.classList.remove('cv-share-active-show', 'cv-share-active-hide', 'cv-share-active-highlight');
+    			document.body.classList.remove('cv-share-active-show', 'cv-share-active-hide', 'cv-share-active-box', 'cv-share-active-highlight');
     		} else {
     			this.isActive = true;
     			this.updateBodyClass();
@@ -13885,7 +15098,23 @@
     	setSelectionMode(mode) {
     		if (this.selectionMode === mode) return;
 
+    		// Always clear hover styling first — prevents outline from lingering
+    		// when switching away from box/show/hide (setHoverTarget no-ops in highlight mode)
+    		if (this.currentHoverTarget) {
+    			this._removeBoxHoverClass(this.currentHoverTarget);
+    			this.currentHoverTarget = null;
+    		}
+
     		this.selectionMode = mode;
+
+    		// Clear other selections based on the target mode
+    		if (mode === 'highlight') {
+    			this.clearAllSelections();
+    		} else {
+    			this.textHighlights = [];
+    			textHighlightService.clear();
+    			window.getSelection()?.removeAllRanges();
+    		}
 
     		// Update styling for all currently selected elements
     		this.selectedElements.forEach((el) => {
@@ -13899,52 +15128,64 @@
     	}
 
     	updateBodyClass() {
-    		document.body.classList.remove('cv-share-active-show', 'cv-share-active-hide', 'cv-share-active-highlight');
+    		document.body.classList.remove('cv-share-active-show', 'cv-share-active-hide', 'cv-share-active-box', 'cv-share-active-highlight');
     		document.body.classList.add(`cv-share-active-${this.selectionMode}`);
     	}
 
     	setHoverTarget(target) {
-    		// Clear previous highlight
+    		// In text highlight mode, element hover is completely disabled
+    		if (this.selectionMode === 'highlight') return;
+
+    		// Clear previous hover
     		if (this.currentHoverTarget && this.currentHoverTarget !== target) {
-    			this._removeHighlightClass(this.currentHoverTarget);
+    			this._removeBoxHoverClass(this.currentHoverTarget);
     		}
 
-    		// Set new highlight
+    		// Set new hover
     		if (target) {
-    			this._addHighlightClass(target);
+    			this._addBoxHoverClass(target);
     		}
 
     		this.currentHoverTarget = target;
     	}
 
     	toggleElementSelection(el) {
+    		// In text highlight mode, element clicking is completely disabled
+    		if (this.selectionMode === 'highlight') return;
+
+    		// When selecting elements, clear any text highlights
+    		if (this.textHighlights.length > 0) {
+    			this.textHighlights = [];
+    			textHighlightService.clear();
+    		}
+
+    		window.getSelection()?.removeAllRanges();
+
     		const { updatedSelection, changesMade } = calculateNewSelection(this.selectedElements, el);
 
     		if (changesMade) {
-    			// We need to sync the classes on the DOM elements
-    			// 1. Remove classes from elements that are no longer selected
+    			// 1. Remove classes from elements no longer selected
     			this.selectedElements.forEach((oldEl) => {
     				if (!updatedSelection.has(oldEl)) {
     					this._removeSelectionClass(oldEl);
-    					this.highlightColors.delete(oldEl);
-    					this.highlightAnnotations.delete(oldEl);
+    					this.boxColors.delete(oldEl);
+    					this.boxAnnotations.delete(oldEl);
     				}
     			});
 
-    			// 2. Add classes to elements that are newly selected
+    			// 2. Add classes to newly selected elements
     			updatedSelection.forEach((newEl) => {
     				if (!this.selectedElements.has(newEl)) {
     					this._addSelectionClass(newEl);
     				}
     			});
 
-    			// 3. Update the state
+    			// 3. Update state
     			this.selectedElements = updatedSelection;
     		}
     	}
 
     	toggleMultipleElements(elements) {
-    		// TODO: Optimization: we could batch this in logic if needed, but simple iteration works for now
     		for (const el of elements) {
     			this.toggleElementSelection(el);
     		}
@@ -13953,8 +15194,11 @@
     	clearAllSelections() {
     		this.selectedElements.forEach((el) => this._removeSelectionClass(el));
     		this.selectedElements.clear();
-    		this.highlightColors.clear();
-    		this.highlightAnnotations.clear();
+    		this.boxColors.clear();
+    		this.boxAnnotations.clear();
+    		this.textHighlights = [];
+    		textHighlightService.clear();
+    		window.getSelection()?.removeAllRanges();
     	}
 
     	setAnnotation(el, text, corner) {
@@ -13962,56 +15206,101 @@
 
     		if (trimmed.length === 0) {
     			if (corner !== DEFAULT_ANNOTATION_CORNER) {
-    				this.highlightAnnotations.set(el, { text: '', corner });
+    				this.boxAnnotations.set(el, { text: '', corner });
     			} else {
-    				this.highlightAnnotations.delete(el);
+    				this.boxAnnotations.delete(el);
     			}
     		} else {
     			const validatedText = trimmed.length > MAX_ANNOTATION_LENGTH ? trimmed.substring(0, MAX_ANNOTATION_LENGTH) : trimmed;
 
-    			this.highlightAnnotations.set(el, { text: validatedText, corner });
+    			this.boxAnnotations.set(el, { text: validatedText, corner });
     		}
     	}
 
-    	setHighlightColor(el, color) {
-    		this.highlightColors.set(el, color);
+    	setTextHighlightAnnotation(index, text, corner) {
+    		const desc = this.textHighlights[index];
+
+    		if (!desc) return;
+
+    		const trimmed = text.trim();
+    		const updated = { ...desc };
+
+    		if (trimmed.length > 0) {
+    			updated.annotation = trimmed.length > MAX_ANNOTATION_LENGTH ? trimmed.substring(0, MAX_ANNOTATION_LENGTH) : trimmed;
+    		} else {
+    			delete updated.annotation;
+    		}
+
+    		updated.annotationCorner = corner;
+    		this.textHighlights = this.textHighlights.map((d, i) => i === index ? updated : d);
+    		textHighlightService.applyDescriptors(this.textHighlights, true);
     	}
 
-    	setAllHighlightColors(color) {
+    	setBoxColor(el, color) {
+    		this.boxColors.set(el, color);
+    	}
+
+    	setAllBoxColors(color) {
     		this.selectedElements.forEach((el) => {
-    			this.highlightColors.set(el, color);
+    			this.boxColors.set(el, color);
     		});
     	}
 
-    	_addHighlightClass(el) {
+    	_addBoxHoverClass(el) {
     		if (this.selectionMode === 'hide') {
-    			el.classList.add(HIDE_HIGHLIGHT_TARGET_CLASS);
-    		} else if (this.selectionMode === 'highlight') {
-    			el.classList.add(HIGHLIGHT_TARGET_MODE_CLASS);
+    			el.classList.add(HIDE_BOX_TARGET_CLASS);
+    		} else if (this.selectionMode === 'box') {
+    			el.classList.add(BOX_TARGET_MODE_CLASS);
     		} else {
-    			el.classList.add(HIGHLIGHT_TARGET_CLASS);
+    			el.classList.add(BOX_TARGET_CLASS);
     		}
     	}
 
-    	_removeHighlightClass(el) {
-    		el.classList.remove(HIGHLIGHT_TARGET_CLASS, HIDE_HIGHLIGHT_TARGET_CLASS, HIGHLIGHT_TARGET_MODE_CLASS);
+    	_removeBoxHoverClass(el) {
+    		el.classList.remove(BOX_TARGET_CLASS, HIDE_BOX_TARGET_CLASS, BOX_TARGET_MODE_CLASS);
     	}
 
     	_addSelectionClass(el) {
     		if (this.selectionMode === 'hide') {
     			el.classList.add(HIDE_SELECTED_CLASS);
-    		} else if (this.selectionMode === 'highlight') {
-    			el.classList.add(HIGHLIGHT_SELECTED_CLASS);
+    		} else if (this.selectionMode === 'box') {
+    			el.classList.add(BOX_SELECTED_CLASS);
     		} else {
     			el.classList.add(SELECTED_CLASS);
     		}
     	}
 
     	_removeSelectionClass(el) {
-    		el.classList.remove(SELECTED_CLASS, HIDE_SELECTED_CLASS, HIGHLIGHT_SELECTED_CLASS);
+    		el.classList.remove(SELECTED_CLASS, HIDE_SELECTED_CLASS, BOX_SELECTED_CLASS);
     	}
 
     	generateLink() {
+    		if (this.selectionMode === 'highlight') {
+    			if (this.textHighlights.length === 0) {
+    				showToast('Please highlight some text first.');
+
+    				return;
+    			}
+
+    			const serialized = serializeTextHighlights(this.textHighlights);
+
+    			// eslint-disable-next-line svelte/prefer-svelte-reactivity
+    			const url = new URL(window.location.href);
+
+    			url.searchParams.delete('cv-show');
+    			url.searchParams.delete('cv-hide');
+    			url.searchParams.delete('cv-box');
+    			url.searchParams.set('cv-highlight', serialized);
+
+    			navigator.clipboard.writeText(url.href).then(() => {
+    				showToast('Highlight link copied!');
+    			}).catch(() => {
+    				showToast('Failed to copy link.');
+    			});
+
+    			return;
+    		}
+
     		if (this.selectedElements.size === 0) {
     			showToast('Please select at least one item.');
 
@@ -14036,12 +15325,13 @@
     		url.searchParams.delete('cv-show');
 
     		url.searchParams.delete('cv-hide');
+    		url.searchParams.delete('cv-box');
     		url.searchParams.delete('cv-highlight');
 
     		if (this.selectionMode === 'hide') {
     			url.searchParams.set('cv-hide', serialized);
-    		} else if (this.selectionMode === 'highlight') {
-    			url.searchParams.set('cv-highlight', serialized);
+    		} else if (this.selectionMode === 'box') {
+    			url.searchParams.set('cv-box', serialized);
     		} else {
     			url.searchParams.set('cv-show', serialized);
     		}
@@ -14055,6 +15345,27 @@
     	}
 
     	previewLink() {
+    		if (this.selectionMode === 'highlight') {
+    			if (this.textHighlights.length === 0) {
+    				showToast('Please highlight some text first.');
+
+    				return;
+    			}
+
+    			const serialized = serializeTextHighlights(this.textHighlights);
+
+    			// eslint-disable-next-line svelte/prefer-svelte-reactivity
+    			const url = new URL(window.location.href);
+
+    			url.searchParams.delete('cv-show');
+    			url.searchParams.delete('cv-hide');
+    			url.searchParams.delete('cv-box');
+    			url.searchParams.set('cv-highlight', serialized);
+    			window.open(url.toString(), '_blank');
+
+    			return;
+    		}
+
     		if (this.selectedElements.size === 0) {
     			showToast('Please select at least one item.');
 
@@ -14069,12 +15380,13 @@
 
     		url.searchParams.delete('cv-show');
     		url.searchParams.delete('cv-hide');
+    		url.searchParams.delete('cv-box');
     		url.searchParams.delete('cv-highlight');
 
     		if (this.selectionMode === 'hide') {
     			url.searchParams.set('cv-hide', serialized);
-    		} else if (this.selectionMode === 'highlight') {
-    			url.searchParams.set('cv-highlight', serialized);
+    		} else if (this.selectionMode === 'box') {
+    			url.searchParams.set('cv-box', serialized);
     		} else {
     			url.searchParams.set('cv-show', serialized);
     		}
@@ -14086,12 +15398,12 @@
     		return Array.from(this.selectedElements).map((el) => {
     			const desc = createDescriptor(el);
 
-    			if (this.selectionMode === 'highlight') {
-    				const color = this.highlightColors.get(el);
+    			if (this.selectionMode === 'box') {
+    				const color = this.boxColors.get(el);
 
     				if (color !== undefined) desc.color = color;
 
-    				const annotation = this.highlightAnnotations.get(el);
+    				const annotation = this.boxAnnotations.get(el);
 
     				if (annotation !== undefined) {
     					desc.annotation = annotation.text;
@@ -14230,19 +15542,19 @@
     }
 
     var root_1$c = from_html(`<div role="alert" aria-live="polite"> </div>`);
-    var root$g = from_html(`<div class="toast-container svelte-14irt8g"></div>`);
+    var root$f = from_html(`<div class="toast-container svelte-14irt8g"></div>`);
 
-    const $$css$k = {
+    const $$css$j = {
     	hash: 'svelte-14irt8g',
     	code: '.toast-container.svelte-14irt8g {position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:20000;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none; /* Let clicks pass through container */}.toast-item.svelte-14irt8g {background:rgba(0, 0, 0, 0.85);color:white;padding:10px 20px;border-radius:4px;font-size:14px;box-shadow:0 4px 6px rgba(0, 0, 0, 0.1);pointer-events:auto; /* Re-enable clicks on toasts */max-width:300px;text-align:center;}'
     };
 
     function Toast($$anchor, $$props) {
     	push($$props, false);
-    	append_styles$1($$anchor, $$css$k);
+    	append_styles$1($$anchor, $$css$j);
     	init();
 
-    	var div = root$g();
+    	var div = root$f();
 
     	each(div, 13, () => toast.items, (t) => t.id, ($$anchor, t) => {
     		var div_1 = root_1$c();
@@ -14266,16 +15578,18 @@
     	pop();
     }
 
-    var root$f = from_html(`<div class="floating-bar svelte-bs8cbd"><div class="mode-toggle svelte-bs8cbd"><button type="button" title="Highlight selected elements">Highlight</button> <button type="button" title="Show only selected elements">Show</button> <button type="button" title="Hide selected elements">Hide</button></div> <span class="divider svelte-bs8cbd"></span> <span class="count svelte-bs8cbd"> </span> <button type="button" class="btn clear svelte-bs8cbd">Clear</button> <button type="button" class="btn preview svelte-bs8cbd">Preview</button> <button type="button" class="btn generate svelte-bs8cbd">Copy Link</button> <button type="button" class="btn exit svelte-bs8cbd">Exit</button></div>`);
+    var root_2$a = from_html(`<button type="button"></button>`);
+    var root_1$b = from_html(`<div class="cv-hl-swatches svelte-bs8cbd" role="group" aria-label="Highlight color"></div> <span class="divider svelte-bs8cbd"></span>`, 1);
+    var root$e = from_html(`<div class="floating-bar svelte-bs8cbd"><div class="mode-toggle svelte-bs8cbd"><button type="button" title="Highlight selected text">Highlight</button> <button type="button" title="Box selected elements">Box</button> <button type="button" title="Show only selected elements">Show</button> <button type="button" title="Hide selected elements">Hide</button></div> <span class="divider svelte-bs8cbd"></span> <!> <span class="count svelte-bs8cbd"><!></span> <button type="button" class="btn clear svelte-bs8cbd">Clear</button> <button type="button" class="btn preview svelte-bs8cbd">Preview</button> <button type="button" class="btn generate svelte-bs8cbd">Copy Link</button> <button type="button" class="btn exit svelte-bs8cbd">Exit</button></div>`);
 
-    const $$css$j = {
+    const $$css$i = {
     	hash: 'svelte-bs8cbd',
-    	code: '.floating-bar.svelte-bs8cbd {position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background-color:#2c2c2c;color:#f1f1f1;border-radius:8px;padding:8px 12px;box-shadow:0 8px 20px rgba(0, 0, 0, 0.4);display:grid;grid-template-columns:auto auto 1fr auto auto auto auto;align-items:center;gap:12px;z-index:99999;font-family:system-ui,\n      -apple-system,\n      sans-serif;font-size:14px;border:1px solid #4a4a4a;pointer-events:auto;white-space:nowrap;min-width:500px;}.mode-toggle.svelte-bs8cbd {display:flex;background:#1a1a1a;border-radius:6px;padding:2px;border:1px solid #4a4a4a;}.mode-btn.svelte-bs8cbd {background:transparent;color:#aeaeae;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:500;font-size:13px;transition:all 0.2s;}.mode-btn.svelte-bs8cbd:hover {color:#fff;}.mode-btn.active.svelte-bs8cbd {background:#4a4a4a;color:#fff;box-shadow:0 1px 3px rgba(0, 0, 0, 0.2);}.divider.svelte-bs8cbd {width:1px;height:20px;background:#4a4a4a;margin:0 4px;}.count.svelte-bs8cbd {font-weight:500;min-width:120px;text-align:center;font-size:13px;color:#ccc;}.btn.svelte-bs8cbd {background-color:#0078d4;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:500;transition:background-color 0.2s;font-size:13px;}.btn.svelte-bs8cbd:hover {background-color:#005a9e;}.btn.clear.svelte-bs8cbd {background-color:transparent;border:1px solid #5a5a5a;color:#dadada;}.btn.clear.svelte-bs8cbd:hover {background-color:#3a3a3a;color:white;}.btn.preview.svelte-bs8cbd {background-color:#333;border:1px solid #555;}.btn.preview.svelte-bs8cbd:hover {background-color:#444;}.btn.exit.svelte-bs8cbd {background-color:transparent;color:#ff6b6b;padding:6px 10px;}.btn.exit.svelte-bs8cbd:hover {background-color:rgba(255, 107, 107, 0.1);}\n\n  @media (max-width: 600px) {.floating-bar.svelte-bs8cbd {display:flex;flex-wrap:wrap;min-width:unset;width:90%;max-width:400px;height:auto;padding:12px;gap:10px;bottom:30px;}.mode-toggle.svelte-bs8cbd {margin-right:auto;order:1;}.btn.exit.svelte-bs8cbd {margin-left:auto;order:2;}.divider.svelte-bs8cbd {display:none;}.count.svelte-bs8cbd {width:100%;text-align:center;order:3;padding:8px 0;border-top:1px solid #3a3a3a;border-bottom:1px solid #3a3a3a;margin:4px 0;}.btn.clear.svelte-bs8cbd,\n    .btn.preview.svelte-bs8cbd,\n    .btn.generate.svelte-bs8cbd {flex:1;text-align:center;font-size:12px;padding:8px 4px;order:4;}.btn.generate.svelte-bs8cbd {flex:1.5;}\n  }'
+    	code: '.floating-bar.svelte-bs8cbd {position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background-color:#2c2c2c;color:#f1f1f1;border-radius:8px;padding:8px 12px;box-shadow:0 8px 20px rgba(0, 0, 0, 0.4);display:flex;align-items:center;gap:12px;z-index:99999;font-family:system-ui,\n      -apple-system,\n      sans-serif;font-size:14px;border:1px solid #4a4a4a;pointer-events:auto;white-space:nowrap;min-width:500px;}.mode-toggle.svelte-bs8cbd {display:flex;background:#1a1a1a;border-radius:6px;padding:2px;border:1px solid #4a4a4a;}.mode-btn.svelte-bs8cbd {background:transparent;color:#aeaeae;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:500;font-size:13px;transition:all 0.2s;}.mode-btn.svelte-bs8cbd:hover {color:#fff;}.mode-btn.active.svelte-bs8cbd {background:#4a4a4a;color:#fff;box-shadow:0 1px 3px rgba(0, 0, 0, 0.2);}.divider.svelte-bs8cbd {width:1px;height:20px;background:#4a4a4a;margin:0 4px;}.count.svelte-bs8cbd {font-weight:500;min-width:120px;text-align:center;font-size:13px;color:#ccc;}.btn.svelte-bs8cbd {background-color:#0078d4;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:500;transition:background-color 0.2s;font-size:13px;}.btn.svelte-bs8cbd:hover {background-color:#005a9e;}.btn.clear.svelte-bs8cbd {background-color:transparent;border:1px solid #5a5a5a;color:#dadada;}.btn.clear.svelte-bs8cbd:hover {background-color:#3a3a3a;color:white;}.btn.preview.svelte-bs8cbd {background-color:#333;border:1px solid #555;}.btn.preview.svelte-bs8cbd:hover {background-color:#444;}.btn.exit.svelte-bs8cbd {background-color:transparent;color:#ff6b6b;padding:6px 10px;}.btn.exit.svelte-bs8cbd:hover {background-color:rgba(255, 107, 107, 0.1);}\n\n  @media (max-width: 600px) {.floating-bar.svelte-bs8cbd {display:flex;flex-wrap:wrap;min-width:unset;width:90%;max-width:400px;height:auto;padding:12px;gap:10px;bottom:30px;}.mode-toggle.svelte-bs8cbd {margin-right:auto;order:1;}.btn.exit.svelte-bs8cbd {margin-left:auto;order:2;}.divider.svelte-bs8cbd {display:none;}.count.svelte-bs8cbd {width:100%;text-align:center;order:3;padding:8px 0;border-top:1px solid #3a3a3a;border-bottom:1px solid #3a3a3a;margin:4px 0;}.btn.clear.svelte-bs8cbd,\n    .btn.preview.svelte-bs8cbd,\n    .btn.generate.svelte-bs8cbd {flex:1;text-align:center;font-size:12px;padding:8px 4px;order:4;}.btn.generate.svelte-bs8cbd {flex:1.5;}\n  }\n\n  /* ── Swatches ─────────────────────────────────── */.cv-hl-swatches.svelte-bs8cbd {display:flex;gap:6px;align-items:center;}.cv-hl-swatch.svelte-bs8cbd {width:18px;height:18px;border-radius:50%;background:var(--swatch-color);border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.12s ease,\n      border-color 0.12s ease,\n      box-shadow 0.12s ease;box-shadow:0 1px 3px rgba(0, 0, 0, 0.3);}.cv-hl-swatch.svelte-bs8cbd:hover {transform:scale(1.2);box-shadow:0 2px 6px rgba(0, 0, 0, 0.4);}.cv-hl-swatch.active.svelte-bs8cbd {border-color:rgba(255, 255, 255, 0.85);transform:scale(1.15);box-shadow:0 0 0 2px var(--swatch-color),\n      0 2px 8px rgba(0, 0, 0, 0.4);}'
     };
 
     function ShareToolbar($$anchor, $$props) {
     	push($$props, false);
-    	append_styles$1($$anchor, $$css$j);
+    	append_styles$1($$anchor, $$css$i);
 
     	function handleClear() {
     		shareStore.clearAllSelections();
@@ -14295,47 +15609,103 @@
 
     	init();
 
-    	var div = root$f();
+    	var div = root$e();
     	var div_1 = child(div);
     	var button = child(div_1);
     	var button_1 = sibling(button, 2);
     	var button_2 = sibling(button_1, 2);
+    	var button_3 = sibling(button_2, 2);
 
     	reset(div_1);
 
-    	var span = sibling(div_1, 4);
-    	var text = child(span);
+    	var node = sibling(div_1, 4);
+
+    	{
+    		var consequent = ($$anchor) => {
+    			var fragment = root_1$b();
+    			var div_2 = first_child(fragment);
+
+    			each(div_2, 5, () => BOX_COLORS, (col) => col.key, ($$anchor, col) => {
+    				var button_4 = root_2$a();
+    				let classes;
+
+    				template_effect(() => {
+    					classes = set_class(button_4, 1, 'cv-hl-swatch svelte-bs8cbd', null, classes, { active: shareStore.selectedTextColor === get(col).key });
+    					set_style(button_4, `--swatch-color: ${get(col).hex ?? ''};`);
+    					set_attribute(button_4, 'title', get(col).label);
+    					set_attribute(button_4, 'aria-label', get(col).label);
+    					set_attribute(button_4, 'aria-pressed', shareStore.selectedTextColor === get(col).key);
+    				});
+
+    				delegated('click', button_4, () => shareStore.selectedTextColor = get(col).key);
+    				append($$anchor, button_4);
+    			});
+
+    			reset(div_2);
+    			next(2);
+    			append($$anchor, fragment);
+    		};
+
+    		if_block(node, ($$render) => {
+    			if (shareStore.selectionMode === 'highlight') $$render(consequent);
+    		});
+    	}
+
+    	var span = sibling(node, 2);
+    	var node_1 = child(span);
+
+    	{
+    		var consequent_1 = ($$anchor) => {
+    			var text$1 = text();
+
+    			template_effect(() => set_text(text$1, `${shareStore.shareCount ?? ''} highlight${shareStore.shareCount === 1 ? '' : 's'}`));
+    			append($$anchor, text$1);
+    		};
+
+    		var alternate = ($$anchor) => {
+    			var text_1 = text();
+
+    			template_effect(() => set_text(text_1, `${shareStore.shareCount ?? ''} item${shareStore.shareCount === 1 ? '' : 's'} to
+      ${shareStore.selectionMode === 'show'
+				? 'show'
+				: shareStore.selectionMode === 'box' ? 'box' : 'hide'}`));
+
+    			append($$anchor, text_1);
+    		};
+
+    		if_block(node_1, ($$render) => {
+    			if (shareStore.selectionMode === 'highlight') $$render(consequent_1); else $$render(alternate, -1);
+    		});
+    	}
 
     	reset(span);
 
-    	var button_3 = sibling(span, 2);
-    	var button_4 = sibling(button_3, 2);
-    	var button_5 = sibling(button_4, 2);
+    	var button_5 = sibling(span, 2);
     	var button_6 = sibling(button_5, 2);
+    	var button_7 = sibling(button_6, 2);
+    	var button_8 = sibling(button_7, 2);
 
     	reset(div);
 
     	template_effect(() => {
     		set_class(button, 1, `mode-btn ${shareStore.selectionMode === 'highlight' ? 'active' : ''}`, 'svelte-bs8cbd');
     		set_attribute(button, 'aria-pressed', shareStore.selectionMode === 'highlight');
-    		set_class(button_1, 1, `mode-btn ${shareStore.selectionMode === 'show' ? 'active' : ''}`, 'svelte-bs8cbd');
-    		set_attribute(button_1, 'aria-pressed', shareStore.selectionMode === 'show');
-    		set_class(button_2, 1, `mode-btn ${shareStore.selectionMode === 'hide' ? 'active' : ''}`, 'svelte-bs8cbd');
-    		set_attribute(button_2, 'aria-pressed', shareStore.selectionMode === 'hide');
-
-    		set_text(text, `${shareStore.shareCount ?? ''} item${shareStore.shareCount === 1 ? '' : 's'} to
-    ${shareStore.selectionMode === 'show'
-			? 'show'
-			: shareStore.selectionMode === 'highlight' ? 'highlight' : 'hide'}`);
+    		set_class(button_1, 1, `mode-btn ${shareStore.selectionMode === 'box' ? 'active' : ''}`, 'svelte-bs8cbd');
+    		set_attribute(button_1, 'aria-pressed', shareStore.selectionMode === 'box');
+    		set_class(button_2, 1, `mode-btn ${shareStore.selectionMode === 'show' ? 'active' : ''}`, 'svelte-bs8cbd');
+    		set_attribute(button_2, 'aria-pressed', shareStore.selectionMode === 'show');
+    		set_class(button_3, 1, `mode-btn ${shareStore.selectionMode === 'hide' ? 'active' : ''}`, 'svelte-bs8cbd');
+    		set_attribute(button_3, 'aria-pressed', shareStore.selectionMode === 'hide');
     	});
 
     	delegated('click', button, () => shareStore.setSelectionMode('highlight'));
-    	delegated('click', button_1, () => shareStore.setSelectionMode('show'));
-    	delegated('click', button_2, () => shareStore.setSelectionMode('hide'));
-    	delegated('click', button_3, handleClear);
-    	delegated('click', button_4, handlePreview);
-    	delegated('click', button_5, handleGenerate);
-    	delegated('click', button_6, handleExit);
+    	delegated('click', button_1, () => shareStore.setSelectionMode('box'));
+    	delegated('click', button_2, () => shareStore.setSelectionMode('show'));
+    	delegated('click', button_3, () => shareStore.setSelectionMode('hide'));
+    	delegated('click', button_5, handleClear);
+    	delegated('click', button_6, handlePreview);
+    	delegated('click', button_7, handleGenerate);
+    	delegated('click', button_8, handleExit);
     	transition(3, div, () => fly, () => ({ y: 50, duration: 200 }));
     	append($$anchor, div);
     	pop();
@@ -14344,17 +15714,17 @@
     delegate(['click']);
 
     var root_2$9 = from_html(`<span class="id-badge svelte-64gpkh" title="ID detection active"> </span>`);
-    var root_3$7 = from_html(`<button type="button" class="action-btn up svelte-64gpkh" title="Select Parent">↰</button>`);
-    var root_1$b = from_html(`<div class="hover-helper svelte-64gpkh"><div class="info svelte-64gpkh"><span class="tag svelte-64gpkh"> </span> <!></div> <button type="button"> </button> <!></div>`);
+    var root_3$5 = from_html(`<button type="button" class="action-btn up svelte-64gpkh" title="Select Parent">↰</button>`);
+    var root_1$a = from_html(`<div class="hover-helper svelte-64gpkh"><div class="info svelte-64gpkh"><span class="tag svelte-64gpkh"> </span> <!></div> <button type="button"> </button> <!></div>`);
 
-    const $$css$i = {
+    const $$css$h = {
     	hash: 'svelte-64gpkh',
     	code: '.hover-helper.svelte-64gpkh {position:fixed;z-index:99999;background-color:#333;color:white;padding:4px 8px;border-radius:4px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 5px rgba(0, 0, 0, 0.2);font-family:monospace;pointer-events:auto;}.info.svelte-64gpkh {display:flex;flex-direction:column;align-items:flex-start;line-height:1;gap:2px;}.tag.svelte-64gpkh {font-size:12px;font-weight:bold;color:#aeaeae;}.id-badge.svelte-64gpkh {font-size:10px;color:#64d2ff;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.action-btn.svelte-64gpkh {background:#555;border:none;color:white;border-radius:3px;cursor:pointer;padding:2px 6px;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:background-color 0.1s;}.action-btn.svelte-64gpkh:hover {background:#777;}.action-btn.deselect.svelte-64gpkh {background-color:#d13438;}.action-btn.deselect.svelte-64gpkh:hover {background-color:#a42628;}'
     };
 
     function HoverHelper($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$i);
+    	append_styles$1($$anchor, $$css$h);
 
     	// Derived state for easier access
     	let target = user_derived(() => shareStore.currentHoverTarget);
@@ -14453,7 +15823,7 @@
 
     	{
     		var consequent_2 = ($$anchor) => {
-    			var div = root_1$b();
+    			var div = root_1$a();
     			var div_1 = child(div);
     			var span = child(div_1);
     			var text = child(span, true);
@@ -14488,7 +15858,7 @@
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var button_1 = root_3$7();
+    					var button_1 = root_3$5();
 
     					delegated('click', button_1, handleSelectParent);
     					append($$anchor, button_1);
@@ -14527,17 +15897,17 @@
     delegate(['click']);
 
     var root_2$8 = from_html(`<button type="button"></button>`);
-    var root_1$a = from_html(`<div class="cv-color-swatches svelte-1r78n4c" role="none"></div>`);
-    var root$e = from_html(`<div class="cv-color-picker svelte-1r78n4c" role="none"><button type="button" class="cv-color-trigger svelte-1r78n4c" title="Choose highlight color" aria-label="Choose highlight color"><span class="cv-color-dot svelte-1r78n4c"></span></button> <!></div>`);
+    var root_1$9 = from_html(`<div class="cv-color-swatches svelte-1r78n4c" role="none"></div>`);
+    var root$d = from_html(`<div class="cv-color-picker svelte-1r78n4c" role="none"><button type="button" class="cv-color-trigger svelte-1r78n4c" title="Choose highlight color" aria-label="Choose highlight color"><span class="cv-color-dot svelte-1r78n4c"></span></button> <!></div>`);
 
-    const $$css$h = {
+    const $$css$g = {
     	hash: 'svelte-1r78n4c',
     	code: '.cv-color-picker.svelte-1r78n4c {position:fixed;transform:translateX(-50%) translateY(-100%);display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:auto;z-index:9500;\n    /* Nudge down so the trigger peeks above the element edge */margin-top:8px;}.cv-color-trigger.svelte-1r78n4c {width:22px;height:16px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;}.cv-color-trigger.svelte-1r78n4c:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-color-dot.svelte-1r78n4c {width:10px;height:10px;border-radius:50%;display:block;border:1px solid rgba(0, 0, 0, 0.12);}.cv-color-swatches.svelte-1r78n4c {display:flex;flex-direction:row;gap:4px;background:white;border-radius:100px;padding:4px 6px;box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);border:1px solid rgba(0, 0, 0, 0.1);}.cv-color-swatch.svelte-1r78n4c {width:16px;height:16px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.1s,\n      border-color 0.1s;}.cv-color-swatch.svelte-1r78n4c:hover {transform:scale(1.2);border-color:rgba(0, 0, 0, 0.3);}.cv-color-swatch.active.svelte-1r78n4c {border-color:rgba(0, 0, 0, 0.5);transform:scale(1.15);}'
     };
 
     function HighlightColorPicker($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$h);
+    	append_styles$1($$anchor, $$css$g);
 
     	let isExpanded = state(false);
     	let rect = state(proxy({ top: 0, left: 0, width: 0 }));
@@ -14560,8 +15930,8 @@
     		};
     	});
 
-    	let currentColorKey = user_derived(() => shareStore.highlightColors.get($$props.element) ?? DEFAULT_COLOR_KEY);
-    	let currentHex = user_derived(() => HIGHLIGHT_COLORS.find((c) => c.key === get(currentColorKey))?.hex ?? HIGHLIGHT_COLORS[0].hex);
+    	let currentColorKey = user_derived(() => shareStore.boxColors.get($$props.element) ?? DEFAULT_COLOR_KEY);
+    	let currentHex = user_derived(() => BOX_COLORS.find((c) => c.key === get(currentColorKey))?.hex ?? BOX_COLORS[0].hex);
     	let clickTimer = null;
 
     	function handleTriggerClick(e) {
@@ -14577,7 +15947,7 @@
     		clickTimer = setTimeout(
     			() => {
     				clickTimer = null;
-    				shareStore.setHighlightColor($$props.element, key);
+    				shareStore.setBoxColor($$props.element, key);
     				set(isExpanded, false);
     			},
     			220
@@ -14592,13 +15962,13 @@
     			clickTimer = null;
     		}
 
-    		shareStore.setAllHighlightColors(key);
+    		shareStore.setAllBoxColors(key);
     		set(isExpanded, false);
     	}
 
     	let centerX = user_derived(() => get(rect).left + get(rect).width / 2);
     	let topY = user_derived(() => get(rect).top);
-    	var div = root$e();
+    	var div = root$d();
     	var button = child(div);
     	var span = child(button);
 
@@ -14608,9 +15978,9 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var div_1 = root_1$a();
+    			var div_1 = root_1$9();
 
-    			each(div_1, 21, () => HIGHLIGHT_COLORS, (color) => color.key, ($$anchor, color) => {
+    			each(div_1, 21, () => BOX_COLORS, (color) => color.key, ($$anchor, color) => {
     				var button_1 = root_2$8();
     				let classes;
 
@@ -14651,29 +16021,32 @@
 
     delegate(['click', 'dblclick']);
 
-    var root_1$9 = from_html(`<span class="cv-annotation-tab-preview svelte-1r1spmr"> </span>`);
+    var root_1$8 = from_html(`<span class="cv-annotation-tab-preview svelte-1r1spmr"> </span>`);
     var root_2$7 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
-    var root_4$3 = from_html(`<button type="button"> </button>`);
-    var root_3$6 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
-    var root$d = from_html(`<div class="cv-annotation-editor svelte-1r1spmr" role="none"><button type="button" aria-label="Annotation"><!></button> <!></div>`);
+    var root_4$2 = from_html(`<button type="button"> </button>`);
+    var root_3$4 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
+    var root$c = from_html(`<div class="cv-annotation-editor svelte-1r1spmr" role="none"><button type="button" aria-label="Annotation"><!></button> <!></div>`);
 
-    const $$css$g = {
+    const $$css$f = {
     	hash: 'svelte-1r1spmr',
-    	code: '.cv-annotation-editor.svelte-1r1spmr {position:fixed;z-index:9400;pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}.cv-annotation-tab.svelte-1r1spmr {height:20px;padding:0 8px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;max-width:160px;overflow:hidden;}.cv-annotation-tab.svelte-1r1spmr:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-annotation-tab--has-text.svelte-1r1spmr {background:#fffbe6;border-color:rgba(180, 83, 9, 0.4);}.cv-annotation-tab-icon.svelte-1r1spmr {font-size:10px;line-height:1;color:#6b7280;}.cv-annotation-tab-preview.svelte-1r1spmr {font-size:9px;font-weight:600;color:#1a1a1a;font-family:ui-sans-serif, system-ui, sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}.cv-annotation-panel.svelte-1r1spmr {background:white;border-radius:8px;border:1px solid rgba(0, 0, 0, 0.12);box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);padding:8px;width:220px;display:flex;flex-direction:column;gap:6px;}.cv-annotation-textarea.svelte-1r1spmr {width:100%;box-sizing:border-box;resize:vertical;border:1px solid rgba(0, 0, 0, 0.15);border-radius:4px;padding:5px 7px;font-size:11px;font-family:ui-sans-serif, system-ui, sans-serif;color:#1a1a1a;line-height:1.5;outline:none;min-height:56px;}.cv-annotation-textarea.svelte-1r1spmr:focus {border-color:#b45309;box-shadow:0 0 0 2px rgba(180, 83, 9, 0.15);}.cv-annotation-footer.svelte-1r1spmr {display:flex;align-items:center;justify-content:space-between;}.cv-corner-selector.svelte-1r1spmr {display:flex;gap:2px;}.cv-corner-btn.svelte-1r1spmr {width:20px;height:20px;border-radius:4px;border:1px solid rgba(0, 0, 0, 0.12);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;padding:0;transition:background 0.1s,\n      border-color 0.1s;}.cv-corner-btn.svelte-1r1spmr:hover {background:#fef3c7;border-color:#b45309;color:#1a1a1a;}.cv-corner-btn.active.svelte-1r1spmr {background:#fef3c7;border-color:#b45309;color:#92400e;font-weight:700;}.cv-char-counter.svelte-1r1spmr {font-size:9px;color:#9ca3af;font-family:ui-sans-serif, system-ui, sans-serif;font-variant-numeric:tabular-nums;}'
+    	code: '.cv-annotation-editor.svelte-1r1spmr {position:fixed;z-index:9400;pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}.cv-annotation-tab.svelte-1r1spmr {height:20px;padding:0 8px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;max-width:160px;overflow:hidden;}.cv-annotation-tab.svelte-1r1spmr:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-annotation-tab--has-text.svelte-1r1spmr {background:#fffbe6;border-color:rgba(180, 83, 9, 0.4);}.cv-annotation-tab-icon.svelte-1r1spmr {font-size:10px;line-height:1;color:#6b7280;}.cv-annotation-tab-preview.svelte-1r1spmr {font-size:9px;font-weight:600;color:#1a1a1a;font-family:ui-sans-serif, system-ui, sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}.cv-annotation-panel.svelte-1r1spmr {background:white;border-radius:8px;border:1px solid rgba(0, 0, 0, 0.12);box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);padding:8px;width:220px;display:flex;flex-direction:column;gap:6px;}.cv-annotation-textarea.svelte-1r1spmr {width:100%;box-sizing:border-box;resize:vertical;border:1px solid rgba(0, 0, 0, 0.15);border-radius:4px;padding:5px 7px;font-size:11px;font-family:ui-sans-serif, system-ui, sans-serif;color:#1a1a1a;line-height:1.5;outline:none;min-height:56px;}.cv-annotation-textarea.svelte-1r1spmr:focus {border-color:#b45309;box-shadow:0 0 0 2px rgba(180, 83, 9, 0.15);}.cv-annotation-footer.svelte-1r1spmr {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;}.cv-corner-selector.svelte-1r1spmr {display:flex;gap:2px;}.cv-corner-btn.svelte-1r1spmr {height:20px;padding:0 5px;border-radius:4px;border:1px solid rgba(0, 0, 0, 0.12);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;transition:background 0.1s,\n      border-color 0.1s;}.cv-corner-btn.svelte-1r1spmr:hover {background:#fef3c7;border-color:#b45309;color:#1a1a1a;}.cv-corner-btn.active.svelte-1r1spmr {background:#fef3c7;border-color:#b45309;color:#92400e;font-weight:700;}.cv-char-counter.svelte-1r1spmr {font-size:9px;color:#9ca3af;font-family:ui-sans-serif, system-ui, sans-serif;font-variant-numeric:tabular-nums;margin-left:auto;}'
     };
 
     function HighlightAnnotationEditor($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$g);
+    	append_styles$1($$anchor, $$css$f);
 
     	let isExpanded = state(false);
-    	let rect = state(proxy({ top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 }));
+
+    	// rect is re-evaluated whenever getRect identity changes, and kept up to date
+    	// via scroll/resize listeners in the $effect below.
+    	let rect = state(proxy(new DOMRect()));
 
     	user_effect(() => {
-    		set(rect, $$props.element.getBoundingClientRect(), true);
+    		set(rect, $$props.getRect(), true);
 
     		const update = () => {
-    			set(rect, $$props.element.getBoundingClientRect(), true);
+    			set(rect, $$props.getRect(), true);
     		};
 
     		window.addEventListener('scroll', update, { capture: true, passive: true });
@@ -14685,35 +16058,21 @@
     		};
     	});
 
-    	let localText = state('');
-    	let localCorner = state(proxy(DEFAULT_ANNOTATION_CORNER));
+    	// Local editable copies — kept in sync with the parent via $derived.
+    	// We use $derived so Svelte tracks the prop reactively; the user's in-flight
+    	// edits are applied through the event handlers which call onchange.
+    	let localText = user_derived(() => $$props.annotation);
 
-    	// Initialize from store when element changes (or annotation changes externally)
-    	user_pre_effect(() => {
-    		const ann = shareStore.highlightAnnotations.get($$props.element);
-    		const newText = ann?.text ?? '';
-
-    		if (get(localText) !== newText) {
-    			set(localText, newText, true);
-    		}
-
-    		// Only sync corner from store when there is a stored annotation;
-    		// otherwise leave the locally-chosen corner intact.
-    		if (ann && get(localCorner) !== ann.corner) {
-    			set(localCorner, ann.corner, true);
-    		}
-    	});
+    	let localCorner = user_derived(() => $$props.corner);
 
     	function handleInput(e) {
     		const value = e.target.value;
 
-    		set(localText, value, true);
-    		shareStore.setAnnotation($$props.element, value, get(localCorner));
+    		$$props.onchange(value, get(localCorner));
     	}
 
     	function setCorner(c) {
-    		set(localCorner, c, true);
-    		shareStore.setAnnotation($$props.element, get(localText), c);
+    		$$props.onchange(get(localText), c);
     	}
 
     	function handleTabClick(e) {
@@ -14724,16 +16083,16 @@
     	let tabStyle = user_derived(() => {
     		switch (get(localCorner)) {
     			case 'tl':
-    				return `top: ${get(rect).top}px; left: ${get(rect).left}px; transform: translateY(-100%);`;
+    				return `top: ${get(rect).top}px; left: ${get(rect).left}px; transform: translateY(-100%); align-items: flex-start;`;
 
     			case 'tr':
-    				return `top: ${get(rect).top}px; left: ${get(rect).right}px; transform: translate(-100%, -100%);`;
+    				return `top: ${get(rect).top}px; left: ${get(rect).right}px; transform: translate(-100%, -100%); align-items: flex-end;`;
 
     			case 'bl':
-    				return `top: ${get(rect).bottom}px; left: ${get(rect).left}px;`;
+    				return `top: ${get(rect).bottom}px; left: ${get(rect).left}px; align-items: flex-start;`;
 
     			case 'br':
-    				return `top: ${get(rect).bottom}px; left: ${get(rect).right}px; transform: translateX(-100%);`;
+    				return `top: ${get(rect).bottom}px; left: ${get(rect).right}px; transform: translateX(-100%); align-items: flex-end;`;
     		}
     	});
 
@@ -14741,14 +16100,14 @@
     		? get(localText).slice(0, ANNOTATION_PREVIEW_LENGTH) + (get(localText).length > ANNOTATION_PREVIEW_LENGTH ? '…' : '')
     		: null);
 
-    	var div = root$d();
+    	var div = root$c();
     	var button = child(div);
     	let classes;
     	var node = child(button);
 
     	{
     		var consequent = ($$anchor) => {
-    			var span = root_1$9();
+    			var span = root_1$8();
     			var text = child(span, true);
 
     			reset(span);
@@ -14776,7 +16135,7 @@
 
     	{
     		var consequent_1 = ($$anchor) => {
-    			var div_1 = root_3$6();
+    			var div_1 = root_3$4();
     			var textarea = child(div_1);
 
     			remove_textarea_child(textarea);
@@ -14787,7 +16146,7 @@
     			each(div_3, 21, () => CORNER_ICONS, ({ key, icon }) => key, ($$anchor, $$item) => {
     				let key = () => get($$item).key;
     				let icon = () => get($$item).icon;
-    				var button_1 = root_4$3();
+    				var button_1 = root_4$2();
     				let classes_1;
     				var text_2 = child(button_1, true);
 
@@ -14795,8 +16154,8 @@
 
     				template_effect(() => {
     					classes_1 = set_class(button_1, 1, 'cv-corner-btn svelte-1r1spmr', null, classes_1, { active: get(localCorner) === key() });
-    					set_attribute(button_1, 'title', `Anchor to ${key() ?? ''}`);
-    					set_attribute(button_1, 'aria-label', `Anchor to ${key() ?? ''}`);
+    					set_attribute(button_1, 'title', `Corner ${key() ?? ''}`);
+    					set_attribute(button_1, 'aria-label', `Corner ${key() ?? ''}`);
     					set_attribute(button_1, 'aria-pressed', get(localCorner) === key());
     					set_text(text_2, icon());
     				});
@@ -14849,24 +16208,268 @@
 
     delegate(['click', 'input']);
 
-    var root_2$6 = from_html(`<!> <!>`, 1);
-    var root_3$5 = from_html(`<div><span class="selection-label svelte-1dbf58w"> </span></div>`);
-    var root$c = from_html(`<div class="share-overlay-ui"><!> <!> <!> <!></div>`);
+    // Block-level tags we split selections on
+    const BLOCK_TAGS = new Set([
+        'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+        'LI', 'BLOCKQUOTE', 'PRE', 'TD', 'TH',
+        'DIV', 'SECTION', 'ARTICLE',
+    ]);
+    const BLOCK_SELECTOR = 'p, h1, h2, h3, h4, h5, h6, li, blockquote, pre, td, th, div, section, article';
+    /**
+     * Given a browser Selection, returns one TextRangeDescriptor per block-level
+     * container the selection intersects.
+     */
+    function createDescriptors(selectionOrRange) {
+        const range = 'rangeCount' in selectionOrRange
+            ? (selectionOrRange.rangeCount > 0 ? selectionOrRange.getRangeAt(0) : null)
+            : selectionOrRange;
+        if (!range || range.collapsed)
+            return [];
+        const startBlock = findNearestBlock(range.startContainer);
+        const endBlock = findNearestBlock(range.endContainer);
+        if (!startBlock)
+            return [];
+        if (startBlock === endBlock) {
+            const desc = descriptorForSubRange(range, startBlock);
+            return desc ? [desc] : [];
+        }
+        // Multi-block: collect all block elements the range touches, in order
+        const commonEl = range.commonAncestorContainer.nodeType === Node.ELEMENT_NODE
+            ? range.commonAncestorContainer
+            : range.commonAncestorContainer.parentElement;
+        const allBlocks = Array.from(commonEl.querySelectorAll(BLOCK_SELECTOR));
+        const result = [];
+        let inRange = false;
+        for (const block of allBlocks) {
+            if (block === startBlock || block.contains(startBlock))
+                inRange = true;
+            if (!inRange)
+                continue;
+            const sub = clipRangeToElement(range, block);
+            if (sub && !sub.collapsed) {
+                const desc = descriptorForSubRange(sub, block);
+                if (desc)
+                    result.push(desc);
+            }
+            if (block === endBlock || block.contains(endBlock))
+                break;
+        }
+        // Fallback: no blocks enumerated → use startBlock
+        if (result.length === 0) {
+            const desc = descriptorForSubRange(range, startBlock);
+            if (desc)
+                result.push(desc);
+        }
+        return result;
+    }
+    // ---------------------------------------------------------------------------
+    // Internal helpers
+    // ---------------------------------------------------------------------------
+    function findNearestBlock(node) {
+        let cur = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+        while (cur && cur !== document.body) {
+            if (cur instanceof HTMLElement && BLOCK_TAGS.has(cur.tagName))
+                return cur;
+            cur = cur.parentElement;
+        }
+        // Fall back to body
+        return cur instanceof HTMLElement ? cur : document.body;
+    }
+    function clipRangeToElement(range, el) {
+        try {
+            const elRange = document.createRange();
+            elRange.selectNodeContents(el);
+            const clipped = document.createRange();
+            // Start = max(range.start, el.start)
+            if (range.compareBoundaryPoints(Range.START_TO_START, elRange) >= 0) {
+                clipped.setStart(range.startContainer, range.startOffset);
+            }
+            else {
+                clipped.setStart(elRange.startContainer, elRange.startOffset);
+            }
+            // End = min(range.end, el.end)
+            if (range.compareBoundaryPoints(Range.END_TO_END, elRange) <= 0) {
+                clipped.setEnd(range.endContainer, range.endOffset);
+            }
+            else {
+                clipped.setEnd(elRange.endContainer, elRange.endOffset);
+            }
+            return clipped.collapsed ? null : clipped;
+        }
+        catch {
+            return null;
+        }
+    }
+    function descriptorForSubRange(range, container) {
+        const rawText = range.toString();
+        const selectedText = rawText.trim().replace(/\s+/g, ' ');
+        if (selectedText.length === 0)
+            return null;
+        const stableText = getStableNormalizedText(container);
+        const containerHash = hashCode(stableText);
+        // Find element id (direct) and parent id (scope)
+        const elementId = container.id || undefined;
+        const containerId = findAncestorId(container);
+        // Scope for index lookup: nearest id-bearing ancestor element (or body)
+        const scope = (containerId ? document.getElementById(containerId) : null) ?? document.body;
+        const siblings = Array.from(scope.querySelectorAll(container.tagName));
+        const containerIndex = Math.max(0, siblings.indexOf(container));
+        const startText = selectedText.slice(0, SNIPPET_LENGTH);
+        const endText = selectedText.length <= SNIPPET_LENGTH
+            ? startText
+            : selectedText.slice(-SNIPPET_LENGTH);
+        const desc = {
+            containerTag: container.tagName,
+            containerIndex,
+            containerHash,
+            startText,
+            endText,
+            textHash: hashCode(selectedText),
+            textLength: selectedText.length,
+        };
+        if (elementId)
+            desc.elementId = elementId;
+        if (containerId)
+            desc.containerId = containerId;
+        return desc;
+    }
+    function findAncestorId(el) {
+        let node = el.parentElement;
+        while (node) {
+            if (node.id)
+                return node.id;
+            node = node.parentElement;
+        }
+        return undefined;
+    }
+    // ---------------------------------------------------------------------------
+    // Merging selections
+    // ---------------------------------------------------------------------------
+    /**
+     * Merges a new DOM Range with existing TextRangeDescriptors.
+     * Resolves overlaps, subsets, and contiguous highlights.
+     * Returns null if the new selection is a complete subset of an existing highlight.
+     */
+    function mergeSelectionWithExisting(newRange, existing, currentColor) {
+        let mergedRange = newRange.cloneRange();
+        const keepExisting = [];
+        for (const desc of existing) {
+            const { range: existingRange } = resolveDescriptor(desc);
+            if (!existingRange) {
+                keepExisting.push(desc);
+                continue;
+            }
+            if (rangesOverlapOrTouch(mergedRange, existingRange)) {
+                const newStartsAfterOrAt = mergedRange.compareBoundaryPoints(Range.START_TO_START, existingRange) >= 0;
+                const newEndsBeforeOrAt = mergedRange.compareBoundaryPoints(Range.END_TO_END, existingRange) <= 0;
+                if (newStartsAfterOrAt && newEndsBeforeOrAt) {
+                    // Complete subset -> ignore new range entirely
+                    return null;
+                }
+                mergedRange = combineRanges(mergedRange, existingRange);
+            }
+            else {
+                keepExisting.push(desc);
+            }
+        }
+        const mergedDescriptors = createDescriptors(mergedRange);
+        if (currentColor) {
+            mergedDescriptors.forEach((d) => (d.color = currentColor));
+        }
+        return [...keepExisting, ...mergedDescriptors];
+    }
+    function rangesOverlapOrTouch(a, b) {
+        // If 'a' starts strictly after 'b' ends, no overlap
+        if (a.compareBoundaryPoints(Range.END_TO_START, b) > 0)
+            return false;
+        // If 'a' ends strictly before 'b' starts, no overlap
+        if (a.compareBoundaryPoints(Range.START_TO_END, b) < 0)
+            return false;
+        return true;
+    }
+    function combineRanges(a, b) {
+        const combined = document.createRange();
+        if (a.compareBoundaryPoints(Range.START_TO_START, b) <= 0) {
+            combined.setStart(a.startContainer, a.startOffset);
+        }
+        else {
+            combined.setStart(b.startContainer, b.startOffset);
+        }
+        if (a.compareBoundaryPoints(Range.END_TO_END, b) >= 0) {
+            combined.setEnd(a.endContainer, a.endOffset);
+        }
+        else {
+            combined.setEnd(b.endContainer, b.endOffset);
+        }
+        return combined;
+    }
 
-    const $$css$f = {
+    var root_2$6 = from_html(`<!> <!>`, 1);
+    var root_6 = from_html(`<div><span class="selection-label svelte-1dbf58w"> </span></div>`);
+    var root$b = from_html(`<div class="share-overlay-ui"><!> <!> <!> <!> <!></div>`);
+
+    const $$css$e = {
     	hash: 'svelte-1dbf58w',
-    	code: '\n  /* Global styles injected when active */body.cv-share-active {cursor:default;user-select:none;-webkit-user-select:none;}\n\n  /* Highlight outlines */.cv-highlight-target {outline:2px dashed #0078d4 !important;outline-offset:2px;cursor:crosshair;}.cv-share-selected {outline:3px solid #005a9e !important;outline-offset:2px;background-color:rgba(0, 120, 212, 0.05);}.cv-highlight-target-hide {outline:2px dashed #d13438 !important;outline-offset:2px;cursor:crosshair;}.cv-share-selected-hide {outline:3px solid #a4262c !important;outline-offset:2px;background-color:rgba(209, 52, 56, 0.05);}.cv-highlight-target-mode {outline:2px dashed #d97706 !important;outline-offset:2px;cursor:crosshair;}.cv-share-selected-highlight {outline:3px solid #b45309 !important;outline-offset:2px;background-color:rgba(245, 158, 11, 0.05);}.selection-box.svelte-1dbf58w {position:fixed;border:1px solid rgba(0, 120, 212, 0.4);background-color:rgba(0, 120, 212, 0.1);pointer-events:none;z-index:10000;box-sizing:border-box;}.selection-box.hide-mode.svelte-1dbf58w {border:1px solid rgba(209, 52, 56, 0.4);background-color:rgba(209, 52, 56, 0.1);}.selection-box.highlight-mode.svelte-1dbf58w {border:1px solid rgba(255, 140, 0, 0.6); /* Orange/Gold for highlight */background-color:rgba(255, 140, 0, 0.1);}.selection-label.svelte-1dbf58w {position:absolute;top:-24px;left:0;background:#0078d4;color:white;padding:2px 6px;font-size:11px;border-radius:3px;white-space:nowrap;font-family:sans-serif;opacity:0.9;}.hide-mode.svelte-1dbf58w .selection-label:where(.svelte-1dbf58w) {background:#d13438;}.highlight-mode.svelte-1dbf58w .selection-label:where(.svelte-1dbf58w) {background:#d97706; /* Darker orange for text bg */}'
+    	code: '\n  /* Global styles injected when active */body.cv-share-active {cursor:default;user-select:none;-webkit-user-select:none;}\n\n  /* Box target outlines */.cv-box-target {outline:2px dashed #0078d4 !important;outline-offset:2px;cursor:crosshair;}.cv-share-selected {outline:3px solid #005a9e !important;outline-offset:2px;background-color:rgba(0, 120, 212, 0.05);}.cv-box-target-hide {outline:2px dashed #d13438 !important;outline-offset:2px;cursor:crosshair;}.cv-share-selected-hide {outline:3px solid #a4262c !important;outline-offset:2px;background-color:rgba(209, 52, 56, 0.05);}.cv-box-target-mode {outline:2px dashed #d97706 !important;outline-offset:2px;cursor:crosshair;}.cv-share-selected-box {outline:3px solid #b45309 !important;outline-offset:2px;background-color:rgba(245, 158, 11, 0.05);}\n\n  /* Text highlight mode — allow native text selection (cursor overridden inline per color) */body.cv-share-active-highlight {user-select:text !important;-webkit-user-select:text !important;}.selection-box.svelte-1dbf58w {position:fixed;border:1px solid rgba(0, 120, 212, 0.4);background-color:rgba(0, 120, 212, 0.1);pointer-events:none;z-index:10000;box-sizing:border-box;}.selection-box.hide-mode.svelte-1dbf58w {border:1px solid rgba(209, 52, 56, 0.4);background-color:rgba(209, 52, 56, 0.1);}.selection-box.box-mode.svelte-1dbf58w {border:1px solid rgba(255, 140, 0, 0.6);background-color:rgba(255, 140, 0, 0.1);}.selection-label.svelte-1dbf58w {position:absolute;top:-24px;left:0;background:#0078d4;color:white;padding:2px 6px;font-size:11px;border-radius:3px;white-space:nowrap;font-family:sans-serif;opacity:0.9;}.hide-mode.svelte-1dbf58w .selection-label:where(.svelte-1dbf58w) {background:#d13438;}.box-mode.svelte-1dbf58w .selection-label:where(.svelte-1dbf58w) {background:#d97706;}'
     };
 
     function ShareOverlay($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$f);
+    	append_styles$1($$anchor, $$css$e);
 
     	let excludedTags = prop($$props, 'excludedTags', 19, () => ['HEADER', 'NAV', 'FOOTER']),
     		excludedIds = prop($$props, 'excludedIds', 19, () => []);
 
     	let excludedTagSet = user_derived(() => new Set(excludedTags().map((t) => t.toUpperCase())));
     	let excludedIdSet = user_derived(() => new Set(excludedIds()));
+
+    	// ── Highlighter pen cursor ────────────────────────────────────────────────
+    	// Maps each color key to a hex value for the SVG pen body fill.
+    	const CURSOR_COLORS = {
+    		yellow: { body: '#facc15', tip: '#a16207' },
+    		blue: { body: '#60a5fa', tip: '#1d4ed8' },
+    		red: { body: '#f87171', tip: '#b91c1c' },
+    		green: { body: '#4ade80', tip: '#15803d' },
+    		black: { body: '#4b5563', tip: '#111827' }
+    	};
+
+    	function buildHighlighterCursor(colorKey) {
+    		const c = CURSOR_COLORS[colorKey] ?? CURSOR_COLORS['yellow'];
+
+    		// 28×28 SVG. The pen is drawn upright then rotated +35° around (14,10)
+    		// so the cap sits upper-right and the chisel nib lands at ≈ (6, 21) —
+    		// the cursor hot-spot — mimicking a natural hand-held highlighter angle.
+    		const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+      <g transform="rotate(35, 14, 10)">
+        <rect x="11" y="1" width="6" height="3" rx="1.5" fill="rgba(30,30,30,0.75)"/>
+        <rect x="10" y="3.8" width="8" height="1" fill="rgba(0,0,0,0.22)"/>
+        <rect x="10" y="4.8" width="8" height="12.5" rx="1" fill="${c.body}" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
+        <rect x="11.5" y="6.5" width="5" height="4" rx="1" fill="rgba(255,255,255,0.42)"/>
+        <rect x="10" y="16" width="8" height="1.5" fill="${c.tip}" opacity="0.85"/>
+        <polygon points="10.5,17.5 17.5,17.5 15.5,22 12.5,22" fill="${c.tip}"/>
+        <rect x="12.5" y="22" width="3" height="2.5" rx="0.5" fill="rgba(0,0,0,0.72)"/>
+      </g>
+    </svg>`;
+
+    		const encoded = encodeURIComponent(svg);
+
+    		// Hot-spot at ≈(6,21): the rotated nib tip position
+    		return `url("data:image/svg+xml,${encoded}") 6 21, text`;
+    	}
+
+    	let highlighterCursor = user_derived(() => shareStore.selectionMode === 'highlight'
+    		? buildHighlighterCursor(shareStore.selectedTextColor)
+    		: '');
+
+    	user_effect(() => {
+    		if (shareStore.selectionMode === 'highlight' && get(highlighterCursor)) {
+    			document.body.style.setProperty('cursor', get(highlighterCursor), 'important');
+    		} else {
+    			document.body.style.removeProperty('cursor');
+    		}
+
+    		return () => document.body.style.removeProperty('cursor');
+    	});
 
     	user_effect(() => {
     		document.body.classList.add('cv-share-active');
@@ -14967,6 +16570,9 @@
     	function handleMouseDown(e) {
     		if (!shareStore.isActive) return;
 
+    		// In highlight mode, do NOT intercept — let the browser handle native text selection
+    		if (shareStore.selectionMode === 'highlight') return;
+
     		// Ignore clicks on UI
     		const target = e.target;
 
@@ -14999,6 +16605,31 @@
     	}
 
     	function handleMouseUp() {
+    		if (shareStore.selectionMode === 'highlight') {
+    			const sel = window.getSelection();
+
+    			if (sel && !sel.isCollapsed && sel.rangeCount > 0) {
+    				const range = sel.getRangeAt(0);
+
+    				if (range && !range.collapsed) {
+    					const mergedList = mergeSelectionWithExisting(range, shareStore.textHighlights, shareStore.selectedTextColor);
+
+    					if (mergedList !== null) {
+    						// Update the store list
+    						shareStore.textHighlights = mergedList;
+
+    						// Apply the highlighted text styles to the screen instantly (without recipient annotation bubbles)
+    						textHighlightService.applyDescriptors(shareStore.textHighlights, true);
+    					}
+    				}
+
+    				// Remove native selection ranges to showcase Custom Highlight styling
+    				sel.removeAllRanges();
+    			}
+
+    			return;
+    		}
+
     		if (get(isDragging) && get(dragStart) && get(dragCurrent)) {
     			// Perform selection logic
     			const width = Math.abs(get(dragCurrent).x - get(dragStart).x);
@@ -15053,6 +16684,9 @@
     	}
 
     	function handleClick(e) {
+    		// Don't intercept clicks in highlight mode — native text selection must work
+    		if (shareStore.selectionMode === 'highlight') return;
+
     		if (wasDragging) {
     			e.preventDefault();
     			e.stopPropagation();
@@ -15089,7 +16723,7 @@
     		return isExcluded(el, get(excludedTagSet), get(excludedIdSet));
     	}
 
-    	var div = root$c();
+    	var div = root$b();
 
     	event('mouseover', $window, handleHover);
     	event('mousedown', $window, handleMouseDown);
@@ -15125,11 +16759,22 @@
 
     				var node_6 = sibling(node_5, 2);
 
-    				HighlightAnnotationEditor(node_6, {
-    					get element() {
-    						return el;
-    					}
-    				});
+    				{
+    					let $0 = user_derived(() => shareStore.boxAnnotations.get(el)?.text ?? '');
+    					let $1 = user_derived(() => shareStore.boxAnnotations.get(el)?.corner ?? DEFAULT_ANNOTATION_CORNER);
+
+    					HighlightAnnotationEditor(node_6, {
+    						getRect: () => el.getBoundingClientRect(),
+    						get annotation() {
+    							return get($0);
+    						},
+
+    						get corner() {
+    							return get($1);
+    						},
+    						onchange: (text, corner) => shareStore.setAnnotation(el, text, corner)
+    					});
+    				}
 
     				append($$anchor, fragment_1);
     			});
@@ -15138,17 +16783,65 @@
     		};
 
     		if_block(node_3, ($$render) => {
-    			if (shareStore.selectionMode === 'highlight') $$render(consequent);
+    			if (shareStore.selectionMode === 'box') $$render(consequent);
     		});
     	}
 
     	var node_7 = sibling(node_3, 2);
 
     	{
-    		var consequent_1 = ($$anchor) => {
-    			var div_1 = root_3$5();
+    		var consequent_2 = ($$anchor) => {
+    			var fragment_2 = comment();
+    			var node_8 = first_child(fragment_2);
+
+    			each(node_8, 17, () => shareStore.textHighlights, index, ($$anchor, desc, i) => {
+    				const resolvedRange = user_derived(() => textHighlightService.getRange(i));
+    				var fragment_3 = comment();
+    				var node_9 = first_child(fragment_3);
+
+    				{
+    					var consequent_1 = ($$anchor) => {
+    						{
+    							let $0 = user_derived(() => get(desc).annotation ?? '');
+    							let $1 = user_derived(() => get(desc).annotationCorner ?? DEFAULT_ANNOTATION_CORNER);
+
+    							HighlightAnnotationEditor($$anchor, {
+    								getRect: () => textHighlightService.getAnchorRect(i) ?? new DOMRect(),
+    								get annotation() {
+    									return get($0);
+    								},
+
+    								get corner() {
+    									return get($1);
+    								},
+    								onchange: (text, corner) => shareStore.setTextHighlightAnnotation(i, text, corner)
+    							});
+    						}
+    					};
+
+    					if_block(node_9, ($$render) => {
+    						if (get(resolvedRange)) $$render(consequent_1);
+    					});
+    				}
+
+    				append($$anchor, fragment_3);
+    			});
+
+    			append($$anchor, fragment_2);
+    		};
+
+    		if_block(node_7, ($$render) => {
+    			if (shareStore.selectionMode === 'highlight') $$render(consequent_2);
+    		});
+    	}
+
+    	var node_10 = sibling(node_7, 2);
+
+    	{
+    		var consequent_3 = ($$anchor) => {
+    			var div_1 = root_6();
     			var span = child(div_1);
-    			var text = child(span, true);
+    			var text_1 = child(span, true);
 
     			reset(span);
     			reset(div_1);
@@ -15159,22 +16852,22 @@
     					1,
     					`selection-box ${shareStore.selectionMode === 'hide'
 						? 'hide-mode'
-						: shareStore.selectionMode === 'highlight' ? 'highlight-mode' : ''}`,
+						: shareStore.selectionMode === 'box' ? 'box-mode' : ''}`,
     					'svelte-1dbf58w'
     				);
 
     				set_style(div_1, `left: ${get(selectionBox).left ?? ''}px; top: ${get(selectionBox).top ?? ''}px; width: ${get(selectionBox).width ?? ''}px; height: ${get(selectionBox).height ?? ''}px;`);
 
-    				set_text(text, shareStore.selectionMode === 'hide'
+    				set_text(text_1, shareStore.selectionMode === 'hide'
     					? 'Select to hide'
-    					: shareStore.selectionMode === 'highlight' ? 'Select to highlight' : 'Select to show');
+    					: shareStore.selectionMode === 'box' ? 'Select to box' : 'Select to show');
     			});
 
     			append($$anchor, div_1);
     		};
 
-    		if_block(node_7, ($$render) => {
-    			if (get(selectionBox)) $$render(consequent_1);
+    		if_block(node_10, ($$render) => {
+    			if (get(selectionBox) && shareStore.selectionMode !== 'highlight') $$render(consequent_3);
     		});
     	}
 
@@ -15183,16 +16876,16 @@
     	pop();
     }
 
-    var root_1$8 = from_html(`<div class="cv-focus-banner-wrapper svelte-1yqpn7e"><div id="cv-exit-focus-banner" data-cv-scroll-offset="" class="svelte-1yqpn7e"><span>You are viewing a 'focused view' generated by CustardUI.</span> <button type="button" class="svelte-1yqpn7e">See Original Page</button></div></div>`);
+    var root_1$7 = from_html(`<div class="cv-focus-banner-wrapper svelte-1yqpn7e"><div id="cv-exit-focus-banner" data-cv-scroll-offset="" class="svelte-1yqpn7e"><span>You are viewing a 'focused view' generated by CustardUI.</span> <button type="button" class="svelte-1yqpn7e">See Original Page</button></div></div>`);
 
-    const $$css$e = {
+    const $$css$d = {
     	hash: 'svelte-1yqpn7e',
     	code: '.cv-focus-banner-wrapper.svelte-1yqpn7e {position:fixed;top:0;left:0;right:0;z-index:9000;background-color:#f3cb52;box-shadow:0 2px 8px rgba(44, 26, 14, 0.15);font-family:system-ui, sans-serif;}#cv-exit-focus-banner.svelte-1yqpn7e {color:#2c1a0e;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:16px;}button.svelte-1yqpn7e {background:#804b18;color:#fdf6e3;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-weight:600;}button.svelte-1yqpn7e:hover {background:#c4853a;}'
     };
 
     function FocusBanner($$anchor, $$props) {
     	push($$props, false);
-    	append_styles$1($$anchor, $$css$e);
+    	append_styles$1($$anchor, $$css$d);
 
     	function handleExit() {
     		focusStore.exit();
@@ -15205,7 +16898,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var div = root_1$8();
+    			var div = root_1$7();
     			var div_1 = child(div);
     			var button = sibling(child(div_1), 2);
 
@@ -15513,16 +17206,16 @@
 
     const colorSchemeStore = new ColorSchemeStore();
 
-    var root$b = from_html(`<div class="cv-widget-root" data-cv-share-ignore=""><!> <!> <!> <!> <!> <!></div>`);
+    var root$a = from_html(`<div class="cv-widget-root" data-cv-share-ignore=""><!> <!> <!> <!> <!> <!></div>`);
 
-    const $$css$d = {
+    const $$css$c = {
     	hash: 'svelte-1vlfixd',
     	code: '\n  /* --cv-* defaults (light) — on :root so custom properties cascade into all shadow DOM */:root {--cv-bg: white;--cv-text: rgba(0, 0, 0, 0.9);--cv-text-secondary: rgba(0, 0, 0, 0.6);--cv-border: rgba(0, 0, 0, 0.1);--cv-bg-hover: rgba(0, 0, 0, 0.05);--cv-primary: #3e84f4;--cv-primary-hover: #2563eb;--cv-danger: #dc2626;--cv-danger-bg: rgba(220, 38, 38, 0.1);--cv-shadow: rgba(0, 0, 0, 0.25);--cv-input-bg: white;--cv-input-border: rgba(0, 0, 0, 0.15);--cv-switch-bg: rgba(0, 0, 0, 0.1);--cv-switch-knob: white;--cv-modal-icon-bg: rgba(0, 0, 0, 0.08);--cv-icon-bg: rgba(255, 255, 255, 0.92);--cv-icon-color: rgba(0, 0, 0, 0.9);--cv-focus-ring: rgba(62, 132, 244, 0.2);--cv-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);--cv-modal-radius: 0.75rem;--cv-card-radius: 0.5rem;--cv-section-label-transform: uppercase;}\n\n  /* Dark Theme — triggered by data-cv-theme="dark" on <html> */:root[data-cv-theme=\'dark\'] {--cv-bg: #101722;--cv-text: #e2e8f0;--cv-text-secondary: rgba(255, 255, 255, 0.6);--cv-border: rgba(255, 255, 255, 0.1);--cv-bg-hover: rgba(255, 255, 255, 0.05);--cv-primary: #3e84f4;--cv-primary-hover: #60a5fa;--cv-danger: #f87171;--cv-danger-bg: rgba(248, 113, 113, 0.1);--cv-shadow: rgba(0, 0, 0, 0.5);--cv-input-bg: #1e293b;--cv-input-border: rgba(255, 255, 255, 0.1);--cv-switch-bg: rgba(255, 255, 255, 0.1);--cv-switch-knob: #e2e8f0;--cv-modal-icon-bg: rgba(255, 255, 255, 0.08);--cv-icon-bg: #1e293b;--cv-icon-color: #e2e8f0;--cv-focus-ring: rgba(62, 132, 244, 0.5);--cv-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);--cv-modal-radius: 0.75rem;--cv-card-radius: 0.5rem;--cv-section-label-transform: uppercase;}\n\n  /* Fixed zero-size overlay — pointer-events none so clicks pass through to the page */.cv-widget-root {position:fixed;top:0;left:0;width:0;height:0;z-index:9999;pointer-events:none;font-family:inherit;}\n\n  /* Interactive children need pointer-events restored */.cv-widget-root > * {pointer-events:auto;}\n\n  /* ShareOverlay manages its own pointer-events internally */.cv-widget-root .cv-share-overlay {pointer-events:none;}.cv-hidden {display:none !important;}'
     };
 
     function UIRoot($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$d);
+    	append_styles$1($$anchor, $$css$c);
 
     	const { persistenceManager, resetToDefault } = getContext(RUNTIME_CALLBACKS_CTX);
     	const iconSettingsStore = getContext(ICON_SETTINGS_CTX);
@@ -15604,7 +17297,7 @@
     	// --- Icon Visibility ---
     	const shouldShowIcon = user_derived(() => get(settingsEnabled) && !iconSettingsStore.isDismissed && (derivedStore.hasMenuOptions || uiStore.uiOptions.showTabGroups || get(isModalOpen)));
 
-    	var div = root$b();
+    	var div = root$a();
     	var node = child(div);
 
     	{
@@ -16123,16 +17816,16 @@
         }
     }
 
-    var root$a = from_html(`<div class="cv-context-divider svelte-1a535nn" role="button" tabindex="0"> </div>`);
+    var root$9 = from_html(`<div class="cv-context-divider svelte-1a535nn" role="button" tabindex="0"> </div>`);
 
-    const $$css$c = {
+    const $$css$b = {
     	hash: 'svelte-1a535nn',
     	code: '.cv-context-divider.svelte-1a535nn {padding:12px;margin:16px 0;background-color:#f8f8f8;border-top:1px dashed #ccc;border-bottom:1px dashed #ccc;color:#555;text-align:center;cursor:pointer;font-family:system-ui, sans-serif;font-size:13px;transition:background-color 0.2s;}.cv-context-divider.svelte-1a535nn:hover {background-color:#e8e8e8;color:#333;}'
     };
 
     function FocusDivider($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$c);
+    	append_styles$1($$anchor, $$css$b);
 
     	// Component is mounted manually via `mount`, use props for communication.
     	let hiddenCount = prop($$props, 'hiddenCount', 3, 0);
@@ -16141,7 +17834,7 @@
     		if ($$props.onExpand) $$props.onExpand();
     	}
 
-    	var div = root$a();
+    	var div = root$9();
     	var text = child(div);
 
     	reset(div);
@@ -16272,358 +17965,14 @@
         return groups;
     }
 
-    var root_4$2 = from_html(`<span>▾</span>`);
-    var root_3$4 = from_html(`<!> <span class="cv-ribbon-text cv-ribbon-text--right svelte-1asb212"> </span> <span class="cv-ribbon-grip svelte-1asb212" aria-hidden="true"><span class="svelte-1asb212"></span><span class="svelte-1asb212"></span> <span class="svelte-1asb212"></span><span class="svelte-1asb212"></span> <span class="svelte-1asb212"></span><span class="svelte-1asb212"></span></span>`, 1);
-    var root_6 = from_html(`<span>▾</span>`);
-    var root_5 = from_html(`<span class="cv-ribbon-grip svelte-1asb212" aria-hidden="true"><span class="svelte-1asb212"></span><span class="svelte-1asb212"></span> <span class="svelte-1asb212"></span><span class="svelte-1asb212"></span> <span class="svelte-1asb212"></span><span class="svelte-1asb212"></span></span> <span class="cv-ribbon-text svelte-1asb212"> </span> <!>`, 1);
-    var root_1$7 = from_html(`<button type="button"><!></button>`);
-    var root_7 = from_html(`<div class="cv-annotation-card svelte-1asb212" role="region" aria-label="Annotation"><button type="button" class="cv-card-close svelte-1asb212" aria-label="Collapse annotation">✕</button> <span class="cv-card-text svelte-1asb212"> </span></div>`);
-    var root$9 = from_html(`<div role="presentation"><!></div>`);
-
-    const $$css$b = {
-    	hash: 'svelte-1asb212',
-    	code: '\n  /* ==============================\n     CONTAINER (position, drag, opacity)\n     ============================== */.cv-annotation-container.svelte-1asb212 {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;cursor:default;opacity:0.88;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-1asb212:hover {opacity:1;z-index:110;}\n\n  /* ==============================\n     RIBBON (home-plate)\n     ============================== */.cv-annotation-ribbon.svelte-1asb212 {border:none;padding:6px 20px 6px 8px;min-width:28px;min-height:24px;background:var(--cv-highlight-color);cursor:default;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);display:flex;align-items:center;justify-content:flex-start;gap:5px;transform-origin:center center;}.cv-annotation-ribbon--intro.svelte-1asb212 {\n    animation: svelte-1asb212-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-annotation-ribbon--periodic.svelte-1asb212 {\n    animation: svelte-1asb212-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-annotation-ribbon--right.svelte-1asb212 {padding:6px 8px 6px 20px;justify-content:flex-end;}.cv-annotation-ribbon--empty.svelte-1asb212 {min-width:24px;padding:6px 16px 6px 8px;}.cv-annotation-ribbon--expandable.svelte-1asb212 {cursor:pointer;}.cv-annotation-ribbon--expandable.svelte-1asb212:hover {filter:brightness(1.1);}\n\n  /* ==============================\n     RIBBON TEXT (single line)\n     ============================== */.cv-ribbon-text.svelte-1asb212 {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;color:#fff;text-shadow:0 1px 3px rgba(0, 0, 0, 0.25);}.cv-ribbon-text--right.svelte-1asb212 {text-align:right;}.cv-ribbon-chevron.svelte-1asb212 {font-size:22px;opacity:1;flex-shrink:0;line-height:1;color:#fff;text-shadow:0 1px 4px rgba(0, 0, 0, 0.4);}.cv-ribbon-chevron--bounce.svelte-1asb212 {\n    animation: svelte-1asb212-cv-chevron-bounce 3s ease-in-out infinite;}\n\n  /* ==============================\n     DRAG GRIP (6-dot grid on flat side)\n     ============================== */.cv-ribbon-grip.svelte-1asb212 {display:grid;grid-template-columns:repeat(2, 3px);gap:3px;flex-shrink:0;opacity:0.7;cursor:grab;padding:2px;}.cv-ribbon-grip.svelte-1asb212:active {cursor:grabbing;}.cv-ribbon-grip.svelte-1asb212 > span:where(.svelte-1asb212) {width:3px;height:3px;border-radius:50%;background:rgba(255, 255, 255, 0.9);box-shadow:0 0 1px rgba(0, 0, 0, 0.4);}\n\n  /* ==============================\n     CARD (sticky note)\n     ============================== */.cv-annotation-card.svelte-1asb212 {background:#fffdf5;border:1.5px solid var(--cv-highlight-color);border-radius:4px;padding:10px 12px;max-width:280px;min-width:120px;box-shadow:0 4px 20px rgba(0, 0, 0, 0.18);position:relative;\n    animation: svelte-1asb212-cv-cardPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}.cv-card-close.svelte-1asb212 {position:absolute;top:3px;right:5px;border:none;background:transparent;cursor:pointer;font-size:12px;color:#aaa;padding:2px 4px;line-height:1;font-family:sans-serif;}.cv-card-close.svelte-1asb212:hover {color:#555;}.cv-card-text.svelte-1asb212 {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:600;color:#333;line-height:1.45;word-break:break-word;white-space:pre-wrap;padding-right:15px;}\n\n  /* ==============================\n     ANIMATIONS\n     ============================== */\n  @keyframes svelte-1asb212-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-1asb212-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }\n\n  @keyframes svelte-1asb212-cv-cardPop {\n    from {\n      opacity: 0;\n      transform: scale(0.9) translateY(5px);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) translateY(0);\n    }\n  }\n\n  @keyframes svelte-1asb212-cv-chevron-bounce {\n    0%,\n    70%,\n    100% {\n      transform: translateY(0);\n    }\n    78% {\n      transform: translateY(-3px);\n    }\n    86% {\n      transform: translateY(1px);\n    }\n    93% {\n      transform: translateY(-1.5px);\n    }\n  }'
-    };
-
-    function HighlightTextAnnotation($$anchor, $$props) {
-    	push($$props, true);
-    	append_styles$1($$anchor, $$css$b);
-
-    	const corner = user_derived(() => $$props.annotationCorner ?? DEFAULT_ANNOTATION_CORNER);
-    	const hasText = user_derived(() => $$props.annotation.length > 0);
-    	const isShort = user_derived(() => $$props.annotation.length <= ANNOTATION_PREVIEW_LENGTH);
-    	const isRightCorner = user_derived(() => get(corner) === 'tr' || get(corner) === 'br');
-    	let expanded = state(false);
-
-    	// --- Intro wiggle state ---
-    	let introAnimationDone = state(false);
-
-    	function onIntroAnimationEnd(e) {
-    		if (e.target !== e.currentTarget) return;
-
-    		set(introAnimationDone, true);
-    	}
-
-    	// --- Drag-to-move state ---
-    	let dragOffsetX = state(0);
-
-    	let dragOffsetY = state(0);
-    	let isDragging = false;
-    	let isPointerDown = false;
-    	let dragStartX = 0;
-    	let dragStartY = 0;
-    	let dragStartOffsetX = 0;
-    	let dragStartOffsetY = 0;
-    	let containerEl;
-
-    	function toggle() {
-    		if (get(isShort)) return;
-
-    		set(expanded, !get(expanded));
-    	}
-
-    	function handleInteraction(e) {
-    		e.stopPropagation();
-
-    		if (!isDragging) toggle();
-    	}
-
-    	function onPointerDown(e) {
-    		// Only initiate drag when the pointer starts on the grip handle.
-    		if (!e.target.closest('.cv-ribbon-grip')) return;
-
-    		isPointerDown = true;
-    		isDragging = false;
-    		dragStartX = e.clientX;
-    		dragStartY = e.clientY;
-    		dragStartOffsetX = get(dragOffsetX);
-    		dragStartOffsetY = get(dragOffsetY);
-    	}
-
-    	// Hard clamp so the element can never leave the viewport.
-    	function clampToViewport(newX, newY) {
-    		if (!containerEl) return { x: newX, y: newY };
-
-    		const rect = containerEl.getBoundingClientRect();
-    		const pad = 8;
-    		const vw = window.innerWidth;
-    		const vh = window.innerHeight;
-    		const origLeft = rect.left - get(dragOffsetX);
-    		const origTop = rect.top - get(dragOffsetY);
-    		const newLeft = origLeft + newX;
-    		const newTop = origTop + newY;
-    		let x = newX;
-    		let y = newY;
-
-    		if (newLeft < pad) x += pad - newLeft;
-    		if (newLeft + rect.width > vw - pad) x -= newLeft + rect.width - (vw - pad);
-    		if (newTop < pad) y += pad - newTop;
-    		if (newTop + rect.height > vh - pad) y -= newTop + rect.height - (vh - pad);
-
-    		return { x, y };
-    	}
-
-    	function onPointerMove(e) {
-    		if (!isPointerDown) return;
-
-    		const dx = e.clientX - dragStartX;
-    		const dy = e.clientY - dragStartY;
-
-    		if (!isDragging && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
-    			isDragging = true;
-    			e.currentTarget.setPointerCapture(e.pointerId);
-    		}
-
-    		if (isDragging) {
-    			const rawX = dragStartOffsetX + dx;
-    			const rawY = dragStartOffsetY + dy;
-    			const clamped = clampToViewport(rawX, rawY);
-
-    			set(dragOffsetX, clamped.x, true);
-    			set(dragOffsetY, clamped.y, true);
-    		}
-    	}
-
-    	function onPointerUp(e) {
-    		if (!isPointerDown) return;
-
-    		isPointerDown = false;
-
-    		if (isDragging) {
-    			e.currentTarget.releasePointerCapture(e.pointerId);
-
-    			setTimeout(
-    				() => {
-    					isDragging = false;
-    				},
-    				50
-    			);
-    		}
-    	}
-
-    	// Cancel (e.g. touch interrupted by scroll) — reset all drag state cleanly.
-    	function onPointerCancel() {
-    		isPointerDown = false;
-    		isDragging = false;
-    	}
-
-    	// Nudge annotation back in-bounds when the viewport shrinks.
-    	user_effect(() => {
-    		function onResize() {
-    			const clamped = clampToViewport(get(dragOffsetX), get(dragOffsetY));
-
-    			set(dragOffsetX, clamped.x, true);
-    			set(dragOffsetY, clamped.y, true);
-    		}
-
-    		window.addEventListener('resize', onResize);
-
-    		return () => window.removeEventListener('resize', onResize);
-    	});
-
-    	/**
-    	 * Returns CSS positioning based on the annotation corner.
-    	 */
-    	function getPositionStyle(c) {
-    		switch (c) {
-    			case 'tr':
-    				return 'top: -6px; right: -6px;';
-
-    			case 'bl':
-    				return 'bottom: -6px; left: -6px;';
-
-    			case 'br':
-    				return 'bottom: -6px; right: -6px;';
-
-    			case 'tl':
-
-    			default:
-    				return 'top: -6px; left: -6px;';
-    		}
-    	}
-
-    	/**
-    	 * Returns the ribbon clip-path. The point faces inward toward the content.
-    	 */
-    	function getRibbonClipPath(c) {
-    		const pointsRight = c === 'tl' || c === 'bl';
-
-    		if (pointsRight) {
-    			return 'polygon(0% 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 0% 100%)';
-    		} else {
-    			return 'polygon(14px 0%, 100% 0%, 100% 100%, 14px 100%, 0% 50%)';
-    		}
-    	}
-
-    	var div = root$9();
-    	let classes;
-    	var node = child(div);
-
-    	{
-    		var consequent_4 = ($$anchor) => {
-    			var button = root_1$7();
-    			let classes_1;
-    			var node_1 = child(button);
-
-    			{
-    				var consequent_3 = ($$anchor) => {
-    					var fragment = comment();
-    					var node_2 = first_child(fragment);
-
-    					{
-    						var consequent_1 = ($$anchor) => {
-    							var fragment_1 = root_3$4();
-    							var node_3 = first_child(fragment_1);
-
-    							{
-    								var consequent = ($$anchor) => {
-    									var span = root_4$2();
-    									let classes_2;
-
-    									template_effect(() => classes_2 = set_class(span, 1, 'cv-ribbon-chevron svelte-1asb212', null, classes_2, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
-    									append($$anchor, span);
-    								};
-
-    								if_block(node_3, ($$render) => {
-    									if (!get(isShort)) $$render(consequent);
-    								});
-    							}
-
-    							var span_1 = sibling(node_3, 2);
-    							var text = child(span_1, true);
-
-    							reset(span_1);
-    							next(2);
-
-    							template_effect(($0) => set_text(text, $0), [
-    								() => get(isShort)
-    									? $$props.annotation
-    									: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH) + '…'
-    							]);
-
-    							append($$anchor, fragment_1);
-    						};
-
-    						var alternate = ($$anchor) => {
-    							var fragment_2 = root_5();
-    							var span_2 = sibling(first_child(fragment_2), 2);
-    							var text_1 = child(span_2, true);
-
-    							reset(span_2);
-
-    							var node_4 = sibling(span_2, 2);
-
-    							{
-    								var consequent_2 = ($$anchor) => {
-    									var span_3 = root_6();
-    									let classes_3;
-
-    									template_effect(() => classes_3 = set_class(span_3, 1, 'cv-ribbon-chevron svelte-1asb212', null, classes_3, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
-    									append($$anchor, span_3);
-    								};
-
-    								if_block(node_4, ($$render) => {
-    									if (!get(isShort)) $$render(consequent_2);
-    								});
-    							}
-
-    							template_effect(($0) => set_text(text_1, $0), [
-    								() => get(isShort)
-    									? $$props.annotation
-    									: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH) + '…'
-    							]);
-
-    							append($$anchor, fragment_2);
-    						};
-
-    						if_block(node_2, ($$render) => {
-    							if (get(isRightCorner)) $$render(consequent_1); else $$render(alternate, -1);
-    						});
-    					}
-
-    					append($$anchor, fragment);
-    				};
-
-    				if_block(node_1, ($$render) => {
-    					if (get(hasText)) $$render(consequent_3);
-    				});
-    			}
-
-    			reset(button);
-
-    			template_effect(
-    				($0) => {
-    					classes_1 = set_class(button, 1, 'cv-annotation-ribbon svelte-1asb212', null, classes_1, {
-    						'cv-annotation-ribbon--empty': !get(hasText),
-    						'cv-annotation-ribbon--right': get(isRightCorner),
-    						'cv-annotation-ribbon--expandable': !get(isShort),
-    						'cv-annotation-ribbon--intro': !get(introAnimationDone),
-    						'cv-annotation-ribbon--periodic': get(introAnimationDone)
-    					});
-
-    					set_style(button, `clip-path: ${$0 ?? ''};`);
-
-    					set_attribute(button, 'aria-label', get(hasText)
-    						? get(isShort) ? $$props.annotation : 'Expand annotation'
-    						: 'Annotation marker');
-
-    					set_attribute(button, 'aria-expanded', get(isShort) ? undefined : get(expanded));
-    				},
-    				[() => getRibbonClipPath(get(corner))]
-    			);
-
-    			delegated('click', button, handleInteraction);
-    			event('animationend', button, onIntroAnimationEnd);
-    			append($$anchor, button);
-    		};
-
-    		var alternate_1 = ($$anchor) => {
-    			var div_1 = root_7();
-    			var button_1 = child(div_1);
-    			var span_4 = sibling(button_1, 2);
-    			var text_2 = child(span_4, true);
-
-    			reset(span_4);
-    			reset(div_1);
-    			template_effect(() => set_text(text_2, $$props.annotation));
-    			delegated('click', button_1, handleInteraction);
-    			append($$anchor, div_1);
-    		};
-
-    		if_block(node, ($$render) => {
-    			if (!get(expanded)) $$render(consequent_4); else $$render(alternate_1, -1);
-    		});
-    	}
-
-    	reset(div);
-    	bind_this(div, ($$value) => containerEl = $$value, () => containerEl);
-
-    	template_effect(
-    		($0) => {
-    			classes = set_class(div, 1, 'cv-annotation-container svelte-1asb212', null, classes, { 'cv-annotation-container--expanded': get(expanded) });
-    			set_style(div, `${$0 ?? ''} transform: translate(${get(dragOffsetX) ?? ''}px, ${get(dragOffsetY) ?? ''}px);`);
-    		},
-    		[() => getPositionStyle(get(corner))]
-    	);
-
-    	delegated('pointerdown', div, onPointerDown);
-    	delegated('pointermove', div, onPointerMove);
-    	delegated('pointerup', div, onPointerUp);
-    	event('pointercancel', div, onPointerCancel);
-    	append($$anchor, div);
-    	pop();
-    }
-
-    delegate(['pointerdown', 'pointermove', 'pointerup', 'click']);
-
-    var root_1$6 = from_html(`<div class="cv-annotation-container svelte-ii1txw"><div role="img" aria-label="Annotation marker"></div> <button type="button" class="cv-empty-dismiss svelte-ii1txw" aria-label="Dismiss marker">✕</button></div>`);
+    var root_1$6 = from_html(`<div class="cv-annotation-container svelte-3i09ws"><div role="img" aria-label="Annotation marker"></div> <button type="button" class="cv-empty-dismiss svelte-3i09ws" aria-label="Dismiss marker">✕</button></div>`);
 
     const $$css$a = {
-    	hash: 'svelte-ii1txw',
-    	code: '.cv-annotation-container.svelte-ii1txw {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;opacity:0.95;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-ii1txw:hover {opacity:1;z-index:110;}.cv-empty-ribbon.svelte-ii1txw {min-width:45px;min-height:22px;background:var(--cv-highlight-color);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0, 0, 0, 0.18),\n      inset 0 1px 0 rgba(255, 255, 255, 0.22);transform-origin:center center;padding:5px 22px 5px 10px;opacity:0.95;transition:opacity 0.2s ease;}.cv-annotation-container.svelte-ii1txw:hover .cv-empty-ribbon:where(.svelte-ii1txw) {opacity:1;}.cv-empty-ribbon--right.svelte-ii1txw {padding:5px 10px 5px 22px;}.cv-empty-ribbon--intro.svelte-ii1txw {\n    animation: svelte-ii1txw-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-empty-ribbon--periodic.svelte-ii1txw {\n    animation: svelte-ii1txw-cv-wiggle-periodic 5s ease-in-out infinite;}\n\n  /* Dismiss button — hidden until container is hovered */.cv-empty-dismiss.svelte-ii1txw {position:absolute;border:none;background:rgba(100, 100, 100, 0.55);color:#fff;font-size:8px;cursor:pointer;width:14px;height:14px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;border-radius:50%;box-shadow:0 1px 4px rgba(0, 0, 0, 0.2);opacity:0;pointer-events:none;transition:opacity 0.15s ease,\n      background 0.15s ease,\n      color 0.15s ease;}.cv-annotation-container.svelte-ii1txw:hover .cv-empty-dismiss:where(.svelte-ii1txw) {opacity:1;pointer-events:auto;}.cv-empty-dismiss.svelte-ii1txw:hover {background:rgba(80, 80, 80, 0.8);box-shadow:0 1px 6px rgba(0, 0, 0, 0.28);}\n\n  @keyframes svelte-ii1txw-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-ii1txw-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }'
+    	hash: 'svelte-3i09ws',
+    	code: '.cv-annotation-container.svelte-3i09ws {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;opacity:0.95;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-3i09ws:hover {opacity:1;z-index:110;}.cv-empty-ribbon.svelte-3i09ws {min-width:45px;min-height:22px;background:var(--cv-box-color);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0, 0, 0, 0.18),\n      inset 0 1px 0 rgba(255, 255, 255, 0.22);transform-origin:center center;padding:5px 22px 5px 10px;opacity:0.95;transition:opacity 0.2s ease;}.cv-annotation-container.svelte-3i09ws:hover .cv-empty-ribbon:where(.svelte-3i09ws) {opacity:1;}.cv-empty-ribbon--right.svelte-3i09ws {padding:5px 10px 5px 22px;}.cv-empty-ribbon--intro.svelte-3i09ws {\n    animation: svelte-3i09ws-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-empty-ribbon--periodic.svelte-3i09ws {\n    animation: svelte-3i09ws-cv-wiggle-periodic 5s ease-in-out infinite;}\n\n  /* Dismiss button — hidden until container is hovered */.cv-empty-dismiss.svelte-3i09ws {position:absolute;border:none;background:rgba(100, 100, 100, 0.55);color:#fff;font-size:8px;cursor:pointer;width:14px;height:14px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;border-radius:50%;box-shadow:0 1px 4px rgba(0, 0, 0, 0.2);opacity:0;pointer-events:none;transition:opacity 0.15s ease,\n      background 0.15s ease,\n      color 0.15s ease;}.cv-annotation-container.svelte-3i09ws:hover .cv-empty-dismiss:where(.svelte-3i09ws) {opacity:1;pointer-events:auto;}.cv-empty-dismiss.svelte-3i09ws:hover {background:rgba(80, 80, 80, 0.8);box-shadow:0 1px 6px rgba(0, 0, 0, 0.28);}\n\n  @keyframes svelte-3i09ws-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-3i09ws-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }'
     };
 
-    function HighlightEmptyAnnotation($$anchor, $$props) {
+    function BoxEmptyAnnotation($$anchor, $$props) {
     	append_styles$1($$anchor, $$css$a);
 
     	const corner = user_derived(() => $$props.annotationCorner ?? DEFAULT_ANNOTATION_CORNER);
@@ -16700,7 +18049,7 @@
     				($0, $1, $2) => {
     					set_style(div, $0);
 
-    					classes = set_class(div_1, 1, 'cv-empty-ribbon svelte-ii1txw', null, classes, {
+    					classes = set_class(div_1, 1, 'cv-empty-ribbon svelte-3i09ws', null, classes, {
     						'cv-empty-ribbon--right': get(isRightCorner),
     						'cv-empty-ribbon--intro': !get(introAnimationDone),
     						'cv-empty-ribbon--periodic': get(introAnimationDone)
@@ -16732,15 +18081,15 @@
     delegate(['click']);
 
     var root_2$5 = from_html(`<button type="button" aria-label="Previous highlight">↑</button> <button type="button" aria-label="Next highlight">↓</button>`, 1);
-    var root_1$5 = from_html(`<div class="cv-highlight-group svelte-1mz0neo"><div class="cv-highlight-marker svelte-1mz0neo"></div> <!> <div class="cv-highlight-pill svelte-1mz0neo"><a href="https://custardui.js.org" target="_blank" rel="noopener noreferrer" class="svelte-1mz0neo">Annotated by: CustardUI↗</a></div> <!></div>`);
-    var root$8 = from_html(`<div class="cv-highlight-overlay svelte-1mz0neo"></div>`);
+    var root_1$5 = from_html(`<div class="cv-box-group svelte-tkm0rc"><div class="cv-box-marker svelte-tkm0rc"></div> <!> <div class="cv-box-pill svelte-tkm0rc"><a href="https://custardui.js.org" target="_blank" rel="noopener noreferrer" class="svelte-tkm0rc">Annotated by: CustardUI↗</a></div> <!></div>`);
+    var root$8 = from_html(`<div class="cv-box-overlay svelte-tkm0rc"></div>`);
 
     const $$css$9 = {
-    	hash: 'svelte-1mz0neo',
-    	code: '.cv-highlight-overlay.svelte-1mz0neo {position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:8000;}.cv-highlight-group.svelte-1mz0neo {position:absolute;pointer-events:none;}.cv-highlight-marker.svelte-1mz0neo {position:absolute;inset:0;pointer-events:none;\n\n    /* Marker Style */border:3.5px solid var(--cv-highlight-color);border-radius:200px 15px 225px 15px / 15px 225px 15px 255px;transform:rotate(-0.5deg);\n\n    /* 3D INTERNAL VOLUME:\n       Adds depth to the yellow border itself so it looks rounded.\n    */box-shadow:inset 0 1px 2px rgba(129, 73, 25, 0.2),\n      inset 0 -1px 1px rgba(255, 255, 255, 0.7);\n\n    /* 2A-3 DOUBLE LIGHT PROJECTION:\n       Stacks multiple drop-shadows to cast into the box interior.\n    */filter:/* Sharp contact shadow for grounding */ drop-shadow(\n        0 2px 2px rgba(44, 26, 14, 0.15)\n      )\n      /* Light Source A: Casts shadow from top-left to bottom-right */\n      drop-shadow(-8px 12px 10px rgba(44, 26, 14, 0.12))\n      /* Light Source B: Casts shadow from top-right to bottom-left */\n      drop-shadow(8px 12px 10px rgba(44, 26, 14, 0.12));\n\n    animation: svelte-1mz0neo-highlightFadeIn 0.3s ease-out forwards;}.cv-nav-arrow.svelte-1mz0neo {position:absolute;z-index:10;right:-5px;pointer-events:auto;width:14px;height:14px;border-radius:100px;border:1px solid var(--cv-highlight-color);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:7px;color:#814919;font-weight:700;font-family:ui-sans-serif, system-ui, sans-serif;line-height:1;padding:0;box-shadow:0 4px 12px rgba(44, 26, 14, 0.15);opacity:0.7;}.cv-nav-arrow.svelte-1mz0neo:hover {opacity:1;}.cv-nav-arrow--up.svelte-1mz0neo {top:0px;}.cv-nav-arrow--down.svelte-1mz0neo {bottom:0px;}.cv-nav-arrow--hidden.svelte-1mz0neo {visibility:hidden;pointer-events:none;}.cv-highlight-pill.svelte-1mz0neo {position:absolute;z-index:10;bottom:-2px;right:14px;background:white;height:14px;padding:0 8px;display:flex;align-items:center;border-radius:100px;border:1px solid var(--cv-highlight-color);pointer-events:auto;white-space:nowrap;\n\n    /* Stronger shadow to match the frame\'s new altitude */box-shadow:0 4px 12px rgba(44, 26, 14, 0.15);}.cv-highlight-pill.svelte-1mz0neo a:where(.svelte-1mz0neo) {font-size:8px;font-weight:700;color:#814919;text-decoration:none;font-family:ui-sans-serif, system-ui, sans-serif;line-height:1;}.cv-highlight-pill.svelte-1mz0neo:hover a:where(.svelte-1mz0neo) {opacity:0.8;}\n\n  @keyframes svelte-1mz0neo-highlightFadeIn {\n    from {\n      opacity: 0;\n      transform: scale(0.98) rotate(-1deg);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) rotate(-0.5deg);\n    }\n  }'
+    	hash: 'svelte-tkm0rc',
+    	code: '.cv-box-overlay.svelte-tkm0rc {position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:8000;}.cv-box-group.svelte-tkm0rc {position:absolute;pointer-events:none;}.cv-box-marker.svelte-tkm0rc {position:absolute;inset:0;pointer-events:none;\n\n    /* Marker Style */border:3.5px solid var(--cv-box-color);border-radius:200px 15px 225px 15px / 15px 225px 15px 255px;transform:rotate(-0.5deg);\n\n    /* 3D INTERNAL VOLUME */box-shadow:inset 0 1px 2px rgba(129, 73, 25, 0.2),\n      inset 0 -1px 1px rgba(255, 255, 255, 0.7);\n\n    /* DOUBLE LIGHT PROJECTION */filter:drop-shadow(0 2px 2px rgba(44, 26, 14, 0.15))\n      drop-shadow(-8px 12px 10px rgba(44, 26, 14, 0.12))\n      drop-shadow(8px 12px 10px rgba(44, 26, 14, 0.12));\n\n    animation: svelte-tkm0rc-boxFadeIn 0.3s ease-out forwards;}.cv-nav-arrow.svelte-tkm0rc {position:absolute;z-index:10;right:-5px;pointer-events:auto;width:14px;height:14px;border-radius:100px;border:1px solid var(--cv-box-color);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:7px;color:#814919;font-weight:700;font-family:ui-sans-serif, system-ui, sans-serif;line-height:1;padding:0;box-shadow:0 4px 12px rgba(44, 26, 14, 0.15);opacity:0.7;}.cv-nav-arrow.svelte-tkm0rc:hover {opacity:1;}.cv-nav-arrow--up.svelte-tkm0rc {top:0px;}.cv-nav-arrow--down.svelte-tkm0rc {bottom:0px;}.cv-nav-arrow--hidden.svelte-tkm0rc {visibility:hidden;pointer-events:none;}.cv-box-pill.svelte-tkm0rc {position:absolute;z-index:10;bottom:-2px;right:14px;background:white;height:14px;padding:0 8px;display:flex;align-items:center;border-radius:100px;border:1px solid var(--cv-box-color);pointer-events:auto;white-space:nowrap;box-shadow:0 4px 12px rgba(44, 26, 14, 0.15);}.cv-box-pill.svelte-tkm0rc a:where(.svelte-tkm0rc) {font-size:8px;font-weight:700;color:#814919;text-decoration:none;font-family:ui-sans-serif, system-ui, sans-serif;line-height:1;}.cv-box-pill.svelte-tkm0rc:hover a:where(.svelte-tkm0rc) {opacity:0.8;}\n\n  @keyframes svelte-tkm0rc-boxFadeIn {\n    from {\n      opacity: 0;\n      transform: scale(0.98) rotate(-1deg);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) rotate(-0.5deg);\n    }\n  }'
     };
 
-    function HighlightOverlay($$anchor, $$props) {
+    function BoxOverlay($$anchor, $$props) {
     	push($$props, true);
     	append_styles$1($$anchor, $$css$9);
 
@@ -16749,7 +18098,7 @@
     	function getColorHex(rect) {
     		const key = rect.color ?? DEFAULT_COLOR_KEY;
 
-    		return HIGHLIGHT_COLORS.find((c) => c.key === key)?.hex ?? HIGHLIGHT_COLORS[0].hex;
+    		return BOX_COLORS.find((c) => c.key === key)?.hex ?? BOX_COLORS[0].hex;
     	}
 
     	function scrollToRect(rect) {
@@ -16771,8 +18120,8 @@
     				let classes_1;
 
     				template_effect(() => {
-    					classes = set_class(button, 1, 'cv-nav-arrow cv-nav-arrow--up svelte-1mz0neo', null, classes, { 'cv-nav-arrow--hidden': get(i) === 0 });
-    					classes_1 = set_class(button_1, 1, 'cv-nav-arrow cv-nav-arrow--down svelte-1mz0neo', null, classes_1, { 'cv-nav-arrow--hidden': get(i) === get(rects).length - 1 });
+    					classes = set_class(button, 1, 'cv-nav-arrow cv-nav-arrow--up svelte-tkm0rc', null, classes, { 'cv-nav-arrow--hidden': get(i) === 0 });
+    					classes_1 = set_class(button_1, 1, 'cv-nav-arrow cv-nav-arrow--down svelte-tkm0rc', null, classes_1, { 'cv-nav-arrow--hidden': get(i) === get(rects).length - 1 });
     				});
 
     				delegated('click', button, () => scrollToRect(get(rects)[get(i) - 1]));
@@ -16789,7 +18138,7 @@
 
     		{
     			var consequent_1 = ($$anchor) => {
-    				HighlightTextAnnotation($$anchor, {
+    				BoxAnnotation($$anchor, {
     					get annotation() {
     						return get(rect).annotation;
     					},
@@ -16801,7 +18150,7 @@
     			};
 
     			var alternate = ($$anchor) => {
-    				HighlightEmptyAnnotation($$anchor, {
+    				BoxEmptyAnnotation($$anchor, {
     					get annotationCorner() {
     						return get(rect).annotationCorner;
     					}
@@ -16814,7 +18163,7 @@
     		}
 
     		reset(div_1);
-    		template_effect(($0) => set_style(div_1, `top: ${get(rect).top ?? ''}px; left: ${get(rect).left ?? ''}px; width: ${get(rect).width ?? ''}px; height: ${get(rect).height ?? ''}px; --cv-highlight-color: ${$0 ?? ''};`), [() => getColorHex(get(rect))]);
+    		template_effect(($0) => set_style(div_1, `top: ${get(rect).top ?? ''}px; left: ${get(rect).left ?? ''}px; width: ${get(rect).width ?? ''}px; height: ${get(rect).height ?? ''}px; --cv-box-color: ${$0 ?? ''};`), [() => getColorHex(get(rect))]);
     		append($$anchor, div_1);
     	});
 
@@ -16946,13 +18295,13 @@
         resultList.push(rect);
     }
 
-    /* highlight-service.svelte.ts generated by Svelte v5.55.10 */
+    /* box-service.svelte.ts generated by Svelte v5.55.10 */
 
-    const BODY_HIGHLIGHT_CLASS = 'cv-highlight-mode';
+    const BODY_BOX_CLASS = 'cv-box-mode';
 
-    const ARROW_OVERLAY_ID = 'cv-highlight-overlay';
+    const BOX_OVERLAY_ID = 'cv-box-overlay';
 
-    class HighlightState {
+    class BoxState {
     	#rects = state(proxy([]));
 
     	get rects() {
@@ -16964,9 +18313,9 @@
     	}
     }
 
-    class HighlightService {
+    class BoxService {
     	overlayApp;
-    	state = new HighlightState();
+    	state = new BoxState();
     	resizeObserver;
     	activeTargets = [];
     	activeColors = new Map();
@@ -16995,7 +18344,7 @@
     		return targets;
     	}
 
-    	applyEncodedHighlights(encodedDescriptors) {
+    	applyEncodedBoxes(encodedDescriptors) {
     		const descriptors = deserialize(encodedDescriptors);
 
     		if (!descriptors || descriptors.length === 0) return;
@@ -17037,7 +18386,7 @@
     		// Activate Store
     		focusStore.setIsActive(true);
 
-    		document.body.classList.add(BODY_HIGHLIGHT_CLASS);
+    		document.body.classList.add(BODY_BOX_CLASS);
 
     		// Create Overlay across the entire page (App will be mounted into it)
     		this.activeTargets = targets;
@@ -17050,9 +18399,9 @@
 
     		this.resizeObserver.observe(document.body); // Catch layout shifts
     		window.addEventListener('resize', this.onWindowResize);
-    		this.renderHighlightOverlay();
+    		this.renderBoxOverlay();
 
-    		// Scroll topmost highlighted box into view
+    		// Scroll topmost box into view
     		const firstRect = this.state.rects[0];
 
     		if (firstRect) {
@@ -17061,7 +18410,7 @@
     	}
 
     	exit() {
-    		document.body.classList.remove(BODY_HIGHLIGHT_CLASS);
+    		document.body.classList.remove(BODY_BOX_CLASS);
     		this.resizeObserver.disconnect();
     		window.removeEventListener('resize', this.onWindowResize);
     		this.activeTargets = [];
@@ -17069,7 +18418,7 @@
     		this.activeAnnotations.clear();
     		this.state.rects = [];
 
-    		const overlay = document.getElementById(ARROW_OVERLAY_ID);
+    		const overlay = document.getElementById(BOX_OVERLAY_ID);
 
     		if (this.overlayApp) {
     			unmount(this.overlayApp);
@@ -17079,12 +18428,12 @@
     		if (overlay) overlay.remove();
     	}
 
-    	renderHighlightOverlay() {
-    		let overlay = document.getElementById(ARROW_OVERLAY_ID);
+    	renderBoxOverlay() {
+    		let overlay = document.getElementById(BOX_OVERLAY_ID);
 
     		if (!overlay) {
     			overlay = document.createElement('div');
-    			overlay.id = ARROW_OVERLAY_ID;
+    			overlay.id = BOX_OVERLAY_ID;
     			document.body.appendChild(overlay);
     		}
 
@@ -17093,12 +18442,12 @@
     		// Initial calc
     		this.updatePositions();
 
-    		// 2. Render Overlay Component
+    		// Render Overlay Component
     		if (this.overlayApp) {
     			unmount(this.overlayApp);
     		}
 
-    		this.overlayApp = mount(HighlightOverlay, { target: overlay, props: { box: this.state } });
+    		this.overlayApp = mount(BoxOverlay, { target: overlay, props: { box: this.state } });
     	}
 
     	async scrollToTarget(element) {
@@ -17179,7 +18528,7 @@
     	// Call unsubscribe in destroy to stop svelte effects
     	unsubscribe;
 
-    	highlightService;
+    	boxService;
 
     	constructor(options) {
     		const userTags = options.shareExclusions?.tags || [];
@@ -17187,13 +18536,13 @@
 
     		this.excludedTags = new SvelteSet([...DEFAULT_EXCLUDED_TAGS, ...userTags].map((t) => t.toUpperCase()));
     		this.excludedIds = new SvelteSet([...DEFAULT_EXCLUDED_IDS, ...userIds]);
-    		this.highlightService = new HighlightService();
+    		this.boxService = new BoxService();
 
     		// Subscribe to store for exit signal
     		this.unsubscribe = effect_root(() => {
     			// Store safety check (Store changes affect UI)
     			user_effect(() => {
-    				if (!focusStore.isActive && (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_HIGHLIGHT_CLASS))) {
+    				if (!focusStore.isActive && (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_BOX_CLASS) || textHighlightService.isActive)) {
     					this.exitShowMode(true);
     				}
     			});
@@ -17222,40 +18571,54 @@
 
     		const showDescriptors = url.searchParams.get(PARAM_CV_SHOW);
     		const hideDescriptors = url.searchParams.get(PARAM_CV_HIDE);
-    		const highlightDescriptors = url.searchParams.get(PARAM_CV_HIGHLIGHT);
-    		const hasAnyMode = showDescriptors || hideDescriptors || highlightDescriptors;
+    		const boxDescriptors = url.searchParams.get(PARAM_CV_BOX);
+    		const textHighlightEncoded = url.searchParams.get(PARAM_CV_HIGHLIGHT);
+    		const hasAnyMode = showDescriptors || hideDescriptors || boxDescriptors || textHighlightEncoded;
 
     		if (!hasAnyMode) {
-    			if (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_HIGHLIGHT_CLASS)) {
+    			if (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_BOX_CLASS)) {
     				this.exitShowMode(false);
     			}
+
+    			// Also clear any active text highlights
+    			textHighlightService.clear();
 
     			return;
     		}
 
     		// Clear any existing active state once before re-applying
-    		if (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_HIGHLIGHT_CLASS)) {
+    		if (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_BOX_CLASS)) {
     			this.exitShowMode(false);
     		}
 
-    		// Pre-resolve highlight targets so show/hide modes can account for them
-    		const highlightTargets = highlightDescriptors
-    			? this.highlightService.resolveTargets(highlightDescriptors)
-    			: [];
+    		// Pre-resolve box targets so show/hide modes can account for them
+    		const boxTargets = boxDescriptors ? this.boxService.resolveTargets(boxDescriptors) : [];
 
     		// Apply show or hide (mutually exclusive with each other).
     		// Pass highlight targets so they are kept visible in show mode / not hidden in hide mode.
     		if (showDescriptors) {
-    			this.applyShowMode(showDescriptors, highlightTargets);
+    			this.applyShowMode(showDescriptors, boxTargets);
     		} else if (hideDescriptors) {
-    			this.applyHideMode(hideDescriptors, highlightTargets);
+    			this.applyHideMode(hideDescriptors, boxTargets);
     		}
 
-    		// Call highlightService.applyEncodedHighlights() directly with the encoded descriptors
-    		// to skip applyHighlightMode()'s guard, which would otherwise see BODY_SHOW_CLASS
-    		// and clear the show mode above.
-    		if (highlightDescriptors) {
-    			this.highlightService.applyEncodedHighlights(highlightDescriptors);
+    		// Apply box overlays
+    		if (boxDescriptors) {
+    			this.boxService.applyEncodedBoxes(boxDescriptors);
+    		}
+
+    		// Apply text highlights (independent — doesn't need body class or focus store)
+    		if (textHighlightEncoded) {
+    			const firstRange = textHighlightService.applyEncoded(textHighlightEncoded);
+
+    			if (firstRange) {
+    				focusStore.setIsActive(true);
+
+    				// Scroll the first highlight into view after a brief paint delay
+    				requestAnimationFrame(() => {
+    					firstRange.startContainer.parentElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    				});
+    			}
     		}
     	}
 
@@ -17265,10 +18628,9 @@
     	 */
     	applyShowMode(encodedDescriptors, keepTargets = []) {
     		// Check if we are already in the right state to avoid re-rendering loops if feasible
-    		if (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_HIGHLIGHT_CLASS)) {
-    			// If we are already active, we might want to check if descriptors changed?
-    			// For now, simple clear and re-apply.
-    			this.exitShowMode(false); // don't clear URL here
+    		if (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_BOX_CLASS)) {
+    			// If we are already active, simple clear and re-apply.
+    			this.exitShowMode(false);
     		}
 
     		const descriptors = deserialize(encodedDescriptors);
@@ -17307,7 +18669,7 @@
     	}
 
     	applyHideMode(encodedDescriptors, excludeTargets = []) {
-    		if (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_HIGHLIGHT_CLASS)) {
+    		if (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_BOX_CLASS)) {
     			this.exitShowMode(false);
     		}
 
@@ -17350,12 +18712,12 @@
     		this.renderHiddenView(filteredTargets);
     	}
 
-    	applyHighlightMode(encodedDescriptors) {
-    		if (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_HIGHLIGHT_CLASS)) {
+    	applyBoxMode(encodedDescriptors) {
+    		if (document.body.classList.contains(BODY_SHOW_CLASS) || document.body.classList.contains(BODY_BOX_CLASS)) {
     			this.exitShowMode(false);
     		}
 
-    		this.highlightService.applyEncodedHighlights(encodedDescriptors);
+    		this.boxService.applyEncodedBoxes(encodedDescriptors);
     	}
 
     	renderHiddenView(targets) {
@@ -17479,7 +18841,7 @@
     	}
 
     	exitShowMode(updateUrl = true) {
-    		document.body.classList.remove(BODY_SHOW_CLASS, BODY_HIGHLIGHT_CLASS);
+    		document.body.classList.remove(BODY_SHOW_CLASS, BODY_BOX_CLASS);
     		this.hiddenElements.forEach((el) => el.classList.remove(HIDDEN_CLASS));
     		this.hiddenElements.clear();
 
@@ -17491,11 +18853,11 @@
     		// Remove wrappers?
     		document.querySelectorAll('.cv-divider-wrapper').forEach((el) => el.remove());
 
-    		// Remove styling from targets
     		const targets = document.querySelectorAll(`.${SHOW_ELEMENT_CLASS}`);
 
     		targets.forEach((t) => t.classList.remove(SHOW_ELEMENT_CLASS));
-    		this.highlightService.exit();
+    		this.boxService.exit();
+    		textHighlightService.clear();
 
     		if (focusStore.isActive) {
     			focusStore.setIsActive(false);
@@ -17514,6 +18876,11 @@
 
     			if (url.searchParams.has(PARAM_CV_HIDE)) {
     				url.searchParams.delete(PARAM_CV_HIDE);
+    				changed = true;
+    			}
+
+    			if (url.searchParams.has(PARAM_CV_BOX)) {
+    				url.searchParams.delete(PARAM_CV_BOX);
     				changed = true;
     			}
 
