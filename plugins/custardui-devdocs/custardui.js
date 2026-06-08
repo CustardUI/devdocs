@@ -12757,7 +12757,7 @@
 
     var root_1$e = from_html(`<button type="button">Customize</button>`);
     var root_3$7 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
-    var root_5$1 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Toggles</div> <div class="toggles-container svelte-16uy9h6"></div></div>`);
+    var root_5$2 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Toggles</div> <div class="toggles-container svelte-16uy9h6"></div></div>`);
     var root_7$1 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Placeholders</div> <div class="placeholders-container svelte-16uy9h6"></div></div>`);
     var root_9 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Tab Groups</div> <div class="tabgroups-container svelte-16uy9h6"><div class="tabgroup-card header-card svelte-16uy9h6" role="group"><div class="tabgroup-row svelte-16uy9h6"><div class="logo-box svelte-16uy9h6" id="cv-nav-icon-box"><div class="nav-icon svelte-16uy9h6"><!></div></div> <div class="tabgroup-info svelte-16uy9h6"><div class="tabgroup-title-container"><p class="tabgroup-title svelte-16uy9h6">Show only the selected tab</p></div> <p class="tabgroup-description svelte-16uy9h6">Hide the navigation headers</p></div> <label class="toggle-switch nav-toggle svelte-16uy9h6"><input class="nav-pref-input svelte-16uy9h6" type="checkbox" aria-label="Show only the selected tab"/> <span class="switch-bg svelte-16uy9h6"></span> <span class="switch-knob svelte-16uy9h6"></span></label></div></div> <div class="tab-groups-list svelte-16uy9h6"></div></div></div>`);
     var root_4$4 = from_html(`<!> <!> <!>`, 1);
@@ -12984,7 +12984,7 @@
 
     				{
     					var consequent_2 = ($$anchor) => {
-    						var div_7 = root_5$1();
+    						var div_7 = root_5$2();
     						var div_8 = sibling(child(div_7), 2);
 
     						each(div_8, 21, () => get(toggles), (toggle) => toggle.toggleId, ($$anchor, toggle) => {
@@ -13294,14 +13294,14 @@
 
     delegate(['mousedown', 'mouseup', 'click', 'change']);
 
-    const BOX_COLORS = [
-        { key: 'yellow', label: 'Yellow', hex: '#f5f521' },
-        { key: 'blue', label: 'Blue', hex: '#3b82f6' },
-        { key: 'red', label: 'Red', hex: '#ef4444' },
-        { key: 'black', label: 'Black', hex: '#1a1a1a' },
-        { key: 'green', label: 'Green', hex: '#22c55e' },
+    const ANNOTATION_COLORS = [
+        { key: 'orange', label: 'Orange', hex: '#ff9e5e' },
+        { key: 'green', label: 'Lime Green', hex: '#e2f073' },
+        { key: 'pink', label: 'Pink', hex: '#ff7eb3' },
+        { key: 'yellow', label: 'Yellow', hex: '#ffd447' },
+        { key: 'blue', label: 'Light Blue', hex: '#7ee0f5' },
     ];
-    const DEFAULT_COLOR_KEY = 'red';
+    const DEFAULT_ANNOTATION_COLOR_KEY = 'yellow';
 
     /**
      * Shared annotation types and constants.
@@ -13321,7 +13321,7 @@
     /** Maximum number of characters allowed in any annotation note. */
     const MAX_ANNOTATION_LENGTH = 280;
     /** Characters shown in the collapsed ribbon preview. */
-    const ANNOTATION_PREVIEW_LENGTH = 40;
+    const ANNOTATION_PREVIEW_LENGTH = 12;
 
     /**
      * Generates a simple hash code for a string.
@@ -13459,7 +13459,7 @@
     }
 
     /* eslint-disable @typescript-eslint/no-explicit-any */
-    const COLOR_KEYS$1 = new Set(BOX_COLORS.map((c) => c.key));
+    const COLOR_KEYS$1 = new Set(ANNOTATION_COLORS.map((c) => c.key));
     const CORNER_KEYS$1 = new Set(ANNOTATION_CORNERS);
     /**
      * Serializes a list of AnchorDescriptors into a URL-safe string.
@@ -13474,7 +13474,7 @@
             s: d.textSnippet,
             h: d.textHash,
             id: d.elementId,
-            ...(d.color && d.color !== DEFAULT_COLOR_KEY ? { c: d.color } : {}),
+            ...(d.color && d.color !== DEFAULT_ANNOTATION_COLOR_KEY ? { c: d.color } : {}),
             ...(d.annotationCorner && d.annotationCorner !== DEFAULT_ANNOTATION_CORNER
                 ? { nc: d.annotationCorner }
                 : {}),
@@ -13557,7 +13557,7 @@
                     textHash: m.h,
                     elementId: m.id,
                 };
-                if (m.c)
+                if (m.c && COLOR_KEYS$1.has(m.c))
                     descriptor.color = m.c;
                 if (m.n) {
                     descriptor.annotation = m.n;
@@ -13840,7 +13840,7 @@
     const SNIPPET_LENGTH = 16;
 
     // ─── Constants ───────────────────────────────────────────────────────────────
-    const COLOR_KEYS = new Set(BOX_COLORS.map((c) => c.key));
+    const COLOR_KEYS = new Set(ANNOTATION_COLORS.map((c) => c.key));
     const CORNER_KEYS = new Set(ANNOTATION_CORNERS);
     const FIELD_SEP = ':';
     const DESC_SEP = ',';
@@ -13884,7 +13884,7 @@
         const s = encodeURIComponent(desc.startText).replace(/%20/g, ' ');
         // If endText is identical to startText (short highlights), omit it to prevent duplication
         const e = desc.startText === desc.endText ? '' : encodeURIComponent(desc.endText).replace(/%20/g, ' ');
-        const colorSuffix = desc.color && desc.color !== 'yellow' ? FIELD_SEP + desc.color : '';
+        const colorSuffix = desc.color && desc.color !== DEFAULT_ANNOTATION_COLOR_KEY ? FIELD_SEP + desc.color : '';
         const annotationSuffix = buildAnnotationSuffix(desc);
         if (desc.elementId) {
             // e:<startEnc>:<endEnc>:<textLen>:<elementId>:<containerHash>:<textHash>[:<color>][:<anchor>:<corner>:<note>]
@@ -13911,7 +13911,7 @@
         };
         if (desc.startText !== desc.endText)
             obj['e'] = desc.endText;
-        if (desc.color)
+        if (desc.color && desc.color !== DEFAULT_ANNOTATION_COLOR_KEY)
             obj['c'] = desc.color;
         if (desc.annotation) {
             obj['n'] = desc.annotation;
@@ -13982,9 +13982,14 @@
             const textHash = parseInt(fields[5], 10);
             if (!elementId || isNaN(containerHash) || isNaN(textHash) || isNaN(textLength))
                 return null;
-            // Field 6: optional color
-            const color = fields[6] && COLOR_KEYS.has(fields[6]) ? fields[6] : undefined;
-            const annotationStartIdx = color ? 7 : 6;
+            // Field 6: optional color (or legacy color) vs corner
+            let color;
+            let annotationStartIdx = 6;
+            if (fields[6] && !CORNER_KEYS.has(fields[6])) {
+                if (COLOR_KEYS.has(fields[6]))
+                    color = fields[6];
+                annotationStartIdx = 7;
+            }
             const desc = {
                 elementId,
                 containerTag: '', // not needed — resolved directly via elementId
@@ -14034,9 +14039,14 @@
                 isNaN(textHash) ||
                 isNaN(textLength))
                 return null;
-            // Field 8: optional color
-            const color = fields[8] && COLOR_KEYS.has(fields[8]) ? fields[8] : undefined;
-            const annotationStartIdx = color ? 9 : 8;
+            // Field 8: optional color (or legacy color) vs corner
+            let color;
+            let annotationStartIdx = 8;
+            if (fields[8] && !CORNER_KEYS.has(fields[8])) {
+                if (COLOR_KEYS.has(fields[8]))
+                    color = fields[8];
+                annotationStartIdx = 9;
+            }
             const desc = {
                 containerId,
                 containerTag,
@@ -14150,8 +14160,7 @@
             }
         }
         // ── Scope to nearest ancestor id ─────────────────────────────────────────
-        const scope = (desc.containerId ? document.getElementById(desc.containerId) : null) ??
-            document.body;
+        const scope = (desc.containerId ? document.getElementById(desc.containerId) : null) ?? document.body;
         if (!desc.containerTag)
             return null;
         const candidates = Array.from(scope.querySelectorAll(desc.containerTag));
@@ -14213,7 +14222,7 @@
         else {
             // Long selection: endText should appear near rawStart + textLength
             const searchFrom = rawStart + Math.max(0, textLength - endText.length - 5);
-            let found = rawText.indexOf(endText, Math.max(rawStart + startText.length - endText.length, searchFrom));
+            const found = rawText.indexOf(endText, Math.max(rawStart + startText.length - endText.length, searchFrom));
             if (found === -1) {
                 // Normalise-both fallback for endText
                 const normHaystack = rawText.replace(/\s+/g, ' ').trim();
@@ -14222,13 +14231,15 @@
                 const normSearchFrom = rawToNorm(rawText, rawSearchFrom);
                 const normIdx = normHaystack.indexOf(normNeedle, normSearchFrom);
                 if (normIdx !== -1) {
-                    found = normToRaw(rawText, normIdx);
+                    rawEnd = normToRaw(rawText, normIdx + normNeedle.length);
+                }
+                else {
+                    rawEnd = advanceByNormLength(rawText, rawStart, textLength);
                 }
             }
-            rawEnd =
-                found !== -1
-                    ? found + endText.length
-                    : advanceByNormLength(rawText, rawStart, textLength);
+            else {
+                rawEnd = found + endText.length;
+            }
         }
         return { rawStart, rawEnd: Math.min(rawEnd, rawText.length) };
     }
@@ -14323,22 +14334,23 @@
     }
 
     var root_4$3 = from_html(`<span>▾</span>`);
-    var root_3$6 = from_html(`<!> <span class="cv-ribbon-text cv-ribbon-text--right svelte-1h9hx7h"> </span> <span class="cv-ribbon-grip svelte-1h9hx7h" aria-hidden="true"><span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span> <span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span> <span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span></span>`, 1);
+    var root_3$6 = from_html(`<span class="cv-ribbon-text cv-ribbon-text--right svelte-1ctem0h"> </span> <!> <span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span>`, 1);
     var root_6$1 = from_html(`<span>▾</span>`);
-    var root_5 = from_html(`<span class="cv-ribbon-grip svelte-1h9hx7h" aria-hidden="true"><span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span> <span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span> <span class="svelte-1h9hx7h"></span><span class="svelte-1h9hx7h"></span></span> <span class="cv-ribbon-text svelte-1h9hx7h"> </span> <!>`, 1);
-    var root_1$d = from_html(`<button type="button"><!></button>`);
-    var root_7 = from_html(`<div class="cv-annotation-card svelte-1h9hx7h" role="region" aria-label="Annotation"><button type="button" class="cv-card-close svelte-1h9hx7h" aria-label="Collapse annotation">✕</button> <span class="cv-card-text svelte-1h9hx7h"> </span></div>`);
+    var root_5$1 = from_html(`<span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span> <span class="cv-ribbon-text svelte-1ctem0h"> </span> <!>`, 1);
+    var root_1$d = from_html(`<div><div aria-hidden="true"></div> <button type="button"><!></button></div>`);
+    var root_7 = from_html(`<div class="cv-annotation-card svelte-1ctem0h" role="region" aria-label="Annotation"><button type="button" class="cv-card-close svelte-1ctem0h" aria-label="Collapse annotation">✕</button> <span class="cv-card-text svelte-1ctem0h"> </span></div>`);
     var root$g = from_html(`<div role="presentation"><!></div>`);
 
     const $$css$k = {
-    	hash: 'svelte-1h9hx7h',
-    	code: '\n  /* ==============================\n     CONTAINER (position, drag, opacity)\n     ============================== */.cv-annotation-container.svelte-1h9hx7h {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;cursor:default;opacity:0.88;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-1h9hx7h:hover {opacity:1;z-index:110;}\n\n  /* ==============================\n     RIBBON (home-plate)\n     ============================== */.cv-annotation-ribbon.svelte-1h9hx7h {border:none;padding:6px 20px 6px 8px;min-width:28px;min-height:24px;background:var(--cv-box-color);cursor:default;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);display:flex;align-items:center;justify-content:flex-start;gap:5px;transform-origin:center center;}.cv-annotation-ribbon--intro.svelte-1h9hx7h {\n    animation: svelte-1h9hx7h-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-annotation-ribbon--periodic.svelte-1h9hx7h {\n    animation: svelte-1h9hx7h-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-annotation-ribbon--right.svelte-1h9hx7h {padding:6px 8px 6px 20px;justify-content:flex-end;}.cv-annotation-ribbon--empty.svelte-1h9hx7h {min-width:24px;padding:6px 16px 6px 8px;}.cv-annotation-ribbon--expandable.svelte-1h9hx7h {cursor:pointer;}.cv-annotation-ribbon--expandable.svelte-1h9hx7h:hover {filter:brightness(1.1);}\n\n  /* ==============================\n     RIBBON TEXT (single line)\n     ============================== */.cv-ribbon-text.svelte-1h9hx7h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;color:#fff;text-shadow:0 1px 3px rgba(0, 0, 0, 0.25);}.cv-ribbon-text--right.svelte-1h9hx7h {text-align:right;}.cv-ribbon-chevron.svelte-1h9hx7h {font-size:22px;opacity:1;flex-shrink:0;line-height:1;color:#fff;text-shadow:0 1px 4px rgba(0, 0, 0, 0.4);}.cv-ribbon-chevron--bounce.svelte-1h9hx7h {\n    animation: svelte-1h9hx7h-cv-chevron-bounce 3s ease-in-out infinite;}\n\n  /* ==============================\n     DRAG GRIP (6-dot grid on flat side)\n     ============================== */.cv-ribbon-grip.svelte-1h9hx7h {display:grid;grid-template-columns:repeat(2, 3px);gap:3px;flex-shrink:0;opacity:0.7;cursor:grab;padding:2px;}.cv-ribbon-grip.svelte-1h9hx7h:active {cursor:grabbing;}.cv-ribbon-grip.svelte-1h9hx7h > span:where(.svelte-1h9hx7h) {width:3px;height:3px;border-radius:50%;background:rgba(255, 255, 255, 0.9);box-shadow:0 0 1px rgba(0, 0, 0, 0.4);}\n\n  /* ==============================\n     CARD (sticky note)\n     ============================== */.cv-annotation-card.svelte-1h9hx7h {background:#fffdf5;border:1.5px solid var(--cv-box-color);border-radius:4px;padding:10px 12px;max-width:280px;min-width:120px;box-shadow:0 4px 20px rgba(0, 0, 0, 0.18);position:relative;\n    animation: svelte-1h9hx7h-cv-cardPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}.cv-card-close.svelte-1h9hx7h {position:absolute;top:3px;right:5px;border:none;background:transparent;cursor:pointer;font-size:12px;color:#aaa;padding:2px 4px;line-height:1;font-family:sans-serif;}.cv-card-close.svelte-1h9hx7h:hover {color:#555;}.cv-card-text.svelte-1h9hx7h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:600;color:#333;line-height:1.45;word-break:break-word;white-space:pre-wrap;padding-right:15px;}\n\n  /* ==============================\n     ANIMATIONS\n     ============================== */\n  @keyframes svelte-1h9hx7h-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-1h9hx7h-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }\n\n  @keyframes svelte-1h9hx7h-cv-cardPop {\n    from {\n      opacity: 0;\n      transform: scale(0.9) translateY(5px);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) translateY(0);\n    }\n  }\n\n  @keyframes svelte-1h9hx7h-cv-chevron-bounce {\n    0%,\n    70%,\n    100% {\n      transform: translateY(0);\n    }\n    78% {\n      transform: translateY(-3px);\n    }\n    86% {\n      transform: translateY(1px);\n    }\n    93% {\n      transform: translateY(-1.5px);\n    }\n  }'
+    	hash: 'svelte-1ctem0h',
+    	code: '\n  /* ==============================\n     CONTAINER (position, drag, opacity)\n     ============================== */.cv-annotation-container.svelte-1ctem0h {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;cursor:default;opacity:0.88;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-1ctem0h:hover {opacity:1;z-index:110;}\n\n  /* ==============================\n     WRAPPER & SHADOW\n     ============================== */.cv-ribbon-wrapper.svelte-1ctem0h {position:relative;transform-origin:center center;}.cv-ribbon-wrapper--intro.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-ribbon-wrapper--periodic.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-ribbon-shadow.svelte-1ctem0h {position:absolute;top:0;left:0;width:140px;height:28px;background:rgba(0, 0, 0, 0.25);transform:translate(3px, 3px);pointer-events:none;z-index:-1;}.cv-ribbon-shadow--empty.svelte-1ctem0h {width:70px;}\n\n  /* ==============================\n     RIBBON (home-plate)\n     ============================== */.cv-annotation-ribbon.svelte-1ctem0h {border:none;padding:6px 20px 6px 8px;width:140px;height:28px;box-sizing:border-box;background:var(--cv-annotation-color, var(--cv-box-color));cursor:default;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);display:flex;align-items:center;justify-content:flex-start;gap:5px;}.cv-annotation-ribbon--right.svelte-1ctem0h {padding:6px 8px 6px 20px;justify-content:flex-end;}.cv-annotation-ribbon--empty.svelte-1ctem0h {width:70px;padding:6px 16px 6px 8px;}.cv-annotation-ribbon--expandable.svelte-1ctem0h {cursor:pointer;}.cv-annotation-ribbon--expandable.svelte-1ctem0h:hover {filter:brightness(1.1);}\n\n  /* ==============================\n     RIBBON TEXT (single line)\n     ============================== */.cv-ribbon-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;color:#2c2c2c;}.cv-ribbon-text--right.svelte-1ctem0h {text-align:right;}.cv-ribbon-chevron.svelte-1ctem0h {font-size:22px;opacity:1;flex-shrink:0;line-height:1;color:#2c2c2c;}.cv-ribbon-chevron--bounce.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-chevron-bounce 3s ease-in-out infinite;}\n\n  /* ==============================\n     DRAG GRIP (6-dot grid on flat side)\n     ============================== */.cv-ribbon-grip.svelte-1ctem0h {display:grid;grid-template-columns:repeat(2, 3px);gap:3px;flex-shrink:0;opacity:0.7;cursor:grab;padding:2px;}.cv-ribbon-grip.svelte-1ctem0h:active {cursor:grabbing;}.cv-ribbon-grip.svelte-1ctem0h > span:where(.svelte-1ctem0h) {width:3px;height:3px;border-radius:50%;background:rgba(44, 44, 44, 0.8);}\n\n  /* ==============================\n     CARD (sticky note)\n     ============================== */.cv-annotation-card.svelte-1ctem0h {background:#fffdf5;border:1.5px solid var(--cv-annotation-color, var(--cv-box-color));border-radius:4px;padding:10px 12px;max-width:280px;min-width:120px;position:relative;z-index:1;box-shadow:3px 3px 0px rgba(0, 0, 0, 0.25);\n    animation: svelte-1ctem0h-cv-cardPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}.cv-card-close.svelte-1ctem0h {position:absolute;top:3px;right:5px;border:none;background:transparent;cursor:pointer;font-size:12px;color:#aaa;padding:2px 4px;line-height:1;font-family:sans-serif;}.cv-card-close.svelte-1ctem0h:hover {color:#555;}.cv-card-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:600;color:#333;line-height:1.45;word-break:break-word;white-space:pre-wrap;padding-right:15px;}\n\n  /* ==============================\n     ANIMATIONS\n     ============================== */\n  @keyframes svelte-1ctem0h-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-cardPop {\n    from {\n      opacity: 0;\n      transform: scale(0.9) translateY(5px);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) translateY(0);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-chevron-bounce {\n    0%,\n    70%,\n    100% {\n      transform: translateY(0);\n    }\n    78% {\n      transform: translateY(-3px);\n    }\n    86% {\n      transform: translateY(1px);\n    }\n    93% {\n      transform: translateY(-1.5px);\n    }\n  }'
     };
 
-    function BoxAnnotation($$anchor, $$props) {
+    function Annotation($$anchor, $$props) {
     	push($$props, true);
     	append_styles$1($$anchor, $$css$k);
 
+    	let verticalOffset = prop($$props, 'verticalOffset', 3, 14);
     	const corner = user_derived(() => $$props.annotationCorner ?? DEFAULT_ANNOTATION_CORNER);
     	const hasText = user_derived(() => $$props.annotation.length > 0);
     	const isShort = user_derived(() => $$props.annotation.length <= ANNOTATION_PREVIEW_LENGTH);
@@ -14378,18 +14390,6 @@
     		if (!isDragging) toggle();
     	}
 
-    	function onPointerDown(e) {
-    		// Only initiate drag when the pointer starts on the grip handle.
-    		if (!e.target.closest('.cv-ribbon-grip')) return;
-
-    		isPointerDown = true;
-    		isDragging = false;
-    		dragStartX = e.clientX;
-    		dragStartY = e.clientY;
-    		dragStartOffsetX = get(dragOffsetX);
-    		dragStartOffsetY = get(dragOffsetY);
-    	}
-
     	// Hard clamp so the element can never leave the viewport.
     	function clampToViewport(newX, newY) {
     		if (!containerEl) return { x: newX, y: newY };
@@ -14413,6 +14413,29 @@
     		return { x, y };
     	}
 
+    	function onPointerDown(e) {
+    		if (e.button !== 0) return; // Only left click
+
+    		const target = e.target;
+    		const isRibbon = target.closest('.cv-annotation-ribbon') !== null;
+    		const isHeader = target.closest('.cv-card-header') !== null;
+    		const isCloseBtn = target.closest('.cv-card-close') !== null;
+
+    		if (!isRibbon && !isHeader || isCloseBtn) return;
+
+    		isPointerDown = true;
+    		dragStartX = e.clientX;
+    		dragStartY = e.clientY;
+    		dragStartOffsetX = get(dragOffsetX);
+    		dragStartOffsetY = get(dragOffsetY);
+
+    		try {
+    			target.setPointerCapture(e.pointerId);
+    		} catch {
+    			/* ignore */
+    		}
+    	}
+
     	function onPointerMove(e) {
     		if (!isPointerDown) return;
 
@@ -14421,7 +14444,6 @@
 
     		if (!isDragging && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
     			isDragging = true;
-    			e.currentTarget.setPointerCapture(e.pointerId);
     		}
 
     		if (isDragging) {
@@ -14439,9 +14461,17 @@
 
     		isPointerDown = false;
 
-    		if (isDragging) {
-    			e.currentTarget.releasePointerCapture(e.pointerId);
+    		const target = e.target;
 
+    		try {
+    			if (target.hasPointerCapture && target.hasPointerCapture(e.pointerId)) {
+    				target.releasePointerCapture(e.pointerId);
+    			}
+    		} catch {
+    			/* ignore */
+    		}
+
+    		if (isDragging) {
     			setTimeout(
     				() => {
     					isDragging = false;
@@ -14452,9 +14482,21 @@
     	}
 
     	// Cancel (e.g. touch interrupted by scroll) — reset all drag state cleanly.
-    	function onPointerCancel() {
+    	function onPointerCancel(e) {
+    		if (!isPointerDown) return;
+
     		isPointerDown = false;
     		isDragging = false;
+
+    		const target = e.target;
+
+    		try {
+    			if (target.hasPointerCapture && target.hasPointerCapture(e.pointerId)) {
+    				target.releasePointerCapture(e.pointerId);
+    			}
+    		} catch {
+    			/* ignore */
+    		}
     	}
 
     	// Nudge annotation back in-bounds when the viewport shrinks.
@@ -14477,18 +14519,18 @@
     	function getPositionStyle(c) {
     		switch (c) {
     			case 'tr':
-    				return 'top: -6px; right: -6px;';
+    				return `top: -${verticalOffset()}px; right: -14px;`;
 
     			case 'bl':
-    				return 'bottom: -6px; left: -6px;';
+    				return `bottom: -${verticalOffset()}px; left: -14px;`;
 
     			case 'br':
-    				return 'bottom: -6px; right: -6px;';
+    				return `bottom: -${verticalOffset()}px; right: -14px;`;
 
     			case 'tl':
 
     			default:
-    				return 'top: -6px; left: -6px;';
+    				return `top: -${verticalOffset()}px; left: -14px;`;
     		}
     	}
 
@@ -14511,8 +14553,12 @@
 
     	{
     		var consequent_4 = ($$anchor) => {
-    			var button = root_1$d();
+    			var div_1 = root_1$d();
     			let classes_1;
+    			var div_2 = child(div_1);
+    			let classes_2;
+    			var button = sibling(div_2, 2);
+    			let classes_3;
     			var node_1 = child(button);
 
     			{
@@ -14523,15 +14569,20 @@
     					{
     						var consequent_1 = ($$anchor) => {
     							var fragment_1 = root_3$6();
-    							var node_3 = first_child(fragment_1);
+    							var span = first_child(fragment_1);
+    							var text = child(span, true);
+
+    							reset(span);
+
+    							var node_3 = sibling(span, 2);
 
     							{
     								var consequent = ($$anchor) => {
-    									var span = root_4$3();
-    									let classes_2;
+    									var span_1 = root_4$3();
+    									let classes_4;
 
-    									template_effect(() => classes_2 = set_class(span, 1, 'cv-ribbon-chevron svelte-1h9hx7h', null, classes_2, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
-    									append($$anchor, span);
+    									template_effect(() => classes_4 = set_class(span_1, 1, 'cv-ribbon-chevron svelte-1ctem0h', null, classes_4, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
+    									append($$anchor, span_1);
     								};
 
     								if_block(node_3, ($$render) => {
@@ -14539,23 +14590,19 @@
     								});
     							}
 
-    							var span_1 = sibling(node_3, 2);
-    							var text = child(span_1, true);
-
-    							reset(span_1);
     							next(2);
 
     							template_effect(($0) => set_text(text, $0), [
     								() => get(isShort)
     									? $$props.annotation
-    									: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH) + '…'
+    									: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH)
     							]);
 
     							append($$anchor, fragment_1);
     						};
 
     						var alternate = ($$anchor) => {
-    							var fragment_2 = root_5();
+    							var fragment_2 = root_5$1();
     							var span_2 = sibling(first_child(fragment_2), 2);
     							var text_1 = child(span_2, true);
 
@@ -14566,9 +14613,9 @@
     							{
     								var consequent_2 = ($$anchor) => {
     									var span_3 = root_6$1();
-    									let classes_3;
+    									let classes_5;
 
-    									template_effect(() => classes_3 = set_class(span_3, 1, 'cv-ribbon-chevron svelte-1h9hx7h', null, classes_3, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
+    									template_effect(() => classes_5 = set_class(span_3, 1, 'cv-ribbon-chevron svelte-1ctem0h', null, classes_5, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
     									append($$anchor, span_3);
     								};
 
@@ -14580,7 +14627,7 @@
     							template_effect(($0) => set_text(text_1, $0), [
     								() => get(isShort)
     									? $$props.annotation
-    									: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH) + '…'
+    									: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH)
     							]);
 
     							append($$anchor, fragment_2);
@@ -14600,18 +14647,25 @@
     			}
 
     			reset(button);
+    			reset(div_1);
 
     			template_effect(
-    				($0) => {
-    					classes_1 = set_class(button, 1, 'cv-annotation-ribbon svelte-1h9hx7h', null, classes_1, {
-    						'cv-annotation-ribbon--empty': !get(hasText),
-    						'cv-annotation-ribbon--right': get(isRightCorner),
-    						'cv-annotation-ribbon--expandable': !get(isShort),
-    						'cv-annotation-ribbon--intro': !get(introAnimationDone),
-    						'cv-annotation-ribbon--periodic': get(introAnimationDone)
+    				($0, $1) => {
+    					classes_1 = set_class(div_1, 1, 'cv-ribbon-wrapper svelte-1ctem0h', null, classes_1, {
+    						'cv-ribbon-wrapper--intro': !get(introAnimationDone),
+    						'cv-ribbon-wrapper--periodic': get(introAnimationDone)
     					});
 
-    					set_style(button, `clip-path: ${$0 ?? ''};`);
+    					classes_2 = set_class(div_2, 1, 'cv-ribbon-shadow svelte-1ctem0h', null, classes_2, { 'cv-ribbon-shadow--empty': !get(hasText) });
+    					set_style(div_2, `clip-path: ${$0 ?? ''};`);
+
+    					classes_3 = set_class(button, 1, 'cv-annotation-ribbon svelte-1ctem0h', null, classes_3, {
+    						'cv-annotation-ribbon--empty': !get(hasText),
+    						'cv-annotation-ribbon--right': get(isRightCorner),
+    						'cv-annotation-ribbon--expandable': !get(isShort)
+    					});
+
+    					set_style(button, `clip-path: ${$1 ?? ''};`);
 
     					set_attribute(button, 'aria-label', get(hasText)
     						? get(isShort) ? $$props.annotation : 'Expand annotation'
@@ -14619,25 +14673,28 @@
 
     					set_attribute(button, 'aria-expanded', get(isShort) ? undefined : get(expanded));
     				},
-    				[() => getRibbonClipPath(get(corner))]
+    				[
+    					() => getRibbonClipPath(get(corner)),
+    					() => getRibbonClipPath(get(corner))
+    				]
     			);
 
+    			event('animationend', div_1, onIntroAnimationEnd);
     			delegated('click', button, handleInteraction);
-    			event('animationend', button, onIntroAnimationEnd);
-    			append($$anchor, button);
+    			append($$anchor, div_1);
     		};
 
     		var alternate_1 = ($$anchor) => {
-    			var div_1 = root_7();
-    			var button_1 = child(div_1);
+    			var div_3 = root_7();
+    			var button_1 = child(div_3);
     			var span_4 = sibling(button_1, 2);
     			var text_2 = child(span_4, true);
 
     			reset(span_4);
-    			reset(div_1);
+    			reset(div_3);
     			template_effect(() => set_text(text_2, $$props.annotation));
     			delegated('click', button_1, handleInteraction);
-    			append($$anchor, div_1);
+    			append($$anchor, div_3);
     		};
 
     		if_block(node, ($$render) => {
@@ -14650,7 +14707,7 @@
 
     	template_effect(
     		($0) => {
-    			classes = set_class(div, 1, 'cv-annotation-container svelte-1h9hx7h', null, classes, { 'cv-annotation-container--expanded': get(expanded) });
+    			classes = set_class(div, 1, 'cv-annotation-container svelte-1ctem0h', null, classes, { 'cv-annotation-container--expanded': get(expanded) });
     			set_style(div, `${$0 ?? ''} transform: translate(${get(dragOffsetX) ?? ''}px, ${get(dragOffsetY) ?? ''}px);`);
     		},
     		[() => getPositionStyle(get(corner))]
@@ -14687,62 +14744,25 @@
 
     // ─── Styles ───────────────────────────────────────────────────────────────────
     const HIGHLIGHT_CSS = `
-::highlight(cv-hl-yellow) {
-  background-color: transparent;
+::highlight(cv-hl-orange) {
+  background-color: rgba(255, 158, 94, 0.45);
   color: inherit;
-  text-decoration-line: underline;
-  text-decoration-style: solid;
-  text-decoration-thickness: 16px;
-  text-decoration-color: oklch(78% 0.25 96 / 0.95);
-  text-underline-offset: -12px;
-  text-shadow:
-    5px 2px 10px oklch(72% 0.24 90 / 0.45),
-    -5px -2px 10px oklch(72% 0.24 90 / 0.32),
-    0 0 16px oklch(72% 0.24 90 / 0.22);
-}
-::highlight(cv-hl-blue) {
-  background-color: transparent;
-  color: inherit;
-  text-decoration-line: underline;
-  text-decoration-style: solid;
-  text-decoration-thickness: 16px;
-  text-decoration-color: oklch(62% 0.22 240 / 0.9);
-  text-underline-offset: -12px;
-  text-shadow:
-    5px 2px 10px oklch(55% 0.2 240 / 0.4),
-    -5px -2px 10px oklch(55% 0.2 240 / 0.3),
-    0 0 16px oklch(50% 0.18 242 / 0.2);
-}
-::highlight(cv-hl-red) {
-  background-color: transparent;
-  color: inherit;
-  text-decoration-line: underline;
-  text-decoration-style: solid;
-  text-decoration-thickness: 16px;
-  text-decoration-color: oklch(65% 0.22 20 / 0.9);
-  text-underline-offset: -12px;
-  text-shadow:
-    5px 2px 10px oklch(58% 0.2 20 / 0.4),
-    -5px -2px 10px oklch(58% 0.2 20 / 0.3),
-    0 0 16px oklch(52% 0.18 22 / 0.2);
 }
 ::highlight(cv-hl-green) {
-  background-color: transparent;
+  background-color: rgba(226, 240, 115, 0.45);
   color: inherit;
-  text-decoration-line: underline;
-  text-decoration-style: solid;
-  text-decoration-thickness: 16px;
-  text-decoration-color: oklch(65% 0.22 145 / 0.9);
-  text-underline-offset: -12px;
-  text-shadow:
-    5px 2px 10px oklch(58% 0.2 148 / 0.4),
-    -5px -2px 10px oklch(58% 0.2 148 / 0.3),
-    0 0 16px oklch(52% 0.18 150 / 0.2);
 }
-::highlight(cv-hl-black) {
-  background-color: oklch(10% 0 0 / 0.95);
-  color: oklch(97% 0 0);
-  text-shadow: 4px 1px 8px rgba(0,0,0,0.6), -4px -1px 8px rgba(0,0,0,0.5);
+::highlight(cv-hl-pink) {
+  background-color: rgba(255, 126, 179, 0.45);
+  color: inherit;
+}
+::highlight(cv-hl-yellow) {
+  background-color: rgba(255, 212, 71, 0.45);
+  color: inherit;
+}
+::highlight(cv-hl-blue) {
+  background-color: rgba(126, 224, 245, 0.45);
+  color: inherit;
 }
 `.trim();
 
@@ -14753,31 +14773,25 @@
   clip-path: polygon(3px 0%, 100% 2px, calc(100% - 3px) 100%, 0% calc(100% - 2px));
   mix-blend-mode: multiply;
 }
-.cv-hl-fallback--yellow {
-  background-color: rgba(230, 190, 0, 0.88);
+.cv-hl-fallback--orange {
+  background-color: rgba(255, 158, 94, 0.45);
   color: inherit;
-  text-shadow: 5px 2px 10px rgba(180, 140, 0, 0.35), -5px -2px 10px rgba(180, 140, 0, 0.25);
-}
-.cv-hl-fallback--blue {
-  background-color: rgba(37, 99, 235, 0.72);
-  color: #fff;
-  text-shadow: 5px 2px 10px rgba(20, 60, 180, 0.35), -5px -2px 10px rgba(20, 60, 180, 0.25);
-}
-.cv-hl-fallback--red {
-  background-color: rgba(220, 38, 38, 0.72);
-  color: #fff;
-  text-shadow: 5px 2px 10px rgba(150, 20, 20, 0.35), -5px -2px 10px rgba(150, 20, 20, 0.25);
 }
 .cv-hl-fallback--green {
-  background-color: rgba(22, 163, 74, 0.72);
-  color: #fff;
-  text-shadow: 5px 2px 10px rgba(10, 110, 40, 0.35), -5px -2px 10px rgba(10, 110, 40, 0.25);
+  background-color: rgba(226, 240, 115, 0.45);
+  color: inherit;
 }
-.cv-hl-fallback--black {
-  background-color: rgba(18, 18, 18, 0.92);
-  color: #f5f5f5;
-  text-shadow: 4px 1px 8px rgba(0,0,0,0.45), -4px -1px 8px rgba(0,0,0,0.35);
-  mix-blend-mode: normal;
+.cv-hl-fallback--pink {
+  background-color: rgba(255, 126, 179, 0.45);
+  color: inherit;
+}
+.cv-hl-fallback--yellow {
+  background-color: rgba(255, 212, 71, 0.45);
+  color: inherit;
+}
+.cv-hl-fallback--blue {
+  background-color: rgba(126, 224, 245, 0.45);
+  color: inherit;
 }
 `.trim();
 
@@ -14814,6 +14828,26 @@
     	// eslint-disable-next-line @typescript-eslint/no-explicit-any
     	annotationComponents = [];
 
+    	/** Tracks wrappers with their underlying range so they can be repositioned on resize/zoom */
+    	activeAnnotations = [];
+
+    	_resizeListener = () => {
+    		requestAnimationFrame(() => this.repositionAnnotations());
+    	};
+
+    	repositionAnnotations() {
+    		if (!this.active) return;
+
+    		for (const { range, wrapper } of this.activeAnnotations) {
+    			const rect = range.getBoundingClientRect();
+
+    			wrapper.style.top = `${rect.top + window.scrollY}px`;
+    			wrapper.style.left = `${rect.left + window.scrollX}px`;
+    			wrapper.style.width = `${rect.width}px`;
+    			wrapper.style.height = `${rect.height}px`;
+    		}
+    	}
+
     	/**
     	 * Parse an encoded string (from ?cv-highlight=…) and apply highlights.
     	 * Returns the first resolved Range for scrolling.
@@ -14827,13 +14861,13 @@
     			return null;
     		}
 
-    		return this.applyDescriptors(descriptors);
+    		return this.applyDescriptors(descriptors, false, true);
     	}
 
     	/**
     	 * Apply a list of TextRangeDescriptors directly (e.g. from the float bar).
     	 */
-    	applyDescriptors(descriptors, hideAnnotations = false) {
+    	applyDescriptors(descriptors, hideAnnotations = false, showWarnings = false) {
     		this.clear();
     		ensureStyle();
 
@@ -14852,7 +14886,7 @@
     			if (!verified) unverifiedCount++;
     			if (!firstRange) firstRange = range;
 
-    			const colorKey = desc.color ?? 'yellow';
+    			const colorKey = desc.color ?? DEFAULT_ANNOTATION_COLOR_KEY;
 
     			if (registry) {
     				// CSS Custom Highlight API path
@@ -14877,8 +14911,12 @@
     			}
     		}
 
-    		if (unverifiedCount > 0) {
+    		if (unverifiedCount > 0 && showWarnings) {
     			showToast('Some highlighted text may have changed since this link was created.');
+    		}
+
+    		if (this.activeAnnotations.length > 0) {
+    			window.addEventListener('resize', this._resizeListener, { passive: true });
     		}
 
     		this.active = true;
@@ -14944,6 +14982,8 @@
 
     		this.annotationComponents = [];
     		this.annotationWrappers = [];
+    		this.activeAnnotations = [];
+    		window.removeEventListener('resize', this._resizeListener);
     		this.hlMap.clear();
     		this.marks = [];
     		this.resolvedRanges = [];
@@ -14983,23 +15023,22 @@
 
     		document.body.appendChild(wrapper);
     		this.annotationWrappers.push(wrapper);
+    		this.activeAnnotations.push({ range, wrapper });
 
     		// Get the color for the box-color CSS variable
-    		const colorKey = desc.color ?? 'yellow';
+    		const colorKey = desc.color ?? DEFAULT_ANNOTATION_COLOR_KEY;
 
-    		const colorMap = {
-    			yellow: '#facc15',
-    			blue: '#60a5fa',
-    			red: '#f87171',
-    			green: '#4ade80',
-    			black: '#4b5563'
-    		};
+    		const colorDef = ANNOTATION_COLORS.find((c) => c.key === colorKey) ?? ANNOTATION_COLORS.find((c) => c.key === DEFAULT_ANNOTATION_COLOR_KEY);
 
-    		wrapper.style.setProperty('--cv-box-color', colorMap[colorKey] ?? colorMap['yellow']);
+    		wrapper.style.setProperty('--cv-annotation-color', colorDef.hex);
 
-    		const component = mount(BoxAnnotation, {
+    		const component = mount(Annotation, {
     			target: wrapper,
-    			props: { annotation: desc.annotation ?? '', annotationCorner: corner }
+    			props: {
+    				annotation: desc.annotation ?? '',
+    				annotationCorner: corner,
+    				verticalOffset: 22
+    			}
     		});
 
     		this.annotationComponents.push(component);
@@ -15066,7 +15105,7 @@
     		set(this.#textHighlights, value, true);
     	}
 
-    	#selectedTextColor = state('yellow');
+    	#selectedTextColor = state(proxy(DEFAULT_ANNOTATION_COLOR_KEY));
 
     	get selectedTextColor() {
     		return get(this.#selectedTextColor);
@@ -15634,7 +15673,7 @@
     			var fragment = root_1$b();
     			var div_2 = first_child(fragment);
 
-    			each(div_2, 5, () => BOX_COLORS, (col) => col.key, ($$anchor, col) => {
+    			each(div_2, 5, () => ANNOTATION_COLORS, (col) => col.key, ($$anchor, col) => {
     				var button_4 = root_2$a();
     				let classes;
 
@@ -15939,8 +15978,8 @@
     		};
     	});
 
-    	let currentColorKey = user_derived(() => shareStore.boxColors.get($$props.element) ?? DEFAULT_COLOR_KEY);
-    	let currentHex = user_derived(() => BOX_COLORS.find((c) => c.key === get(currentColorKey))?.hex ?? BOX_COLORS[0].hex);
+    	let currentColorKey = user_derived(() => shareStore.boxColors.get($$props.element) ?? DEFAULT_ANNOTATION_COLOR_KEY);
+    	let currentHex = user_derived(() => ANNOTATION_COLORS.find((c) => c.key === get(currentColorKey))?.hex ?? ANNOTATION_COLORS[0].hex);
     	let clickTimer = null;
 
     	function handleTriggerClick(e) {
@@ -15989,7 +16028,7 @@
     		var consequent = ($$anchor) => {
     			var div_1 = root_1$9();
 
-    			each(div_1, 21, () => BOX_COLORS, (color) => color.key, ($$anchor, color) => {
+    			each(div_1, 21, () => ANNOTATION_COLORS, (color) => color.key, ($$anchor, color) => {
     				var button_1 = root_2$8();
     				let classes;
 
@@ -16030,15 +16069,16 @@
 
     delegate(['click', 'dblclick']);
 
-    var root_1$8 = from_html(`<span class="cv-annotation-tab-preview svelte-1r1spmr"> </span>`);
-    var root_2$7 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
-    var root_4$2 = from_html(`<button type="button"> </button>`);
-    var root_3$4 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
+    var root_2$7 = from_html(`<span class="cv-annotation-tab-chevron svelte-1r1spmr">▾</span>`);
+    var root_1$8 = from_html(`<span class="cv-annotation-tab-preview svelte-1r1spmr"> </span> <!>`, 1);
+    var root_3$4 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
+    var root_5 = from_html(`<button type="button"> </button>`);
+    var root_4$2 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
     var root$c = from_html(`<div class="cv-annotation-editor svelte-1r1spmr" role="none"><button type="button" aria-label="Annotation"><!></button> <!></div>`);
 
     const $$css$f = {
     	hash: 'svelte-1r1spmr',
-    	code: '.cv-annotation-editor.svelte-1r1spmr {position:fixed;z-index:9400;pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}.cv-annotation-tab.svelte-1r1spmr {height:20px;padding:0 8px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;max-width:160px;overflow:hidden;}.cv-annotation-tab.svelte-1r1spmr:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-annotation-tab--has-text.svelte-1r1spmr {background:#fffbe6;border-color:rgba(180, 83, 9, 0.4);}.cv-annotation-tab-icon.svelte-1r1spmr {font-size:10px;line-height:1;color:#6b7280;}.cv-annotation-tab-preview.svelte-1r1spmr {font-size:9px;font-weight:600;color:#1a1a1a;font-family:ui-sans-serif, system-ui, sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}.cv-annotation-panel.svelte-1r1spmr {background:white;border-radius:8px;border:1px solid rgba(0, 0, 0, 0.12);box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);padding:8px;width:220px;display:flex;flex-direction:column;gap:6px;}.cv-annotation-textarea.svelte-1r1spmr {width:100%;box-sizing:border-box;resize:vertical;border:1px solid rgba(0, 0, 0, 0.15);border-radius:4px;padding:5px 7px;font-size:11px;font-family:ui-sans-serif, system-ui, sans-serif;color:#1a1a1a;line-height:1.5;outline:none;min-height:56px;}.cv-annotation-textarea.svelte-1r1spmr:focus {border-color:#b45309;box-shadow:0 0 0 2px rgba(180, 83, 9, 0.15);}.cv-annotation-footer.svelte-1r1spmr {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;}.cv-corner-selector.svelte-1r1spmr {display:flex;gap:2px;}.cv-corner-btn.svelte-1r1spmr {height:20px;padding:0 5px;border-radius:4px;border:1px solid rgba(0, 0, 0, 0.12);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;transition:background 0.1s,\n      border-color 0.1s;}.cv-corner-btn.svelte-1r1spmr:hover {background:#fef3c7;border-color:#b45309;color:#1a1a1a;}.cv-corner-btn.active.svelte-1r1spmr {background:#fef3c7;border-color:#b45309;color:#92400e;font-weight:700;}.cv-char-counter.svelte-1r1spmr {font-size:9px;color:#9ca3af;font-family:ui-sans-serif, system-ui, sans-serif;font-variant-numeric:tabular-nums;margin-left:auto;}'
+    	code: '.cv-annotation-editor.svelte-1r1spmr {position:fixed;z-index:9400;pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}.cv-annotation-tab.svelte-1r1spmr {height:20px;padding:0 8px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;max-width:160px;overflow:hidden;}.cv-annotation-tab.svelte-1r1spmr:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-annotation-tab--has-text.svelte-1r1spmr {background:#fffbe6;border-color:rgba(180, 83, 9, 0.4);}.cv-annotation-tab-icon.svelte-1r1spmr {font-size:10px;line-height:1;color:#6b7280;}.cv-annotation-tab-preview.svelte-1r1spmr {font-size:9px;font-weight:600;color:#1a1a1a;font-family:ui-sans-serif, system-ui, sans-serif;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:130px;}.cv-annotation-tab-chevron.svelte-1r1spmr {font-size:12px;line-height:1;color:#6b7280;margin-left:2px;}.cv-annotation-panel.svelte-1r1spmr {background:white;border-radius:8px;border:1px solid rgba(0, 0, 0, 0.12);box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);padding:8px;width:220px;display:flex;flex-direction:column;gap:6px;}.cv-annotation-textarea.svelte-1r1spmr {width:100%;box-sizing:border-box;resize:vertical;border:1px solid rgba(0, 0, 0, 0.15);border-radius:4px;padding:5px 7px;font-size:11px;font-family:ui-sans-serif, system-ui, sans-serif;color:#1a1a1a;line-height:1.5;outline:none;min-height:56px;}.cv-annotation-textarea.svelte-1r1spmr:focus {border-color:#b45309;box-shadow:0 0 0 2px rgba(180, 83, 9, 0.15);}.cv-annotation-footer.svelte-1r1spmr {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;}.cv-corner-selector.svelte-1r1spmr {display:flex;gap:2px;}.cv-corner-btn.svelte-1r1spmr {height:20px;padding:0 5px;border-radius:4px;border:1px solid rgba(0, 0, 0, 0.12);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;transition:background 0.1s,\n      border-color 0.1s;}.cv-corner-btn.svelte-1r1spmr:hover {background:#fef3c7;border-color:#b45309;color:#1a1a1a;}.cv-corner-btn.active.svelte-1r1spmr {background:#fef3c7;border-color:#b45309;color:#92400e;font-weight:700;}.cv-char-counter.svelte-1r1spmr {font-size:9px;color:#9ca3af;font-family:ui-sans-serif, system-ui, sans-serif;font-variant-numeric:tabular-nums;margin-left:auto;}'
     };
 
     function HighlightAnnotationEditor($$anchor, $$props) {
@@ -16106,7 +16146,7 @@
     	});
 
     	let preview = user_derived(() => get(localText).length > 0
-    		? get(localText).slice(0, ANNOTATION_PREVIEW_LENGTH) + (get(localText).length > ANNOTATION_PREVIEW_LENGTH ? '…' : '')
+    		? get(localText).slice(0, ANNOTATION_PREVIEW_LENGTH)
     		: null);
 
     	var div = root$c();
@@ -16115,36 +16155,52 @@
     	var node = child(button);
 
     	{
-    		var consequent = ($$anchor) => {
-    			var span = root_1$8();
+    		var consequent_1 = ($$anchor) => {
+    			var fragment = root_1$8();
+    			var span = first_child(fragment);
     			var text = child(span, true);
 
     			reset(span);
+
+    			var node_1 = sibling(span, 2);
+
+    			{
+    				var consequent = ($$anchor) => {
+    					var span_1 = root_2$7();
+
+    					append($$anchor, span_1);
+    				};
+
+    				if_block(node_1, ($$render) => {
+    					if (get(localText).length > ANNOTATION_PREVIEW_LENGTH) $$render(consequent);
+    				});
+    			}
+
     			template_effect(() => set_text(text, get(preview)));
-    			append($$anchor, span);
+    			append($$anchor, fragment);
     		};
 
     		var alternate = ($$anchor) => {
-    			var span_1 = root_2$7();
-    			var text_1 = child(span_1, true);
+    			var span_2 = root_3$4();
+    			var text_1 = child(span_2, true);
 
-    			reset(span_1);
+    			reset(span_2);
     			template_effect(() => set_text(text_1, get(isExpanded) ? '- note' : '+ note'));
-    			append($$anchor, span_1);
+    			append($$anchor, span_2);
     		};
 
     		if_block(node, ($$render) => {
-    			if (get(preview)) $$render(consequent); else $$render(alternate, -1);
+    			if (get(preview)) $$render(consequent_1); else $$render(alternate, -1);
     		});
     	}
 
     	reset(button);
 
-    	var node_1 = sibling(button, 2);
+    	var node_2 = sibling(button, 2);
 
     	{
-    		var consequent_1 = ($$anchor) => {
-    			var div_1 = root_3$4();
+    		var consequent_2 = ($$anchor) => {
+    			var div_1 = root_4$2();
     			var textarea = child(div_1);
 
     			remove_textarea_child(textarea);
@@ -16155,7 +16211,7 @@
     			each(div_3, 21, () => CORNER_ICONS, ({ key, icon }) => key, ($$anchor, $$item) => {
     				let key = () => get($$item).key;
     				let icon = () => get($$item).icon;
-    				var button_1 = root_4$2();
+    				var button_1 = root_5();
     				let classes_1;
     				var text_2 = child(button_1, true);
 
@@ -16179,10 +16235,10 @@
 
     			reset(div_3);
 
-    			var span_2 = sibling(div_3, 2);
-    			var text_3 = child(span_2, true);
+    			var span_3 = sibling(div_3, 2);
+    			var text_3 = child(span_3, true);
 
-    			reset(span_2);
+    			reset(span_3);
     			reset(div_2);
     			reset(div_1);
 
@@ -16196,8 +16252,8 @@
     			append($$anchor, div_1);
     		};
 
-    		if_block(node_1, ($$render) => {
-    			if (get(isExpanded)) $$render(consequent_1);
+    		if_block(node_2, ($$render) => {
+    			if (get(isExpanded)) $$render(consequent_2);
     		});
     	}
 
@@ -16219,9 +16275,21 @@
 
     // Block-level tags we split selections on
     const BLOCK_TAGS = new Set([
-        'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
-        'LI', 'BLOCKQUOTE', 'PRE', 'TD', 'TH',
-        'DIV', 'SECTION', 'ARTICLE',
+        'P',
+        'H1',
+        'H2',
+        'H3',
+        'H4',
+        'H5',
+        'H6',
+        'LI',
+        'BLOCKQUOTE',
+        'PRE',
+        'TD',
+        'TH',
+        'DIV',
+        'SECTION',
+        'ARTICLE',
     ]);
     const BLOCK_SELECTOR = 'p, h1, h2, h3, h4, h5, h6, li, blockquote, pre, td, th, div, section, article';
     /**
@@ -16230,7 +16298,9 @@
      */
     function createDescriptors(selectionOrRange) {
         const range = 'rangeCount' in selectionOrRange
-            ? (selectionOrRange.rangeCount > 0 ? selectionOrRange.getRangeAt(0) : null)
+            ? selectionOrRange.rangeCount > 0
+                ? selectionOrRange.getRangeAt(0)
+                : null
             : selectionOrRange;
         if (!range || range.collapsed)
             return [];
@@ -16324,9 +16394,7 @@
         const siblings = Array.from(scope.querySelectorAll(container.tagName));
         const containerIndex = Math.max(0, siblings.indexOf(container));
         const startText = selectedText.slice(0, SNIPPET_LENGTH);
-        const endText = selectedText.length <= SNIPPET_LENGTH
-            ? startText
-            : selectedText.slice(-SNIPPET_LENGTH);
+        const endText = selectedText.length <= SNIPPET_LENGTH ? startText : selectedText.slice(-SNIPPET_LENGTH);
         const desc = {
             containerTag: container.tagName,
             containerIndex,
@@ -16413,6 +16481,15 @@
         return combined;
     }
 
+    // Maps each color key to a hex value for the SVG pen body and tip fill.
+    const TEXT_HIGHLIGHT_CURSORS = {
+        orange: { body: '#fb923c', tip: '#c2410c' },
+        green: { body: '#bef264', tip: '#4d7c0f' },
+        pink: { body: '#f472b6', tip: '#be185d' },
+        yellow: { body: '#facc15', tip: '#a16207' },
+        blue: { body: '#7dd3fc', tip: '#0369a1' },
+    };
+
     var root_2$6 = from_html(`<!> <!>`, 1);
     var root_6 = from_html(`<div><span class="selection-label svelte-1dbf58w"> </span></div>`);
     var root$b = from_html(`<div class="share-overlay-ui"><!> <!> <!> <!> <!></div>`);
@@ -16433,17 +16510,9 @@
     	let excludedIdSet = user_derived(() => new Set(excludedIds()));
 
     	// ── Highlighter pen cursor ────────────────────────────────────────────────
-    	// Maps each color key to a hex value for the SVG pen body fill.
-    	const CURSOR_COLORS = {
-    		yellow: { body: '#facc15', tip: '#a16207' },
-    		blue: { body: '#60a5fa', tip: '#1d4ed8' },
-    		red: { body: '#f87171', tip: '#b91c1c' },
-    		green: { body: '#4ade80', tip: '#15803d' },
-    		black: { body: '#4b5563', tip: '#111827' }
-    	};
-
     	function buildHighlighterCursor(colorKey) {
-    		const c = CURSOR_COLORS[colorKey] ?? CURSOR_COLORS['yellow'];
+    		const safeKey = TEXT_HIGHLIGHT_CURSORS[colorKey] ? colorKey : DEFAULT_ANNOTATION_COLOR_KEY;
+    		const c = TEXT_HIGHLIGHT_CURSORS[safeKey];
 
     		// 28×28 SVG. The pen is drawn upright then rotated +35° around (14,10)
     		// so the cap sits upper-right and the chisel nib lands at ≈ (6, 21) —
@@ -17974,16 +18043,17 @@
         return groups;
     }
 
-    var root_1$6 = from_html(`<div class="cv-annotation-container svelte-3i09ws"><div role="img" aria-label="Annotation marker"></div> <button type="button" class="cv-empty-dismiss svelte-3i09ws" aria-label="Dismiss marker">✕</button></div>`);
+    var root_1$6 = from_html(`<div class="cv-annotation-container svelte-pq6dvi"><div><div class="cv-ribbon-shadow svelte-pq6dvi" aria-hidden="true"></div> <div role="img" aria-label="Annotation marker"></div></div> <button type="button" class="cv-empty-dismiss svelte-pq6dvi" aria-label="Dismiss marker">✕</button></div>`);
 
     const $$css$a = {
-    	hash: 'svelte-3i09ws',
-    	code: '.cv-annotation-container.svelte-3i09ws {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;opacity:0.95;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-3i09ws:hover {opacity:1;z-index:110;}.cv-empty-ribbon.svelte-3i09ws {min-width:45px;min-height:22px;background:var(--cv-box-color);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0, 0, 0, 0.18),\n      inset 0 1px 0 rgba(255, 255, 255, 0.22);transform-origin:center center;padding:5px 22px 5px 10px;opacity:0.95;transition:opacity 0.2s ease;}.cv-annotation-container.svelte-3i09ws:hover .cv-empty-ribbon:where(.svelte-3i09ws) {opacity:1;}.cv-empty-ribbon--right.svelte-3i09ws {padding:5px 10px 5px 22px;}.cv-empty-ribbon--intro.svelte-3i09ws {\n    animation: svelte-3i09ws-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-empty-ribbon--periodic.svelte-3i09ws {\n    animation: svelte-3i09ws-cv-wiggle-periodic 5s ease-in-out infinite;}\n\n  /* Dismiss button — hidden until container is hovered */.cv-empty-dismiss.svelte-3i09ws {position:absolute;border:none;background:rgba(100, 100, 100, 0.55);color:#fff;font-size:8px;cursor:pointer;width:14px;height:14px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;border-radius:50%;box-shadow:0 1px 4px rgba(0, 0, 0, 0.2);opacity:0;pointer-events:none;transition:opacity 0.15s ease,\n      background 0.15s ease,\n      color 0.15s ease;}.cv-annotation-container.svelte-3i09ws:hover .cv-empty-dismiss:where(.svelte-3i09ws) {opacity:1;pointer-events:auto;}.cv-empty-dismiss.svelte-3i09ws:hover {background:rgba(80, 80, 80, 0.8);box-shadow:0 1px 6px rgba(0, 0, 0, 0.28);}\n\n  @keyframes svelte-3i09ws-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-3i09ws-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }'
+    	hash: 'svelte-pq6dvi',
+    	code: '.cv-annotation-container.svelte-pq6dvi {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;opacity:0.95;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-pq6dvi:hover {opacity:1;z-index:110;}.cv-ribbon-wrapper.svelte-pq6dvi {position:relative;transform-origin:center center;}.cv-ribbon-wrapper--intro.svelte-pq6dvi {\n    animation: svelte-pq6dvi-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-ribbon-wrapper--periodic.svelte-pq6dvi {\n    animation: svelte-pq6dvi-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-ribbon-shadow.svelte-pq6dvi {position:absolute;top:0;left:0;width:70px;height:28px;background:rgba(0, 0, 0, 0.25);transform:translate(3px, 3px);pointer-events:none;z-index:-1;}.cv-empty-ribbon.svelte-pq6dvi {width:70px;height:28px;box-sizing:border-box;background:var(--cv-annotation-color, var(--cv-box-color));display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0, 0, 0, 0.18),\n      inset 0 1px 0 rgba(255, 255, 255, 0.22);padding:5px 22px 5px 10px;opacity:0.95;transition:opacity 0.2s ease;}.cv-annotation-container.svelte-pq6dvi:hover .cv-empty-ribbon:where(.svelte-pq6dvi) {opacity:1;}.cv-empty-ribbon--right.svelte-pq6dvi {padding:5px 10px 5px 22px;}\n\n  /* Dismiss button — hidden until container is hovered */.cv-empty-dismiss.svelte-pq6dvi {position:absolute;border:none;background:rgba(100, 100, 100, 0.55);color:#fff;font-size:8px;cursor:pointer;width:14px;height:14px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;border-radius:50%;box-shadow:0 1px 4px rgba(0, 0, 0, 0.2);opacity:0;pointer-events:none;transition:opacity 0.15s ease,\n      background 0.15s ease,\n      color 0.15s ease;}.cv-annotation-container.svelte-pq6dvi:hover .cv-empty-dismiss:where(.svelte-pq6dvi) {opacity:1;pointer-events:auto;}.cv-empty-dismiss.svelte-pq6dvi:hover {background:rgba(80, 80, 80, 0.8);box-shadow:0 1px 6px rgba(0, 0, 0, 0.28);}\n\n  @keyframes svelte-pq6dvi-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-pq6dvi-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }'
     };
 
-    function BoxEmptyAnnotation($$anchor, $$props) {
+    function EmptyAnnotation($$anchor, $$props) {
     	append_styles$1($$anchor, $$css$a);
 
+    	let verticalOffset = prop($$props, 'verticalOffset', 3, 14);
     	const corner = user_derived(() => $$props.annotationCorner ?? DEFAULT_ANNOTATION_CORNER);
     	const isRightCorner = user_derived(() => get(corner) === 'tr' || get(corner) === 'br');
     	let dismissed = state(false);
@@ -17998,18 +18068,18 @@
     	function getPositionStyle(c) {
     		switch (c) {
     			case 'tr':
-    				return 'top: 4px; right: -6px;';
+    				return `top: -${verticalOffset()}px; right: -14px;`;
 
     			case 'bl':
-    				return 'bottom: 4px; left: -6px;';
+    				return `bottom: -${verticalOffset()}px; left: -14px;`;
 
     			case 'br':
-    				return 'bottom: 4px; right: -6px;';
+    				return `bottom: -${verticalOffset()}px; right: -14px;`;
 
     			case 'tl':
 
     			default:
-    				return 'top: 4px; left: -6px;';
+    				return `top: -${verticalOffset()}px; left: -14px;`;
     		}
     	}
 
@@ -18017,9 +18087,9 @@
     		const pointsRight = c === 'tl' || c === 'bl';
 
     		if (pointsRight) {
-    			return 'polygon(0% 0%, 80% 0%, 100% 50%, 80% 100%, 0% 100%)';
+    			return 'polygon(0% 0%, calc(100% - 14px) 0%, 100% 50%, calc(100% - 14px) 100%, 0% 100%)';
     		} else {
-    			return 'polygon(20% 0%, 100% 0%, 100% 100%, 20% 100%, 0% 50%)';
+    			return 'polygon(14px 0%, 100% 0%, 100% 100%, 14px 100%, 0% 50%)';
     		}
     	}
 
@@ -18050,25 +18120,33 @@
     			var div = root_1$6();
     			var div_1 = child(div);
     			let classes;
+    			var div_2 = child(div_1);
+    			var div_3 = sibling(div_2, 2);
+    			let classes_1;
+
+    			reset(div_1);
+
     			var button = sibling(div_1, 2);
 
     			reset(div);
 
     			template_effect(
-    				($0, $1, $2) => {
+    				($0, $1, $2, $3) => {
     					set_style(div, $0);
 
-    					classes = set_class(div_1, 1, 'cv-empty-ribbon svelte-3i09ws', null, classes, {
-    						'cv-empty-ribbon--right': get(isRightCorner),
-    						'cv-empty-ribbon--intro': !get(introAnimationDone),
-    						'cv-empty-ribbon--periodic': get(introAnimationDone)
+    					classes = set_class(div_1, 1, 'cv-ribbon-wrapper svelte-pq6dvi', null, classes, {
+    						'cv-ribbon-wrapper--intro': !get(introAnimationDone),
+    						'cv-ribbon-wrapper--periodic': get(introAnimationDone)
     					});
 
-    					set_style(div_1, `clip-path: ${$1 ?? ''};`);
-    					set_style(button, $2);
+    					set_style(div_2, `clip-path: ${$1 ?? ''};`);
+    					classes_1 = set_class(div_3, 1, 'cv-empty-ribbon svelte-pq6dvi', null, classes_1, { 'cv-empty-ribbon--right': get(isRightCorner) });
+    					set_style(div_3, `clip-path: ${$2 ?? ''};`);
+    					set_style(button, $3);
     				},
     				[
     					() => getPositionStyle(get(corner)),
+    					() => getRibbonClipPath(get(corner)),
     					() => getRibbonClipPath(get(corner)),
     					() => getDismissStyle(get(corner))
     				]
@@ -18095,7 +18173,7 @@
 
     const $$css$9 = {
     	hash: 'svelte-tkm0rc',
-    	code: '.cv-box-overlay.svelte-tkm0rc {position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:8000;}.cv-box-group.svelte-tkm0rc {position:absolute;pointer-events:none;}.cv-box-marker.svelte-tkm0rc {position:absolute;inset:0;pointer-events:none;\n\n    /* Marker Style */border:3.5px solid var(--cv-box-color);border-radius:200px 15px 225px 15px / 15px 225px 15px 255px;transform:rotate(-0.5deg);\n\n    /* 3D INTERNAL VOLUME */box-shadow:inset 0 1px 2px rgba(129, 73, 25, 0.2),\n      inset 0 -1px 1px rgba(255, 255, 255, 0.7);\n\n    /* DOUBLE LIGHT PROJECTION */filter:drop-shadow(0 2px 2px rgba(44, 26, 14, 0.15))\n      drop-shadow(-8px 12px 10px rgba(44, 26, 14, 0.12))\n      drop-shadow(8px 12px 10px rgba(44, 26, 14, 0.12));\n\n    animation: svelte-tkm0rc-boxFadeIn 0.3s ease-out forwards;}.cv-nav-arrow.svelte-tkm0rc {position:absolute;z-index:10;right:-5px;pointer-events:auto;width:14px;height:14px;border-radius:100px;border:1px solid var(--cv-box-color);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:7px;color:#814919;font-weight:700;font-family:ui-sans-serif, system-ui, sans-serif;line-height:1;padding:0;box-shadow:0 4px 12px rgba(44, 26, 14, 0.15);opacity:0.7;}.cv-nav-arrow.svelte-tkm0rc:hover {opacity:1;}.cv-nav-arrow--up.svelte-tkm0rc {top:0px;}.cv-nav-arrow--down.svelte-tkm0rc {bottom:0px;}.cv-nav-arrow--hidden.svelte-tkm0rc {visibility:hidden;pointer-events:none;}.cv-box-pill.svelte-tkm0rc {position:absolute;z-index:10;bottom:-2px;right:14px;background:white;height:14px;padding:0 8px;display:flex;align-items:center;border-radius:100px;border:1px solid var(--cv-box-color);pointer-events:auto;white-space:nowrap;box-shadow:0 4px 12px rgba(44, 26, 14, 0.15);}.cv-box-pill.svelte-tkm0rc a:where(.svelte-tkm0rc) {font-size:8px;font-weight:700;color:#814919;text-decoration:none;font-family:ui-sans-serif, system-ui, sans-serif;line-height:1;}.cv-box-pill.svelte-tkm0rc:hover a:where(.svelte-tkm0rc) {opacity:0.8;}\n\n  @keyframes svelte-tkm0rc-boxFadeIn {\n    from {\n      opacity: 0;\n      transform: scale(0.98) rotate(-1deg);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) rotate(-0.5deg);\n    }\n  }'
+    	code: '.cv-box-overlay.svelte-tkm0rc {position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:8000;}.cv-box-group.svelte-tkm0rc {position:absolute;pointer-events:none;}.cv-box-marker.svelte-tkm0rc {position:absolute;inset:0;pointer-events:none;\n\n    /* Marker Style */border:3.5px solid var(--cv-box-color);border-radius:200px 15px 225px 15px / 15px 225px 15px 255px;transform:rotate(-0.5deg);\n\n    /* 3D INTERNAL VOLUME */box-shadow:inset 0 1px 2px rgba(129, 73, 25, 0.2),\n      inset 0 -1px 1px rgba(255, 255, 255, 0.7);\n\n    /* CRISP DROP SHADOW */filter:drop-shadow(4px 4px 1px rgba(0, 0, 0, 0.25));\n\n    animation: svelte-tkm0rc-boxFadeIn 0.3s ease-out forwards;}.cv-nav-arrow.svelte-tkm0rc {position:absolute;z-index:10;right:-5px;pointer-events:auto;width:14px;height:14px;border-radius:100px;border:1px solid var(--cv-box-color);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:7px;color:#814919;font-weight:700;font-family:ui-sans-serif, system-ui, sans-serif;line-height:1;padding:0;box-shadow:0 4px 12px rgba(44, 26, 14, 0.15);opacity:0.7;}.cv-nav-arrow.svelte-tkm0rc:hover {opacity:1;}.cv-nav-arrow--up.svelte-tkm0rc {top:0px;}.cv-nav-arrow--down.svelte-tkm0rc {bottom:0px;}.cv-nav-arrow--hidden.svelte-tkm0rc {visibility:hidden;pointer-events:none;}.cv-box-pill.svelte-tkm0rc {position:absolute;z-index:10;bottom:-2px;right:14px;background:white;height:14px;padding:0 8px;display:flex;align-items:center;border-radius:100px;border:1px solid var(--cv-box-color);pointer-events:auto;white-space:nowrap;box-shadow:0 4px 12px rgba(44, 26, 14, 0.15);}.cv-box-pill.svelte-tkm0rc a:where(.svelte-tkm0rc) {font-size:8px;font-weight:700;color:#814919;text-decoration:none;font-family:ui-sans-serif, system-ui, sans-serif;line-height:1;}.cv-box-pill.svelte-tkm0rc:hover a:where(.svelte-tkm0rc) {opacity:0.8;}\n\n  @keyframes svelte-tkm0rc-boxFadeIn {\n    from {\n      opacity: 0;\n      transform: scale(0.98) rotate(-1deg);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) rotate(-0.5deg);\n    }\n  }'
     };
 
     function BoxOverlay($$anchor, $$props) {
@@ -18105,9 +18183,9 @@
     	let rects = user_derived(() => $$props.box.rects);
 
     	function getColorHex(rect) {
-    		const key = rect.color ?? DEFAULT_COLOR_KEY;
+    		const key = rect.color ?? DEFAULT_ANNOTATION_COLOR_KEY;
 
-    		return BOX_COLORS.find((c) => c.key === key)?.hex ?? BOX_COLORS[0].hex;
+    		return ANNOTATION_COLORS.find((c) => c.key === key)?.hex ?? ANNOTATION_COLORS[0].hex;
     	}
 
     	function scrollToRect(rect) {
@@ -18147,7 +18225,7 @@
 
     		{
     			var consequent_1 = ($$anchor) => {
-    				BoxAnnotation($$anchor, {
+    				Annotation($$anchor, {
     					get annotation() {
     						return get(rect).annotation;
     					},
@@ -18159,7 +18237,7 @@
     			};
 
     			var alternate = ($$anchor) => {
-    				BoxEmptyAnnotation($$anchor, {
+    				EmptyAnnotation($$anchor, {
     					get annotationCorner() {
     						return get(rect).annotationCorner;
     					}
