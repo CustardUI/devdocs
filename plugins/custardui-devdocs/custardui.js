@@ -12825,6 +12825,7 @@
 
     	let activeTab = state('customize');
     	let copySuccess = state(false);
+    	let isOverlayMousedown = false;
 
     	// Height preservation logic
     	let mainClientHeight = state(0);
@@ -13262,8 +13263,16 @@
     		set_class(button_2, 1, `tab ${get(activeTab) === 'share' ? 'active' : ''}`, 'svelte-16uy9h6');
     	});
 
-    	delegated('click', div, (e) => {
-    		if (e.target === e.currentTarget) onclose()();
+    	delegated('mousedown', div, (e) => {
+    		if (e.target === e.currentTarget) isOverlayMousedown = true;
+    	});
+
+    	delegated('mouseup', div, (e) => {
+    		if (isOverlayMousedown && e.target === e.currentTarget) {
+    			onclose()();
+    		}
+
+    		isOverlayMousedown = false;
     	});
 
     	delegated('click', button, function (...$$args) {
@@ -13283,7 +13292,7 @@
     	pop();
     }
 
-    delegate(['click', 'change']);
+    delegate(['mousedown', 'mouseup', 'click', 'change']);
 
     const BOX_COLORS = [
         { key: 'yellow', label: 'Yellow', hex: '#f5f521' },
