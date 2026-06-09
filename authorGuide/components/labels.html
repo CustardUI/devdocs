@@ -264,7 +264,97 @@ For the latest stable release, visit <a href="https://custardui.github.io">here<
 
     </div>
     </div>
-    </button></div></pre></div> <p><span class="dimmed">OUTPUT:</span></p> <div class="indented"><div class="alert box-container alert-default" style="border-left:5px solid grey;" data-v-2c3d295c><!--Icon and vertical divider for seamless header box--><!----><div class="header-and-body" data-v-2c3d295c><!-- Header wrapper, not rendered if there is no header attribute --><!----><!-- Body wrapper --><div class="box-body-wrapper" data-v-2c3d295c><!-- icon on the left, not shown if there is a header --><!----><!-- Icon -- content divider for seamless boxes without the header attribute --><!----><!-- Content wrapper --><div class="contents" style="" data-v-2c3d295c><!--[--><cv-label name="sampleColor" color="r">r</cv-label> <cv-label name="sampleColor" color="g">g</cv-label> <cv-label name="sampleColor" color="b">b</cv-label> <cv-label name="sampleColor" color="c">c</cv-label> <cv-label name="sampleColor" color="m">m</cv-label> <cv-label name="sampleColor" color="y">y</cv-label> <cv-label name="sampleColor" color="w">w</cv-label> <cv-label name="sampleColor" color="k">k</cv-label><!--]--></div><!-- dismiss button on the right, not shown if there is a header --><!----></div></div></div></div></div> <hr> <br> <h3 id="adaptation-overrides">Adaptation Overrides<a class="fa fa-anchor" href="#adaptation-overrides" onclick="event.stopPropagation()"></a></h3> <p>Labels can be overridden per adaptation via <code class="hljs inline no-lang">preset.labels</code>. This lets different audiences see different label text and colors for the same element. For example, marking a step as &quot;COMPULSORY&quot; in red for one course while keeping it &quot;OPTIONAL&quot; in blue for others.</p> <pre><code class="hljs json"><span>{
+    </button></div></pre></div> <p><span class="dimmed">OUTPUT:</span></p> <div class="indented"><div class="alert box-container alert-default" style="border-left:5px solid grey;" data-v-2c3d295c><!--Icon and vertical divider for seamless header box--><!----><div class="header-and-body" data-v-2c3d295c><!-- Header wrapper, not rendered if there is no header attribute --><!----><!-- Body wrapper --><div class="box-body-wrapper" data-v-2c3d295c><!-- icon on the left, not shown if there is a header --><!----><!-- Icon -- content divider for seamless boxes without the header attribute --><!----><!-- Content wrapper --><div class="contents" style="" data-v-2c3d295c><!--[--><cv-label name="sampleColor" color="r">r</cv-label> <cv-label name="sampleColor" color="g">g</cv-label> <cv-label name="sampleColor" color="b">b</cv-label> <cv-label name="sampleColor" color="c">c</cv-label> <cv-label name="sampleColor" color="m">m</cv-label> <cv-label name="sampleColor" color="y">y</cv-label> <cv-label name="sampleColor" color="w">w</cv-label> <cv-label name="sampleColor" color="k">k</cv-label><!--]--></div><!-- dismiss button on the right, not shown if there is a header --><!----></div></div></div></div></div> <br> <h3 id="rich-formatting-and-icons">Rich Formatting and Icons<a class="fa fa-anchor" href="#rich-formatting-and-icons" onclick="event.stopPropagation()"></a></h3> <p>Labels support rich HTML formatting, meaning you can easily include icons or styled text. Global stylesheets (such as Font Awesome) are automatically injected, allowing icon classes to render perfectly.</p> <h4 id="using-icons-via-slot">Using Icons via Slot<a class="fa fa-anchor" href="#using-icons-via-slot" onclick="event.stopPropagation()"></a></h4> <p>When you write content directly inside the <code class="hljs inline no-lang">&lt;cv-label&gt;</code> tag, you can include icons in two ways:</p> <ol><li><strong>Via MarkBind shortcodes</strong> (when using MarkBind) — MarkBind pre-processes <code class="hljs inline no-lang">:fa-solid-icon:</code> into <code class="hljs inline no-lang">&lt;i&gt;</code> elements. For them to render, you must wrap the slot content with <code class="hljs inline no-lang">&lt;md&gt;</code>.</li> <li><strong>Via direct HTML</strong> — Include Font Awesome <code class="hljs inline no-lang">&lt;i&gt;</code> tags directly.</li></ol> <div><p><span class="dimmed">CODE:</span></p> <div class="indented"><pre><code class="hljs html"><span><span class="hljs-tag">&lt;<span class="hljs-name">cv-label</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;new&quot;</span> <span class="hljs-attr">color</span>=<span class="hljs-string">&quot;g&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">md</span>&gt;</span>:fa-solid-star: NEW<span class="hljs-tag">&lt;/<span class="hljs-name">md</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">cv-label</span>&gt;</span>
+</span><span><span class="hljs-tag">&lt;<span class="hljs-name">cv-label</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;warning&quot;</span> <span class="hljs-attr">color</span>=<span class="hljs-string">&quot;y&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">strong</span>&gt;</span>⚠ IMPORTANT<span class="hljs-tag">&lt;/<span class="hljs-name">strong</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">cv-label</span>&gt;</span>
+</span><span><span class="hljs-tag">&lt;<span class="hljs-name">cv-label</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;pro&quot;</span> <span class="hljs-attr">color</span>=<span class="hljs-string">&quot;m&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">i</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;fa-solid fa-crown&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">i</span>&gt;</span>  <span class="hljs-symbol">&amp;nbsp;</span> PRO<span class="hljs-tag">&lt;/<span class="hljs-name">cv-label</span>&gt;</span>
+</span></code><div class="function-btn-container"><button onclick="copyCodeBlock(this)" class="function-btn d-print-none">
+    <div class="tooltip-container">
+    <span class="tooltiptext">Copy</span>
+    <div class="function-btn-body">
+    
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" viewBox="0 0 18 18" version="1.1">
+    <g id="surface1">
+      <path d="M 11.273438 0 L 2.546875 0 C 1.746094 0 1.089844 0.613281 1.089844
+      1.363281 L 1.089844 10.910156 L 2.546875 10.910156 L 2.546875 1.363281 L 11.273438
+      1.363281 Z M 13.453125 2.726562 L 5.453125 2.726562 C 4.65625 2.726562 4 3.339844 4
+      4.089844 L 4 13.636719 C 4 14.386719 4.65625 15 5.453125 15 L 13.453125 15 C 14.253906
+      15 14.910156 14.386719 14.910156 13.636719 L 14.910156 4.089844 C 14.910156 3.339844
+      14.253906 2.726562 13.453125 2.726562 Z M 13.453125 13.636719 L 5.453125 13.636719 L
+      5.453125 4.089844 L 13.453125 4.089844 Z M 13.453125 13.636719 "></path>
+    </g>
+</svg>
+
+    </div>
+    </div>
+    </button><button onclick="toggleCodeBlockWrap(this)" class="function-btn d-print-none wrap-button">
+    <div class="tooltip-container">
+    <span class="tooltiptext">Wrap Text</span>
+    <div class="function-btn-body">
+    
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" viewBox="0 0 18 18" version="1.1">
+    <g id="surface1">
+      <path id="path17964" d="M 1.109375 0 L 1.109375 2.5351562 L 2.0410156 2.5351562 L
+      2.0410156 0.93164062 L 4.8203125 0.93164062 L 4.8203125 9.3222656 L 3.4746094
+      9.3222656 L 3.4746094 10.144531 L 8.8027344 10.144531 L 8.8027344 9.3222656 L
+      7.4492188 9.3222656 L 7.4492188 0.93164062 L 10.25 0.93164062 L 10.25 2.5351562 L
+      11.166016 2.5351562 L 11.166016 0 L 1.109375 0 z M 10.84375 5.1054688 L 10.84375
+      6.6074219 C 12.268027 6.6074219 13.40625 7.7456444 13.40625 9.1699219 C 13.40625
+      10.185673 12.827237 11.055036 11.978516 11.470703 L 11.978516 9.5175781 L 7.1386719
+      12.3125 L 11.978516 15.105469 L 11.978516 13.072266 C 13.66701 12.577757 14.910156
+      11.012746 14.910156 9.1699219 C 14.910156 6.9333638 13.080308 5.1054688 10.84375
+      5.1054688 z "></path>
+    </g>
+</svg>
+
+    </div>
+    </div>
+    </button></div></pre></div> <p><span class="dimmed">OUTPUT:</span></p> <div class="indented"><div class="alert box-container alert-default" style="border-left:5px solid grey;" data-v-2c3d295c><!--Icon and vertical divider for seamless header box--><!----><div class="header-and-body" data-v-2c3d295c><!-- Header wrapper, not rendered if there is no header attribute --><!----><!-- Body wrapper --><div class="box-body-wrapper" data-v-2c3d295c><!-- icon on the left, not shown if there is a header --><!----><!-- Icon -- content divider for seamless boxes without the header attribute --><!----><!-- Content wrapper --><div class="contents" style="" data-v-2c3d295c><!--[--><cv-label name="new" color="g"><span><span aria-hidden="true" class="fa-solid fa-star"></span> NEW</span></cv-label> <cv-label name="warning" color="y"><strong>⚠ IMPORTANT</strong></cv-label> <cv-label name="pro" color="m"><i class="fa-solid fa-crown"></i>    PRO</cv-label><!--]--></div><!-- dismiss button on the right, not shown if there is a header --><!----></div></div></div></div></div> <h4 id="using-icons-via-config">Using Icons via Config<a class="fa fa-anchor" href="#using-icons-via-config" onclick="event.stopPropagation()"></a></h4> <p>If you specify a <code class="hljs inline no-lang">value</code> in <code class="hljs inline no-lang">custardui.config.json</code> or through an adaptation override, it also fully supports HTML. This allows different adaptations to use different icons.</p> <pre><code class="hljs json"><span>{
+</span><span>  <span class="hljs-attr">&quot;name&quot;</span>: <span class="hljs-string">&quot;pro&quot;</span>,
+</span><span>  <span class="hljs-attr">&quot;value&quot;</span>: <span class="hljs-string">&quot;&lt;i class=\&quot;fa-solid fa-crown\&quot;&gt;&lt;/i&gt; PRO&quot;</span>,
+</span><span>  <span class="hljs-attr">&quot;color&quot;</span>: <span class="hljs-string">&quot;m&quot;</span>
+</span><span>}
+</span></code><div class="function-btn-container"><button onclick="copyCodeBlock(this)" class="function-btn d-print-none">
+    <div class="tooltip-container">
+    <span class="tooltiptext">Copy</span>
+    <div class="function-btn-body">
+    
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" viewBox="0 0 18 18" version="1.1">
+    <g id="surface1">
+      <path d="M 11.273438 0 L 2.546875 0 C 1.746094 0 1.089844 0.613281 1.089844
+      1.363281 L 1.089844 10.910156 L 2.546875 10.910156 L 2.546875 1.363281 L 11.273438
+      1.363281 Z M 13.453125 2.726562 L 5.453125 2.726562 C 4.65625 2.726562 4 3.339844 4
+      4.089844 L 4 13.636719 C 4 14.386719 4.65625 15 5.453125 15 L 13.453125 15 C 14.253906
+      15 14.910156 14.386719 14.910156 13.636719 L 14.910156 4.089844 C 14.910156 3.339844
+      14.253906 2.726562 13.453125 2.726562 Z M 13.453125 13.636719 L 5.453125 13.636719 L
+      5.453125 4.089844 L 13.453125 4.089844 Z M 13.453125 13.636719 "></path>
+    </g>
+</svg>
+
+    </div>
+    </div>
+    </button><button onclick="toggleCodeBlockWrap(this)" class="function-btn d-print-none wrap-button">
+    <div class="tooltip-container">
+    <span class="tooltiptext">Wrap Text</span>
+    <div class="function-btn-body">
+    
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18" viewBox="0 0 18 18" version="1.1">
+    <g id="surface1">
+      <path id="path17964" d="M 1.109375 0 L 1.109375 2.5351562 L 2.0410156 2.5351562 L
+      2.0410156 0.93164062 L 4.8203125 0.93164062 L 4.8203125 9.3222656 L 3.4746094
+      9.3222656 L 3.4746094 10.144531 L 8.8027344 10.144531 L 8.8027344 9.3222656 L
+      7.4492188 9.3222656 L 7.4492188 0.93164062 L 10.25 0.93164062 L 10.25 2.5351562 L
+      11.166016 2.5351562 L 11.166016 0 L 1.109375 0 z M 10.84375 5.1054688 L 10.84375
+      6.6074219 C 12.268027 6.6074219 13.40625 7.7456444 13.40625 9.1699219 C 13.40625
+      10.185673 12.827237 11.055036 11.978516 11.470703 L 11.978516 9.5175781 L 7.1386719
+      12.3125 L 11.978516 15.105469 L 11.978516 13.072266 C 13.66701 12.577757 14.910156
+      11.012746 14.910156 9.1699219 C 14.910156 6.9333638 13.080308 5.1054688 10.84375
+      5.1054688 z "></path>
+    </g>
+</svg>
+
+    </div>
+    </div>
+    </button></div></pre><p><em>Note: You must use direct HTML like <code class="hljs inline no-lang">&lt;i class=&quot;...&quot;&gt;&lt;/i&gt;</code> in configuration files, as MarkBind shortcodes are not processed inside JSON.</em></p> <br> <h3 id="adaptation-overrides">Adaptation Overrides<a class="fa fa-anchor" href="#adaptation-overrides" onclick="event.stopPropagation()"></a></h3> <p>Labels can be overridden per adaptation via <code class="hljs inline no-lang">preset.labels</code>. This lets different audiences see different label text and colors for the same element. For example, marking a step as &quot;COMPULSORY&quot; in red for one course while keeping it &quot;OPTIONAL&quot; in blue for others.</p> <pre><code class="hljs json"><span>{
 </span><span>  <span class="hljs-attr">&quot;id&quot;</span>: <span class="hljs-string">&quot;sample&quot;</span>,
 </span><span>  <span class="hljs-attr">&quot;preset&quot;</span>: {
 </span><span>    <span class="hljs-attr">&quot;labels&quot;</span>: {
@@ -362,7 +452,7 @@ For the latest stable release, visit <a href="https://custardui.github.io">here<
 
     </div>
     </div>
-    </button></div></pre></div> <p><span class="dimmed">OUTPUT:</span></p> <div class="indented"><div class="alert box-container alert-default" style="border-left:5px solid grey;" data-v-2c3d295c><!--Icon and vertical divider for seamless header box--><!----><div class="header-and-body" data-v-2c3d295c><!-- Header wrapper, not rendered if there is no header attribute --><!----><!-- Body wrapper --><div class="box-body-wrapper" data-v-2c3d295c><!-- icon on the left, not shown if there is a header --><!----><!-- Icon -- content divider for seamless boxes without the header attribute --><!----><!-- Content wrapper --><div class="contents" style="" data-v-2c3d295c><!--[--><p>Exercise 1 is <cv-label name="exercise-1">OPTIONAL</cv-label>.</p> <p>Exercise 2 is <cv-label name="exercise-2">OPTIONAL</cv-label>.</p> <p>Exercise 3 is <cv-label name="exercise-3">OPTIONAL</cv-label>.</p> <p>Exercise 4 is <cv-label name="exercise-4">OPTIONAL</cv-label>.</p><!--]--></div><!-- dismiss button on the right, not shown if there is a header --><!----></div></div></div></div></div> <p>By default all four render as blue <strong>OPTIONAL</strong> pills. After clicking <strong>Sample</strong>, the <code class="hljs inline no-lang">preset.labels</code> in <code class="hljs inline no-lang">sample.json</code> overrides them to red <strong>COMPULSORY</strong> pills. Click <strong>Reset</strong> to clear the adaptation and return to defaults.</p></div> <nav id="page-nav" data-v-6b1b63d2><!--[--><div class="nav-component slim-scroll"><a class="navbar-brand page-nav-title" href="#">Topics</a> <nav id="mb-page-nav" class="nav nav-pills flex-column my-0 small no-flex-wrap" data-v-6b1b63d2><!--[--><a class="nav-link py-1" href="#labels">Labels‎</a> <nav class="nav nav-pills flex-column my-0 nested no-flex-wrap"><a class="nav-link py-1" href="#basic-syntax">Basic Syntax‎</a> <a class="nav-link py-1" href="#attributes-of-cv-label">Attributes of &lt;cv-label&gt;‎</a></nav> <a class="nav-link py-1" href="#configuration">Configuration‎</a> <nav class="nav nav-pills flex-column my-0 nested no-flex-wrap"><a class="nav-link py-1" href="#configuration-fields">Configuration Fields‎</a> <a class="nav-link py-1" href="#shorthand-colors">Shorthand Colors‎</a> <a class="nav-link py-1" href="#adaptation-overrides">Adaptation Overrides‎</a></nav><!--]--><!--v-if--></nav></div><!--]--><!--v-if--></nav> <div class="scroll-top-button fa-lg d-print-none" style="display:none;bottom:2%;right:2%;position:fixed;" aria-hidden="true"><!--[--><i class="fas fa-arrow-circle-up"></i><!--]--></div></div> <div><footer><div class="text-center"><small>[Generated by <a href="https://markbind.org/">MarkBind 7.1.1</a> on Tue, 9 Jun 2026, 14:53:43 GMT+8]</small><br></div></footer></div><!--]--></div>
+    </button></div></pre></div> <p><span class="dimmed">OUTPUT:</span></p> <div class="indented"><div class="alert box-container alert-default" style="border-left:5px solid grey;" data-v-2c3d295c><!--Icon and vertical divider for seamless header box--><!----><div class="header-and-body" data-v-2c3d295c><!-- Header wrapper, not rendered if there is no header attribute --><!----><!-- Body wrapper --><div class="box-body-wrapper" data-v-2c3d295c><!-- icon on the left, not shown if there is a header --><!----><!-- Icon -- content divider for seamless boxes without the header attribute --><!----><!-- Content wrapper --><div class="contents" style="" data-v-2c3d295c><!--[--><p>Exercise 1 is <cv-label name="exercise-1">OPTIONAL</cv-label>.</p> <p>Exercise 2 is <cv-label name="exercise-2">OPTIONAL</cv-label>.</p> <p>Exercise 3 is <cv-label name="exercise-3">OPTIONAL</cv-label>.</p> <p>Exercise 4 is <cv-label name="exercise-4">OPTIONAL</cv-label>.</p><!--]--></div><!-- dismiss button on the right, not shown if there is a header --><!----></div></div></div></div></div> <p>By default all four render as blue <strong>OPTIONAL</strong> pills. After clicking <strong>Sample</strong>, the <code class="hljs inline no-lang">preset.labels</code> in <code class="hljs inline no-lang">sample.json</code> overrides them to red <strong>COMPULSORY</strong> pills. Click <strong>Reset</strong> to clear the adaptation and return to defaults.</p></div> <nav id="page-nav" data-v-6b1b63d2><!--[--><div class="nav-component slim-scroll"><a class="navbar-brand page-nav-title" href="#">Topics</a> <nav id="mb-page-nav" class="nav nav-pills flex-column my-0 small no-flex-wrap" data-v-6b1b63d2><!--[--><a class="nav-link py-1" href="#labels">Labels‎</a> <nav class="nav nav-pills flex-column my-0 nested no-flex-wrap"><a class="nav-link py-1" href="#basic-syntax">Basic Syntax‎</a> <a class="nav-link py-1" href="#attributes-of-cv-label">Attributes of &lt;cv-label&gt;‎</a></nav> <a class="nav-link py-1" href="#configuration">Configuration‎</a> <nav class="nav nav-pills flex-column my-0 nested no-flex-wrap"><a class="nav-link py-1" href="#configuration-fields">Configuration Fields‎</a> <a class="nav-link py-1" href="#shorthand-colors">Shorthand Colors‎</a> <a class="nav-link py-1" href="#rich-formatting-and-icons">Rich Formatting and Icons‎</a> <a class="nav-link py-1" href="#adaptation-overrides">Adaptation Overrides‎</a></nav><!--]--><!--v-if--></nav></div><!--]--><!--v-if--></nav> <div class="scroll-top-button fa-lg d-print-none" style="display:none;bottom:2%;right:2%;position:fixed;" aria-hidden="true"><!--[--><i class="fas fa-arrow-circle-up"></i><!--]--></div></div> <div><footer><div class="text-center"><small>[Generated by <a href="https://markbind.org/">MarkBind 7.1.1</a> on Tue, 9 Jun 2026, 16:00:52 GMT+8]</small><br></div></footer></div><!--]--></div>
 </body><script src="/devdocs/markbind/js/bootstrap-utility.min.js"></script>
 <script src="/devdocs/markbind/js/polyfill.min.js"></script>
 <script src="/devdocs/markbind/js/vue.global.prod.min.js"></script>

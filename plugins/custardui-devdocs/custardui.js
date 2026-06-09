@@ -38,12 +38,12 @@
         return pattern.test(normalized);
     }
     /**
-     * Sanitizes HTML sourced from cv-tab-header innerHTML or header attribute.
+     * Sanitizes HTML sourced from user input (e.g. cv-tab-header innerHTML, label values).
      * Strips script, style, link, and all inline event handler attributes (on*)
      * and javascript:/vbscript:/data: URLs from href/src/action, preserving safe rich formatting.
      * Uses DOMParser — no external dependencies.
      */
-    function sanitizeTabHeader(rawHtml) {
+    function sanitizeHtml(rawHtml) {
         if (typeof DOMParser === 'undefined') {
             // Return rawHtml if DOMParser is not available (e.g., SSR or node context without jsdom),
             // though in our actual runtime it's browser-only.
@@ -12893,7 +12893,7 @@
     }
 
     var root_1$e = from_html(`<button type="button">Customize</button>`);
-    var root_3$7 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
+    var root_3$8 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
     var root_5$2 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Toggles</div> <div class="toggles-container svelte-16uy9h6"></div></div>`);
     var root_7$1 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Placeholders</div> <div class="placeholders-container svelte-16uy9h6"></div></div>`);
     var root_9 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Tab Groups</div> <div class="tabgroups-container svelte-16uy9h6"><div class="tabgroup-card header-card svelte-16uy9h6" role="group"><div class="tabgroup-row svelte-16uy9h6"><div class="logo-box svelte-16uy9h6" id="cv-nav-icon-box"><div class="nav-icon svelte-16uy9h6"><!></div></div> <div class="tabgroup-info svelte-16uy9h6"><div class="tabgroup-title-container"><p class="tabgroup-title svelte-16uy9h6">Show only the selected tab</p></div> <p class="tabgroup-description svelte-16uy9h6">Hide the navigation headers</p></div> <label class="toggle-switch nav-toggle svelte-16uy9h6"><input class="nav-pref-input svelte-16uy9h6" type="checkbox" aria-label="Show only the selected tab"/> <span class="switch-bg svelte-16uy9h6"></span> <span class="switch-knob svelte-16uy9h6"></span></label></div></div> <div class="tab-groups-list svelte-16uy9h6"></div></div></div>`);
@@ -13114,7 +13114,7 @@
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var p_1 = root_3$7();
+    					var p_1 = root_3$8();
     					var text_1 = child(p_1, true);
 
     					reset(p_1);
@@ -14493,7 +14493,7 @@
     }
 
     var root_4$3 = from_html(`<span>▾</span>`);
-    var root_3$6 = from_html(`<span class="cv-ribbon-text cv-ribbon-text--right svelte-1ctem0h"> </span> <!> <span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span>`, 1);
+    var root_3$7 = from_html(`<span class="cv-ribbon-text cv-ribbon-text--right svelte-1ctem0h"> </span> <!> <span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span>`, 1);
     var root_6$1 = from_html(`<span>▾</span>`);
     var root_5$1 = from_html(`<span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span> <span class="cv-ribbon-text svelte-1ctem0h"> </span> <!>`, 1);
     var root_1$d = from_html(`<div><div aria-hidden="true"></div> <button type="button"><!></button></div>`);
@@ -14727,7 +14727,7 @@
 
     					{
     						var consequent_1 = ($$anchor) => {
-    							var fragment_1 = root_3$6();
+    							var fragment_1 = root_3$7();
     							var span = first_child(fragment_1);
     							var text = child(span, true);
 
@@ -15939,7 +15939,7 @@
     delegate(['click']);
 
     var root_2$9 = from_html(`<span class="id-badge svelte-64gpkh" title="ID detection active"> </span>`);
-    var root_3$5 = from_html(`<button type="button" class="action-btn up svelte-64gpkh" title="Select Parent">↰</button>`);
+    var root_3$6 = from_html(`<button type="button" class="action-btn up svelte-64gpkh" title="Select Parent">↰</button>`);
     var root_1$a = from_html(`<div class="hover-helper svelte-64gpkh"><div class="info svelte-64gpkh"><span class="tag svelte-64gpkh"> </span> <!></div> <button type="button"> </button> <!></div>`);
 
     const $$css$h = {
@@ -16083,7 +16083,7 @@
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var button_1 = root_3$5();
+    					var button_1 = root_3$6();
 
     					delegated('click', button_1, handleSelectParent);
     					append($$anchor, button_1);
@@ -16248,7 +16248,7 @@
 
     var root_2$7 = from_html(`<span class="cv-annotation-tab-chevron svelte-1r1spmr">▾</span>`);
     var root_1$8 = from_html(`<span class="cv-annotation-tab-preview svelte-1r1spmr"> </span> <!>`, 1);
-    var root_3$4 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
+    var root_3$5 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
     var root_5 = from_html(`<button type="button"> </button>`);
     var root_4$2 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
     var root$c = from_html(`<div class="cv-annotation-editor svelte-1r1spmr" role="none"><button type="button" aria-label="Annotation"><!></button> <!></div>`);
@@ -16358,7 +16358,7 @@
     		};
 
     		var alternate = ($$anchor) => {
-    			var span_2 = root_3$4();
+    			var span_2 = root_3$5();
     			var text_1 = child(span_2, true);
 
     			reset(span_2);
@@ -19839,7 +19839,7 @@
     }
 
     var root_1$4 = from_html(`<div class="cv-toggle-label svelte-1ka2eec"> </div>`);
-    var root_3$3 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show less</span>`, 1);
+    var root_3$4 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show less</span>`, 1);
     var root_4$1 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show more</span>`, 1);
     var root_2$4 = from_html(`<button type="button" class="cv-expand-btn svelte-1ka2eec"><!></button>`);
     var root$5 = from_html(`<div><!> <div class="cv-toggle-content svelte-1ka2eec"><div class="cv-toggle-inner svelte-1ka2eec"><!></div></div> <!></div>`);
@@ -20094,7 +20094,7 @@
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var fragment = root_3$3();
+    					var fragment = root_3$4();
     					var node_4 = first_child(fragment);
 
     					IconChevronUp(node_4, {});
@@ -20168,7 +20168,7 @@
     	{ mode: 'open' }
     ));
 
-    var root_3$2 = from_html(`<p class="description svelte-1lfe2lv"> </p>`);
+    var root_3$3 = from_html(`<p class="description svelte-1lfe2lv"> </p>`);
     var root_2$3 = from_html(`<div class="card svelte-1lfe2lv"><div class="content svelte-1lfe2lv"><div><p class="label svelte-1lfe2lv"> </p> <!></div> <!></div></div>`);
 
     const $$css$7 = {
@@ -20250,7 +20250,7 @@
 
     					{
     						var consequent = ($$anchor) => {
-    							var p_1 = root_3$2();
+    							var p_1 = root_3$3();
     							var text_1 = child(p_1, true);
 
     							reset(p_1);
@@ -20433,7 +20433,7 @@
 
     var root_2$1 = from_html(`<li class="cv-tabgroup-item svelte-1ujqpe3"><div><a role="tab" title="Double-click a tab to 'mark' it in all similar tab groups."><span class="cv-tab-header-text svelte-1ujqpe3"></span></a> <button type="button"><!></button></div></li>`);
     var root_1$2 = from_html(`<ul class="cv-tabgroup-nav svelte-1ujqpe3" role="tablist"></ul>`);
-    var root_3$1 = from_html(`<link rel="stylesheet"/>`);
+    var root_3$2 = from_html(`<link rel="stylesheet"/>`);
     var root_4 = from_html(`<div class="cv-tabgroup-bottom-border svelte-1ujqpe3"></div>`);
     var root$2 = from_html(`<div class="cv-tabgroup-container svelte-1ujqpe3"><!> <!> <div class="cv-tabgroup-content"><!></div> <!></div>`);
 
@@ -20556,13 +20556,13 @@
     				const headerEl = element.querySelector('cv-tab-header');
 
     				if (headerEl) {
-    					header = sanitizeTabHeader(headerEl.innerHTML.trim());
+    					header = sanitizeHtml(headerEl.innerHTML.trim());
     				} else {
     					// Attribute syntax — also supports raw HTML (e.g. <i> icons), so sanitize too
     					const rawAttrHeader = element.header || element.getAttribute('header') || '';
 
     					if (rawAttrHeader) {
-    						header = sanitizeTabHeader(rawAttrHeader);
+    						header = sanitizeHtml(rawAttrHeader);
     					} else {
     						// Fallback to tab-id or default
     						header = element.getAttribute('tab-id') ? primaryId : `Tab ${index + 1}`;
@@ -20755,7 +20755,7 @@
     	var node_2 = sibling(node, 2);
 
     	each(node_2, 16, () => Array.from(document.querySelectorAll('link[rel="stylesheet"]')), (link) => link.href, ($$anchor, link) => {
-    		var link_1 = root_3$1();
+    		var link_1 = root_3$2();
 
     		template_effect(() => set_attribute(link_1, 'href', link.href));
     		append($$anchor, link_1);
@@ -20970,7 +20970,7 @@
 
     var root_2 = from_html(`<p class="placeholder-description svelte-dpk3ag"> </p>`);
     var root_1$1 = from_html(`<div class="label-group svelte-dpk3ag"><label class="placeholder-label svelte-dpk3ag"> </label> <!></div>`);
-    var root_3 = from_html(`<label class="placeholder-label svelte-dpk3ag"> </label>`);
+    var root_3$1 = from_html(`<label class="placeholder-label svelte-dpk3ag"> </label>`);
     var root = from_html(`<div><!> <div class="input-container svelte-dpk3ag"><input type="text"/> <span class="edit-icon svelte-dpk3ag" aria-hidden="true"><!></span></div></div>`);
 
     const $$css$1 = {
@@ -21127,7 +21127,7 @@
     		};
 
     		var consequent_2 = ($$anchor) => {
-    			var label_2 = root_3();
+    			var label_2 = root_3$1();
     			var text_2 = child(label_2, true);
 
     			reset(label_2);
@@ -21246,7 +21246,8 @@
         return luminance > 0.5 ? '#000000' : '#ffffff';
     }
 
-    var root_1 = from_html(`<span class="cv-label svelte-10fc57e"><!></span>`);
+    var root_3 = from_html(`<link rel="stylesheet"/>`);
+    var root_1 = from_html(`<!> <span class="cv-label svelte-10fc57e"><!></span>`, 1);
 
     const $$css = {
     	hash: 'svelte-10fc57e',
@@ -21308,47 +21309,71 @@
     	var node = first_child(fragment);
 
     	{
-    		var consequent_1 = ($$anchor) => {
-    			var span = root_1();
-    			let styles;
-    			var node_1 = child(span);
+    		var consequent_2 = ($$anchor) => {
+    			var fragment_1 = root_1();
+    			var node_1 = first_child(fragment_1);
 
     			{
     				var consequent = ($$anchor) => {
-    					var text$1 = text();
-
-    					template_effect(() => set_text(text$1, get(labelDef).value));
-    					append($$anchor, text$1);
-    				};
-
-    				var alternate = ($$anchor) => {
     					var fragment_2 = comment();
     					var node_2 = first_child(fragment_2);
 
-    					slot(node_2, $$props, 'default', {});
+    					each(node_2, 16, () => Array.from(document.querySelectorAll('link[rel="stylesheet"]')), (link) => link.href, ($$anchor, link) => {
+    						var link_1 = root_3();
+
+    						template_effect(() => set_attribute(link_1, 'href', link.href));
+    						append($$anchor, link_1);
+    					});
+
     					append($$anchor, fragment_2);
     				};
 
     				if_block(node_1, ($$render) => {
-    					if (get(labelDef)?.value) $$render(consequent); else $$render(alternate, -1);
+    					if (get(labelDef)?.value) $$render(consequent);
+    				});
+    			}
+
+    			var span = sibling(node_1, 2);
+    			let styles;
+    			var node_3 = child(span);
+
+    			{
+    				var consequent_1 = ($$anchor) => {
+    					var fragment_3 = comment();
+    					var node_4 = first_child(fragment_3);
+
+    					html(node_4, () => sanitizeHtml(get(labelDef).value));
+    					append($$anchor, fragment_3);
+    				};
+
+    				var alternate = ($$anchor) => {
+    					var fragment_4 = comment();
+    					var node_5 = first_child(fragment_4);
+
+    					slot(node_5, $$props, 'default', {});
+    					append($$anchor, fragment_4);
+    				};
+
+    				if_block(node_3, ($$render) => {
+    					if (get(labelDef)?.value) $$render(consequent_1); else $$render(alternate, -1);
     				});
     			}
 
     			reset(span);
     			template_effect(() => styles = set_style(span, '', styles, { background: get(bgColor), color: get(textColor) }));
-    			append($$anchor, span);
+    			append($$anchor, fragment_1);
     		};
 
     		var alternate_1 = ($$anchor) => {
-    			var fragment_3 = comment();
-    			var node_3 = first_child(fragment_3);
+    			var fragment_5 = comment();
+    			var node_6 = first_child(fragment_5);
 
-    			slot(node_3, $$props, 'default', {});
-    			append($$anchor, fragment_3);
+    			slot(node_6, $$props, 'default', {});
+    			append($$anchor, fragment_5);
     		};
 
     		if_block(node, ($$render) => {
-    			if (get(labelDef)?.value || get(hasSlotContent)) $$render(consequent_1); else $$render(alternate_1, -1);
+    			if (get(labelDef)?.value || get(hasSlotContent)) $$render(consequent_2); else $$render(alternate_1, -1);
     		});
     	}
 
