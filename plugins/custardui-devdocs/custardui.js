@@ -3943,6 +3943,30 @@
     	}
     }
 
+    /**
+     * Listen to the given event, and then instantiate a global form reset listener if not already done,
+     * to notify all bindings when the form is reset
+     * @param {HTMLElement} element
+     * @param {string} event
+     * @param {(is_reset?: true) => void} handler
+     * @param {(is_reset?: true) => void} [on_reset]
+     */
+    function listen_to_event_and_reset_event(element, event, handler, on_reset = handler) {
+    	element.addEventListener(event, () => without_reactive_context(handler));
+    	const prev = /** @type {any} */ (element)[FORM_RESET_HANDLER];
+    	if (prev) {
+    		// special case for checkbox that can have multiple binds (group & checked)
+    		/** @type {any} */ (element)[FORM_RESET_HANDLER] = () => {
+    			prev();
+    			on_reset(true);
+    		};
+    	} else {
+    		/** @type {any} */ (element)[FORM_RESET_HANDLER] = () => on_reset(true);
+    	}
+
+    	add_form_reset_listener();
+    }
+
     /** @import { Blocker, ComponentContext, ComponentContextLegacy, Derived, Effect, TemplateNode, TransitionManager } from '#client' */
 
     /**
@@ -8737,6 +8761,126 @@
     	return setters;
     }
 
+    /** @import { Batch } from '../../../reactivity/batch.js' */
+
+    /**
+     * @param {HTMLInputElement} input
+     * @param {() => unknown} get
+     * @param {(value: unknown) => void} set
+     * @returns {void}
+     */
+    function bind_value(input, get, set = get) {
+    	var batches = new WeakSet();
+
+    	listen_to_event_and_reset_event(input, 'input', async (is_reset) => {
+
+    		/** @type {any} */
+    		var value = is_reset ? input.defaultValue : input.value;
+    		value = is_numberlike_input(input) ? to_number(value) : value;
+    		set(value);
+
+    		if (current_batch !== null) {
+    			batches.add(current_batch);
+    		}
+
+    		// Because `{#each ...}` blocks work by updating sources inside the flush,
+    		// we need to wait a tick before checking to see if we should forcibly
+    		// update the input and reset the selection state
+    		await tick();
+
+    		// Respect any validation in accessors
+    		if (value !== (value = get())) {
+    			var start = input.selectionStart;
+    			var end = input.selectionEnd;
+    			var length = input.value.length;
+
+    			// the value is coerced on assignment
+    			input.value = value ?? '';
+
+    			// Restore selection
+    			if (end !== null) {
+    				var new_length = input.value.length;
+    				// If cursor was at end and new input is longer, move cursor to new end
+    				if (start === end && end === length && new_length > length) {
+    					input.selectionStart = new_length;
+    					input.selectionEnd = new_length;
+    				} else {
+    					input.selectionStart = start;
+    					input.selectionEnd = Math.min(end, new_length);
+    				}
+    			}
+    		}
+    	});
+
+    	if (
+    		// If we are hydrating and the value has since changed,
+    		// then use the updated value from the input instead.
+    		(hydrating && input.defaultValue !== input.value) ||
+    		// If defaultValue is set, then value == defaultValue
+    		// TODO Svelte 6: remove input.value check and set to empty string?
+    		(untrack(get) == null && input.value)
+    	) {
+    		set(is_numberlike_input(input) ? to_number(input.value) : input.value);
+
+    		if (current_batch !== null) {
+    			batches.add(current_batch);
+    		}
+    	}
+
+    	render_effect(() => {
+
+    		var value = get();
+
+    		if (input === document.activeElement) {
+    			// In sync mode render effects are executed during tree traversal -> needs current_batch
+    			// In async mode render effects are flushed once batch resolved, at which point current_batch is null -> needs previous_batch
+    			var batch = /** @type {Batch} */ (current_batch);
+
+    			// Never rewrite the contents of a focused input. We can get here if, for example,
+    			// an update is deferred because of async work depending on the input:
+    			//
+    			// <input bind:value={query}>
+    			// <p>{await find(query)}</p>
+    			if (batches.has(batch)) {
+    				return;
+    			}
+    		}
+
+    		if (is_numberlike_input(input) && value === to_number(input.value)) {
+    			// handles 0 vs 00 case (see https://github.com/sveltejs/svelte/issues/9959)
+    			return;
+    		}
+
+    		if (input.type === 'date' && !value && !input.value) {
+    			// Handles the case where a temporarily invalid date is set (while typing, for example with a leading 0 for the day)
+    			// and prevents this state from clearing the other parts of the date input (see https://github.com/sveltejs/svelte/issues/7897)
+    			return;
+    		}
+
+    		// don't set the value of the input if it's the same to allow
+    		// minlength to work properly
+    		if (value !== input.value) {
+    			// @ts-expect-error the value is coerced on assignment
+    			input.value = value ?? '';
+    		}
+    	});
+    }
+
+    /**
+     * @param {HTMLInputElement} input
+     */
+    function is_numberlike_input(input) {
+    	var type = input.type;
+    	return type === 'number' || type === 'range';
+    }
+
+    /**
+     * @param {string} value
+     */
+    function to_number(value) {
+    	return value === '' ? null : +value;
+    }
+
     /**
      * We create one listener for all elements
      * @see {@link https://groups.google.com/a/chromium.org/g/blink-dev/c/z6ienONUb5A/m/F5-VcUZtBAAJ Explanation}
@@ -10705,18 +10849,10 @@
     	 * all others retain their current visibility.
     	 */
     	applyToggleDelta(deltaState) {
-    		// eslint-disable-next-line svelte/prefer-svelte-reactivity
     		const toShow = new Set(this.filterNonSiteManagedToggleIds(this.filterValidToggles(deltaState.shownToggles ?? [])));
-
-    		// eslint-disable-next-line svelte/prefer-svelte-reactivity
     		const toPeek = new Set(this.filterNonSiteManagedToggleIds(this.filterValidToggles(deltaState.peekToggles ?? [])));
-
-    		// eslint-disable-next-line svelte/prefer-svelte-reactivity
     		const toHide = new Set(this.filterNonSiteManagedToggleIds(this.filterValidToggles(deltaState.hiddenToggles ?? [])));
-
-    		// eslint-disable-next-line svelte/prefer-svelte-reactivity
     		const allMentioned = new Set([...toShow, ...toPeek, ...toHide]);
-
     		const newShown = (this.state.shownToggles ?? []).filter((id) => !allMentioned.has(id));
     		const newPeek = (this.state.peekToggles ?? []).filter((id) => !allMentioned.has(id));
 
@@ -11760,6 +11896,7 @@
     const PARAM_HIDE_TOGGLE = 't-hide';
     const PARAM_TABS = 'tabs';
     const PARAM_PH = 'ph';
+    const PARAM_LINK_LABEL = 'link-label';
     const PARAM_CV_SHOW = 'cv-show';
     const PARAM_CV_HIDE = 'cv-hide';
     const PARAM_CV_BOX = 'cv-box';
@@ -12762,7 +12899,7 @@
     var root_9 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Tab Groups</div> <div class="tabgroups-container svelte-16uy9h6"><div class="tabgroup-card header-card svelte-16uy9h6" role="group"><div class="tabgroup-row svelte-16uy9h6"><div class="logo-box svelte-16uy9h6" id="cv-nav-icon-box"><div class="nav-icon svelte-16uy9h6"><!></div></div> <div class="tabgroup-info svelte-16uy9h6"><div class="tabgroup-title-container"><p class="tabgroup-title svelte-16uy9h6">Show only the selected tab</p></div> <p class="tabgroup-description svelte-16uy9h6">Hide the navigation headers</p></div> <label class="toggle-switch nav-toggle svelte-16uy9h6"><input class="nav-pref-input svelte-16uy9h6" type="checkbox" aria-label="Show only the selected tab"/> <span class="switch-bg svelte-16uy9h6"></span> <span class="switch-knob svelte-16uy9h6"></span></label></div></div> <div class="tab-groups-list svelte-16uy9h6"></div></div></div>`);
     var root_4$4 = from_html(`<!> <!> <!>`, 1);
     var root_2$b = from_html(`<div class="tab-content active svelte-16uy9h6"><!> <!></div>`);
-    var root_15 = from_html(`<button type="button" class="share-action-btn copy-url-btn svelte-16uy9h6"><span class="btn-icon svelte-16uy9h6"><!></span> <span><!></span></button>`);
+    var root_15 = from_html(`<div class="link-label-container svelte-16uy9h6"><label for="settings-link-label" class="svelte-16uy9h6">Link Label (Optional)</label> <input type="text" id="settings-link-label" class="link-label-input svelte-16uy9h6" placeholder="e.g. default-settings"/></div> <button type="button" class="share-action-btn copy-url-btn svelte-16uy9h6"><span class="btn-icon svelte-16uy9h6"><!></span> <span><!></span></button>`, 1);
 
     var root_14 = from_html(`<div class="tab-content active svelte-16uy9h6"><div class="share-content svelte-16uy9h6"><div class="share-instruction svelte-16uy9h6">Create a shareable link for your current customization, or select specific parts of
               the page to share.</div> <button type="button" class="share-action-btn primary start-share-btn svelte-16uy9h6"><span class="btn-icon svelte-16uy9h6"><!></span> <span>Select elements to share</span></button> <!></div></div>`);
@@ -12773,7 +12910,7 @@
 
     const $$css$l = {
     	hash: 'svelte-16uy9h6',
-    	code: '\n  /* Modal Overlay & Modal Frame */.modal-overlay.svelte-16uy9h6 {position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0, 0, 0, 0.5);display:flex;align-items:center;justify-content:center;z-index:10002;}.modal-box.svelte-16uy9h6 {background:var(--cv-bg);border-radius:var(--cv-modal-radius, 0.75rem);box-shadow:0 25px 50px -12px var(--cv-shadow);max-width:32rem;width:90vw;max-height:80vh;display:flex;flex-direction:column;}.header.svelte-16uy9h6 {display:flex;align-items:center;justify-content:space-between;padding:0.5rem 1rem;border-bottom:1px solid var(--cv-border);}.header-content.svelte-16uy9h6 {display:flex;align-items:center;gap:0.75rem;}.modal-icon.svelte-16uy9h6 {position:relative;width:1rem;height:1rem;display:flex;align-items:center;justify-content:center;border-radius:9999px;color:var(--cv-text);}.modal-icon.svelte-16uy9h6 svg {fill:currentColor;}.title.svelte-16uy9h6 {font-size:1.125rem;font-weight:bold;color:var(--cv-text);margin:0;}.close-btn.svelte-16uy9h6 {width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;border-radius:9999px;background:transparent;border:none;color:var(--cv-text-secondary);cursor:pointer;transition:all 0.2s ease;}.close-btn.svelte-16uy9h6:hover {background:rgba(62, 132, 244, 0.1);color:var(--cv-primary);}.main.svelte-16uy9h6 {padding:1rem;flex:1;display:flex;flex-direction:column;overflow-y:auto;max-height:calc(80vh - 8rem);min-height:var(--cv-modal-min-height, 20rem);}.description.svelte-16uy9h6 {font-size:0.875rem;color:var(--cv-text);margin:0 0 1rem 0;line-height:1.4;}\n\n  /* Tabs */.tabs.svelte-16uy9h6 {display:flex;margin-bottom:1rem;border-bottom:2px solid var(--cv-border);}.tab.svelte-16uy9h6 {background:transparent;border:none;padding:0.5rem 1rem;font-size:0.9rem;font-weight:600;color:var(--cv-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;}.tab.active.svelte-16uy9h6 {color:var(--cv-primary);border-bottom-color:var(--cv-primary);}.tab-content.svelte-16uy9h6 {display:none;}.tab-content.active.svelte-16uy9h6 {display:block;}\n\n  /* Section Styling */.section.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.5rem;}.section-heading.svelte-16uy9h6 {font-size:0.7rem;font-weight:600;color:var(--cv-text-secondary);text-transform:var(--cv-section-label-transform, uppercase);letter-spacing:0.08em;margin:0;}.toggles-container.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.5rem;overflow:hidden;}\n\n  /* Tab Groups Section specific */.tabgroups-container.svelte-16uy9h6 {border-radius:0.5rem;}\n\n  /* Nav Toggle Card */.tabgroup-card.svelte-16uy9h6 {background:var(--cv-bg);border-bottom:1px solid var(--cv-border);}.tabgroup-card.header-card.svelte-16uy9h6 {display:flex;align-items:center;justify-content:space-between;padding:0.75rem;border:1px solid var(--cv-border);border-radius:0.5rem;margin-bottom:0.75rem;}.tabgroup-row.svelte-16uy9h6 {display:flex;align-items:center;justify-content:space-between;width:100%;gap:1rem;}.logo-box.svelte-16uy9h6 {width:3rem;height:3rem;background:var(--cv-modal-icon-bg);border-radius:0.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}.nav-icon.svelte-16uy9h6 {width:2rem;height:2rem;color:var(--cv-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color 0.2s ease;}.tabgroup-info.svelte-16uy9h6 {flex:1;display:flex;flex-direction:column;gap:0.25rem;}.tabgroup-title.svelte-16uy9h6 {font-weight:500;font-size:0.875rem;color:var(--cv-text);margin:0 0 0 0;}.tabgroup-description.svelte-16uy9h6 {font-size:0.75rem;color:var(--cv-text-secondary);margin:0;line-height:1.3;}\n\n  /* Toggle Switch */.toggle-switch.svelte-16uy9h6 {position:relative;display:inline-flex;align-items:center;width:44px;height:24px;background:var(--cv-switch-bg);border-radius:9999px;padding:2px;box-sizing:border-box;cursor:pointer;transition:background-color 0.2s ease;border:none;}.toggle-switch.svelte-16uy9h6 input:where(.svelte-16uy9h6) {display:none;}.toggle-switch.svelte-16uy9h6 .switch-bg:where(.svelte-16uy9h6) {position:absolute;inset:0;border-radius:9999px;background:var(--cv-switch-bg);transition:background-color 0.2s ease;pointer-events:none;}.toggle-switch.svelte-16uy9h6 .switch-knob:where(.svelte-16uy9h6) {position:relative;width:20px;height:20px;background:var(--cv-switch-knob);border-radius:50%;box-shadow:0 1px 2px rgba(0, 0, 0, 0.1);transition:transform 0.2s ease;transform:translateX(0);}.toggle-switch.svelte-16uy9h6 input:where(.svelte-16uy9h6):checked ~ .switch-knob:where(.svelte-16uy9h6) {transform:translateX(20px);}.toggle-switch.svelte-16uy9h6 input:where(.svelte-16uy9h6):checked ~ .switch-bg:where(.svelte-16uy9h6) {background:var(--cv-primary);}\n\n  /* Tab Groups List */.tab-groups-list.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.75rem;}\n\n  /* Footer */.footer.svelte-16uy9h6 {padding:0.75rem 1rem;border-top:1px solid var(--cv-border);display:flex;align-items:center;justify-content:space-between;background:var(--cv-bg);border-bottom-left-radius:var(--cv-modal-radius, 0.75rem);border-bottom-right-radius:var(--cv-modal-radius, 0.75rem);}.footer-attribution.svelte-16uy9h6 {display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.1rem;opacity:0.5;transition:opacity 0.15s ease;}.footer-attribution.svelte-16uy9h6:hover {opacity:1;}.footer-tagline.svelte-16uy9h6 {font-size:0.6rem;color:var(--cv-text-secondary);letter-spacing:0.04em;}.footer-link.svelte-16uy9h6 {color:var(--cv-text-secondary);text-decoration:none;font-size:0.68rem;font-weight:600;letter-spacing:0.08em;transition:color 0.15s ease;}.footer-link.svelte-16uy9h6:hover {color:var(--cv-primary);}.footer-link-container.svelte-16uy9h6 {display:flex;align-items:center;gap:0.35rem;}.footer-version.svelte-16uy9h6 {font-size:0.65rem;color:var(--cv-text);opacity:0.9;letter-spacing:0.04em;}.reset-btn.svelte-16uy9h6 {display:flex;align-items:center;gap:0.4rem;background:transparent;border:none;font-size:0.875rem;font-weight:500;color:var(--cv-text-secondary);cursor:pointer;padding:0.4rem 0.5rem;border-radius:0.5rem;transition:all 0.2s ease;}.reset-btn.svelte-16uy9h6:hover {background:var(--cv-danger-bg);color:var(--cv-danger);}.done-btn.svelte-16uy9h6 {background:var(--cv-primary);color:white;border:none;padding:0.5rem 1.1rem;border-radius:0.5rem;font-weight:600;font-size:0.875rem;cursor:pointer;box-shadow:0 1px 3px rgba(0, 0, 0, 0.12),\n      0 1px 2px rgba(0, 0, 0, 0.08);transition:background-color 0.15s ease,\n      box-shadow 0.15s ease;}.done-btn.svelte-16uy9h6:hover {background:var(--cv-primary-hover);box-shadow:0 3px 6px rgba(0, 0, 0, 0.12),\n      0 2px 4px rgba(0, 0, 0, 0.08);}\n\n  /* Share Tab Styles */.share-content.svelte-16uy9h6 {display:flex;flex-direction:column;gap:1rem;align-items:center;text-align:center;padding:1rem 0;}.share-instruction.svelte-16uy9h6 {font-size:0.95rem;color:var(--cv-text-secondary);margin-bottom:0.5rem;}.share-action-btn.svelte-16uy9h6 {display:flex;align-items:center;justify-content:center;gap:0.75rem;width:100%;max-width:320px;padding:0.75rem 1rem;border-radius:0.5rem;font-weight:500;font-size:0.95rem;cursor:pointer;transition:all 0.2s ease;border:1px solid var(--cv-border);background:var(--cv-bg);color:var(--cv-text);}.share-action-btn.svelte-16uy9h6:hover {border-color:var(--cv-primary);color:var(--cv-primary);background:var(--cv-bg-hover);}.share-action-btn.primary.svelte-16uy9h6 {background:var(--cv-primary);border-color:var(--cv-primary);color:white;}.share-action-btn.primary.svelte-16uy9h6:hover {background:var(--cv-primary-hover);border-color:var(--cv-primary-hover);}.btn-icon.svelte-16uy9h6 {display:flex;align-items:center;justify-content:center;width:1.25rem;height:1.25rem;}\n\n  /* Placeholder Inputs */.placeholders-container.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.75rem;}'
+    	code: '\n  /* Modal Overlay & Modal Frame */.modal-overlay.svelte-16uy9h6 {position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0, 0, 0, 0.5);display:flex;align-items:center;justify-content:center;z-index:10002;}.modal-box.svelte-16uy9h6 {background:var(--cv-bg);border-radius:var(--cv-modal-radius, 0.75rem);box-shadow:0 25px 50px -12px var(--cv-shadow);max-width:32rem;width:90vw;max-height:80vh;display:flex;flex-direction:column;}.header.svelte-16uy9h6 {display:flex;align-items:center;justify-content:space-between;padding:0.5rem 1rem;border-bottom:1px solid var(--cv-border);}.header-content.svelte-16uy9h6 {display:flex;align-items:center;gap:0.75rem;}.modal-icon.svelte-16uy9h6 {position:relative;width:1rem;height:1rem;display:flex;align-items:center;justify-content:center;border-radius:9999px;color:var(--cv-text);}.modal-icon.svelte-16uy9h6 svg {fill:currentColor;}.title.svelte-16uy9h6 {font-size:1.125rem;font-weight:bold;color:var(--cv-text);margin:0;}.close-btn.svelte-16uy9h6 {width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;border-radius:9999px;background:transparent;border:none;color:var(--cv-text-secondary);cursor:pointer;transition:all 0.2s ease;}.close-btn.svelte-16uy9h6:hover {background:rgba(62, 132, 244, 0.1);color:var(--cv-primary);}.main.svelte-16uy9h6 {padding:1rem;flex:1;display:flex;flex-direction:column;overflow-y:auto;max-height:calc(80vh - 8rem);min-height:var(--cv-modal-min-height, 20rem);}.description.svelte-16uy9h6 {font-size:0.875rem;color:var(--cv-text);margin:0 0 1rem 0;line-height:1.4;}\n\n  /* Tabs */.tabs.svelte-16uy9h6 {display:flex;margin-bottom:1rem;border-bottom:2px solid var(--cv-border);}.tab.svelte-16uy9h6 {background:transparent;border:none;padding:0.5rem 1rem;font-size:0.9rem;font-weight:600;color:var(--cv-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;}.tab.active.svelte-16uy9h6 {color:var(--cv-primary);border-bottom-color:var(--cv-primary);}.tab-content.svelte-16uy9h6 {display:none;}.tab-content.active.svelte-16uy9h6 {display:block;}\n\n  /* Section Styling */.section.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.5rem;}.section-heading.svelte-16uy9h6 {font-size:0.7rem;font-weight:600;color:var(--cv-text-secondary);text-transform:var(--cv-section-label-transform, uppercase);letter-spacing:0.08em;margin:0;}.toggles-container.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.5rem;overflow:hidden;}\n\n  /* Tab Groups Section specific */.tabgroups-container.svelte-16uy9h6 {border-radius:0.5rem;}\n\n  /* Nav Toggle Card */.tabgroup-card.svelte-16uy9h6 {background:var(--cv-bg);border-bottom:1px solid var(--cv-border);}.tabgroup-card.header-card.svelte-16uy9h6 {display:flex;align-items:center;justify-content:space-between;padding:0.75rem;border:1px solid var(--cv-border);border-radius:0.5rem;margin-bottom:0.75rem;}.tabgroup-row.svelte-16uy9h6 {display:flex;align-items:center;justify-content:space-between;width:100%;gap:1rem;}.logo-box.svelte-16uy9h6 {width:3rem;height:3rem;background:var(--cv-modal-icon-bg);border-radius:0.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}.nav-icon.svelte-16uy9h6 {width:2rem;height:2rem;color:var(--cv-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color 0.2s ease;}.tabgroup-info.svelte-16uy9h6 {flex:1;display:flex;flex-direction:column;gap:0.25rem;}.tabgroup-title.svelte-16uy9h6 {font-weight:500;font-size:0.875rem;color:var(--cv-text);margin:0 0 0 0;}.tabgroup-description.svelte-16uy9h6 {font-size:0.75rem;color:var(--cv-text-secondary);margin:0;line-height:1.3;}\n\n  /* Toggle Switch */.toggle-switch.svelte-16uy9h6 {position:relative;display:inline-flex;align-items:center;width:44px;height:24px;background:var(--cv-switch-bg);border-radius:9999px;padding:2px;box-sizing:border-box;cursor:pointer;transition:background-color 0.2s ease;border:none;}.toggle-switch.svelte-16uy9h6 input:where(.svelte-16uy9h6) {display:none;}.toggle-switch.svelte-16uy9h6 .switch-bg:where(.svelte-16uy9h6) {position:absolute;inset:0;border-radius:9999px;background:var(--cv-switch-bg);transition:background-color 0.2s ease;pointer-events:none;}.toggle-switch.svelte-16uy9h6 .switch-knob:where(.svelte-16uy9h6) {position:relative;width:20px;height:20px;background:var(--cv-switch-knob);border-radius:50%;box-shadow:0 1px 2px rgba(0, 0, 0, 0.1);transition:transform 0.2s ease;transform:translateX(0);}.toggle-switch.svelte-16uy9h6 input:where(.svelte-16uy9h6):checked ~ .switch-knob:where(.svelte-16uy9h6) {transform:translateX(20px);}.toggle-switch.svelte-16uy9h6 input:where(.svelte-16uy9h6):checked ~ .switch-bg:where(.svelte-16uy9h6) {background:var(--cv-primary);}\n\n  /* Tab Groups List */.tab-groups-list.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.75rem;}\n\n  /* Footer */.footer.svelte-16uy9h6 {padding:0.75rem 1rem;border-top:1px solid var(--cv-border);display:flex;align-items:center;justify-content:space-between;background:var(--cv-bg);border-bottom-left-radius:var(--cv-modal-radius, 0.75rem);border-bottom-right-radius:var(--cv-modal-radius, 0.75rem);}.footer-attribution.svelte-16uy9h6 {display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.1rem;opacity:0.5;transition:opacity 0.15s ease;}.footer-attribution.svelte-16uy9h6:hover {opacity:1;}.footer-tagline.svelte-16uy9h6 {font-size:0.6rem;color:var(--cv-text-secondary);letter-spacing:0.04em;}.footer-link.svelte-16uy9h6 {color:var(--cv-text-secondary);text-decoration:none;font-size:0.68rem;font-weight:600;letter-spacing:0.08em;transition:color 0.15s ease;}.footer-link.svelte-16uy9h6:hover {color:var(--cv-primary);}.footer-link-container.svelte-16uy9h6 {display:flex;align-items:center;gap:0.35rem;}.footer-version.svelte-16uy9h6 {font-size:0.65rem;color:var(--cv-text);opacity:0.9;letter-spacing:0.04em;}.reset-btn.svelte-16uy9h6 {display:flex;align-items:center;gap:0.4rem;background:transparent;border:none;font-size:0.875rem;font-weight:500;color:var(--cv-text-secondary);cursor:pointer;padding:0.4rem 0.5rem;border-radius:0.5rem;transition:all 0.2s ease;}.reset-btn.svelte-16uy9h6:hover {background:var(--cv-danger-bg);color:var(--cv-danger);}.done-btn.svelte-16uy9h6 {background:var(--cv-primary);color:white;border:none;padding:0.5rem 1.1rem;border-radius:0.5rem;font-weight:600;font-size:0.875rem;cursor:pointer;box-shadow:0 1px 3px rgba(0, 0, 0, 0.12),\n      0 1px 2px rgba(0, 0, 0, 0.08);transition:background-color 0.15s ease,\n      box-shadow 0.15s ease;}.done-btn.svelte-16uy9h6:hover {background:var(--cv-primary-hover);box-shadow:0 3px 6px rgba(0, 0, 0, 0.12),\n      0 2px 4px rgba(0, 0, 0, 0.08);}\n\n  /* Share Tab Styles */.share-content.svelte-16uy9h6 {display:flex;flex-direction:column;gap:1rem;align-items:center;text-align:center;padding:1rem 0;}.share-instruction.svelte-16uy9h6 {font-size:0.95rem;color:var(--cv-text-secondary);margin-bottom:0.5rem;}.share-action-btn.svelte-16uy9h6 {display:flex;align-items:center;justify-content:center;gap:0.75rem;width:100%;max-width:320px;padding:0.75rem 1rem;border-radius:0.5rem;font-weight:500;font-size:0.95rem;cursor:pointer;transition:all 0.2s ease;border:1px solid var(--cv-border);background:var(--cv-bg);color:var(--cv-text);}.share-action-btn.svelte-16uy9h6:hover {border-color:var(--cv-primary);color:var(--cv-primary);background:var(--cv-bg-hover);}.share-action-btn.primary.svelte-16uy9h6 {background:var(--cv-primary);border-color:var(--cv-primary);color:white;}.share-action-btn.primary.svelte-16uy9h6:hover {background:var(--cv-primary-hover);border-color:var(--cv-primary-hover);}.btn-icon.svelte-16uy9h6 {display:flex;align-items:center;justify-content:center;width:1.25rem;height:1.25rem;}\n\n  /* Placeholder Inputs */.placeholders-container.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.75rem;}\n\n  /* Link Label */.link-label-container.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.5rem;width:100%;max-width:320px;text-align:left;margin-bottom:0.5rem;}.link-label-container.svelte-16uy9h6 label:where(.svelte-16uy9h6) {font-size:0.85rem;font-weight:500;color:var(--cv-text-secondary);}.link-label-input.svelte-16uy9h6 {width:100%;padding:0.6rem 0.75rem;border-radius:0.5rem;border:1px solid var(--cv-border);background:var(--cv-bg);color:var(--cv-text);font-size:0.95rem;box-sizing:border-box;transition:border-color 0.2s ease, box-shadow 0.2s ease;}.link-label-input.svelte-16uy9h6:focus {outline:none;border-color:var(--cv-primary);box-shadow:0 0 0 2px rgba(62, 132, 244, 0.2);}'
     };
 
     function Modal($$anchor, $$props) {
@@ -12831,6 +12968,7 @@
     	let mainClientHeight = state(0);
 
     	let preservedHeight = state(0);
+    	let linkLabel = state('');
 
     	user_effect(() => {
     		if (!get(hasCustomizeContent) && get(activeTab) === 'customize') {
@@ -12878,14 +13016,27 @@
     	}
 
     	async function copyShareUrl() {
-    		const url = URLStateManager.generateShareableURL(activeStateStore.state, activeStateStore.config, {
+    		const rawUrl = URLStateManager.generateShareableURL(activeStateStore.state, activeStateStore.config, {
     			toggles: elementStore.detectedToggles,
     			tabGroups: elementStore.detectedTabGroups,
     			placeholders: elementStore.detectedPlaceholders
     		});
 
+    		const urlObj = new URL(rawUrl);
+    		const trimmed = get(linkLabel).trim();
+
+    		if (trimmed) {
+    			const existingSearch = urlObj.search.replace(/^\?/, '');
+    			const withoutLabel = existingSearch.split('&').filter((p) => p && p !== PARAM_LINK_LABEL && !p.startsWith(`${PARAM_LINK_LABEL}=`)).join('&');
+    			const labelPart = `${PARAM_LINK_LABEL}=${encodeURIComponent(trimmed)}`;
+
+    			urlObj.search = [labelPart, withoutLabel].filter(Boolean).join('&');
+    		}
+
+    		const finalUrl = urlObj.toString();
+
     		try {
-    			await copyToClipboard(url);
+    			await copyToClipboard(finalUrl);
     			showToast('Link copied to clipboard!');
     			set(copySuccess, true);
 
@@ -12963,12 +13114,12 @@
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var p = root_3$7();
-    					var text_1 = child(p, true);
+    					var p_1 = root_3$7();
+    					var text_1 = child(p_1, true);
 
-    					reset(p);
+    					reset(p_1);
     					template_effect(() => set_text(text_1, get(description)));
-    					append($$anchor, p);
+    					append($$anchor, p_1);
     				};
 
     				if_block(node_4, ($$render) => {
@@ -13148,7 +13299,14 @@
 
     			{
     				var consequent_10 = ($$anchor) => {
-    					var button_4 = root_15();
+    					var fragment_7 = root_15();
+    					var div_20 = first_child(fragment_7);
+    					var input_1 = sibling(child(div_20), 2);
+
+    					remove_input_defaults(input_1);
+    					reset(div_20);
+
+    					var button_4 = sibling(div_20, 2);
     					var span_1 = child(button_4);
     					var node_12 = child(span_1);
 
@@ -13191,8 +13349,9 @@
 
     					reset(span_2);
     					reset(button_4);
+    					bind_value(input_1, () => get(linkLabel), ($$value) => set(linkLabel, $$value));
     					delegated('click', button_4, copyShareUrl);
-    					append($$anchor, button_4);
+    					append($$anchor, fragment_7);
     				};
 
     				if_block(node_11, ($$render) => {
@@ -13229,9 +13388,9 @@
     		};
 
     		var alternate_4 = ($$anchor) => {
-    			var div_20 = root_21();
+    			var div_21 = root_21();
 
-    			append($$anchor, div_20);
+    			append($$anchor, div_21);
     		};
 
     		if_block(node_14, ($$render) => {
@@ -13239,15 +13398,15 @@
     		});
     	}
 
-    	var div_21 = sibling(node_14, 2);
-    	var div_22 = sibling(child(div_21), 2);
-    	var span_3 = sibling(child(div_22), 2);
+    	var div_22 = sibling(node_14, 2);
+    	var div_23 = sibling(child(div_22), 2);
+    	var span_3 = sibling(child(div_23), 2);
 
     	span_3.textContent = 'v2.3.0';
+    	reset(div_23);
     	reset(div_22);
-    	reset(div_21);
 
-    	var button_6 = sibling(div_21, 2);
+    	var button_6 = sibling(div_22, 2);
 
     	reset(footer);
     	reset(div_1);
@@ -15115,6 +15274,16 @@
     		set(this.#selectedTextColor, value, true);
     	}
 
+    	#linkLabel = state('');
+
+    	get linkLabel() {
+    		return get(this.#linkLabel);
+    	}
+
+    	set linkLabel(value) {
+    		set(this.#linkLabel, value, true);
+    	}
+
     	get shareCount() {
     		return this.selectionMode === 'highlight'
     			? this.textHighlights.length
@@ -15137,6 +15306,7 @@
 
     			this.currentHoverTarget = null;
     			document.body.classList.remove('cv-share-active-show', 'cv-share-active-hide', 'cv-share-active-box', 'cv-share-active-highlight');
+    			this.linkLabel = '';
     		} else {
     			this.isActive = true;
     			this.updateBodyClass();
@@ -15245,6 +15415,7 @@
     		this.boxColors.clear();
     		this.boxAnnotations.clear();
     		this.textHighlights = [];
+    		this.linkLabel = '';
     		textHighlightService.clear();
     		window.getSelection()?.removeAllRanges();
     	}
@@ -15331,14 +15502,9 @@
     			}
 
     			const serialized = serializeTextHighlights(this.textHighlights);
-
-    			// eslint-disable-next-line svelte/prefer-svelte-reactivity
     			const url = new URL(window.location.href);
 
-    			url.searchParams.delete('cv-show');
-    			url.searchParams.delete('cv-hide');
-    			url.searchParams.delete('cv-box');
-    			url.searchParams.set('cv-highlight', serialized);
+    			this._injectShareParams(url, 'cv-highlight', serialized);
 
     			navigator.clipboard.writeText(url.href).then(() => {
     				showToast('Highlight link copied!');
@@ -15366,23 +15532,16 @@
     			return;
     		}
 
-    		// eslint-disable-next-line svelte/prefer-svelte-reactivity
     		const url = new URL(window.location.href);
-
-    		// Clear all potential params first
-    		url.searchParams.delete('cv-show');
-
-    		url.searchParams.delete('cv-hide');
-    		url.searchParams.delete('cv-box');
-    		url.searchParams.delete('cv-highlight');
+    		let paramKey = 'cv-show';
 
     		if (this.selectionMode === 'hide') {
-    			url.searchParams.set('cv-hide', serialized);
+    			paramKey = 'cv-hide';
     		} else if (this.selectionMode === 'box') {
-    			url.searchParams.set('cv-box', serialized);
-    		} else {
-    			url.searchParams.set('cv-show', serialized);
+    			paramKey = 'cv-box';
     		}
+
+    		this._injectShareParams(url, paramKey, serialized);
 
     		// Copy to clipboard
     		navigator.clipboard.writeText(url.href).then(() => {
@@ -15401,14 +15560,9 @@
     			}
 
     			const serialized = serializeTextHighlights(this.textHighlights);
-
-    			// eslint-disable-next-line svelte/prefer-svelte-reactivity
     			const url = new URL(window.location.href);
 
-    			url.searchParams.delete('cv-show');
-    			url.searchParams.delete('cv-hide');
-    			url.searchParams.delete('cv-box');
-    			url.searchParams.set('cv-highlight', serialized);
+    			this._injectShareParams(url, 'cv-highlight', serialized);
     			window.open(url.toString(), '_blank');
 
     			return;
@@ -15422,23 +15576,16 @@
 
     		const descriptors = this._buildDescriptors();
     		const serialized = serialize(descriptors);
-
-    		// eslint-disable-next-line svelte/prefer-svelte-reactivity
     		const url = new URL(window.location.href);
-
-    		url.searchParams.delete('cv-show');
-    		url.searchParams.delete('cv-hide');
-    		url.searchParams.delete('cv-box');
-    		url.searchParams.delete('cv-highlight');
+    		let paramKey = 'cv-show';
 
     		if (this.selectionMode === 'hide') {
-    			url.searchParams.set('cv-hide', serialized);
+    			paramKey = 'cv-hide';
     		} else if (this.selectionMode === 'box') {
-    			url.searchParams.set('cv-box', serialized);
-    		} else {
-    			url.searchParams.set('cv-show', serialized);
+    			paramKey = 'cv-box';
     		}
 
+    		this._injectShareParams(url, paramKey, serialized);
     		window.open(url.toString(), '_blank');
     	}
 
@@ -15461,6 +15608,31 @@
 
     			return desc;
     		});
+    	}
+
+    	_injectShareParams(url, paramKey, paramValue) {
+    		const existingSearch = url.search.replace(/^\?/, '');
+
+    		const withoutManaged = existingSearch.split('&').filter((p) => {
+    			if (!p) return false;
+    			if (p === 'cv-show' || p.startsWith('cv-show=')) return false;
+    			if (p === 'cv-hide' || p.startsWith('cv-hide=')) return false;
+    			if (p === 'cv-box' || p.startsWith('cv-box=')) return false;
+    			if (p === 'cv-highlight' || p.startsWith('cv-highlight=')) return false;
+    			if (p === PARAM_LINK_LABEL || p.startsWith(`${PARAM_LINK_LABEL}=`)) return false;
+
+    			return true;
+    		});
+
+    		const newParams = [];
+    		const trimmed = this.linkLabel.trim();
+
+    		if (trimmed) {
+    			newParams.push(`${PARAM_LINK_LABEL}=${encodeURIComponent(trimmed)}`);
+    		}
+
+    		newParams.push(`${paramKey}=${encodeURIComponent(paramValue)}`);
+    		url.search = [...newParams, ...withoutManaged].join('&');
     	}
     }
 
@@ -15628,11 +15800,11 @@
 
     var root_2$a = from_html(`<button type="button"></button>`);
     var root_1$b = from_html(`<div class="cv-hl-swatches svelte-bs8cbd" role="group" aria-label="Highlight color"></div> <span class="divider svelte-bs8cbd"></span>`, 1);
-    var root$e = from_html(`<div class="floating-bar svelte-bs8cbd"><div class="mode-toggle svelte-bs8cbd"><button type="button" title="Highlight selected text">Highlight</button> <button type="button" title="Box selected elements">Box</button> <button type="button" title="Show only selected elements">Show</button> <button type="button" title="Hide selected elements">Hide</button></div> <span class="divider svelte-bs8cbd"></span> <!> <span class="count svelte-bs8cbd"><!></span> <button type="button" class="btn clear svelte-bs8cbd">Clear</button> <button type="button" class="btn preview svelte-bs8cbd">Preview</button> <button type="button" class="btn generate svelte-bs8cbd">Copy Link</button> <button type="button" class="btn exit svelte-bs8cbd">Exit</button></div>`);
+    var root$e = from_html(`<div class="floating-bar svelte-bs8cbd"><div class="mode-toggle svelte-bs8cbd"><button type="button" title="Highlight selected text">Highlight</button> <button type="button" title="Box selected elements">Box</button> <button type="button" title="Show only selected elements">Show</button> <button type="button" title="Hide selected elements">Hide</button></div> <span class="divider svelte-bs8cbd"></span> <!> <span class="count svelte-bs8cbd"><!></span> <button type="button" class="btn clear svelte-bs8cbd">Clear</button> <input type="text" class="label-input svelte-bs8cbd" placeholder="Label Link" aria-label="Optional link label"/> <button type="button" class="btn preview svelte-bs8cbd">Preview</button> <button type="button" class="btn generate svelte-bs8cbd">Copy Link</button> <button type="button" class="btn exit svelte-bs8cbd">Exit</button></div>`);
 
     const $$css$i = {
     	hash: 'svelte-bs8cbd',
-    	code: '.floating-bar.svelte-bs8cbd {position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background-color:#2c2c2c;color:#f1f1f1;border-radius:8px;padding:8px 12px;box-shadow:0 8px 20px rgba(0, 0, 0, 0.4);display:flex;align-items:center;gap:12px;z-index:99999;font-family:system-ui,\n      -apple-system,\n      sans-serif;font-size:14px;border:1px solid #4a4a4a;pointer-events:auto;white-space:nowrap;min-width:500px;}.mode-toggle.svelte-bs8cbd {display:flex;background:#1a1a1a;border-radius:6px;padding:2px;border:1px solid #4a4a4a;}.mode-btn.svelte-bs8cbd {background:transparent;color:#aeaeae;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:500;font-size:13px;transition:all 0.2s;}.mode-btn.svelte-bs8cbd:hover {color:#fff;}.mode-btn.active.svelte-bs8cbd {background:#4a4a4a;color:#fff;box-shadow:0 1px 3px rgba(0, 0, 0, 0.2);}.divider.svelte-bs8cbd {width:1px;height:20px;background:#4a4a4a;margin:0 4px;}.count.svelte-bs8cbd {font-weight:500;min-width:120px;text-align:center;font-size:13px;color:#ccc;}.btn.svelte-bs8cbd {background-color:#0078d4;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:500;transition:background-color 0.2s;font-size:13px;}.btn.svelte-bs8cbd:hover {background-color:#005a9e;}.btn.clear.svelte-bs8cbd {background-color:transparent;border:1px solid #5a5a5a;color:#dadada;}.btn.clear.svelte-bs8cbd:hover {background-color:#3a3a3a;color:white;}.btn.preview.svelte-bs8cbd {background-color:#333;border:1px solid #555;}.btn.preview.svelte-bs8cbd:hover {background-color:#444;}.btn.exit.svelte-bs8cbd {background-color:transparent;color:#ff6b6b;padding:6px 10px;}.btn.exit.svelte-bs8cbd:hover {background-color:rgba(255, 107, 107, 0.1);}\n\n  @media (max-width: 600px) {.floating-bar.svelte-bs8cbd {display:flex;flex-wrap:wrap;min-width:unset;width:90%;max-width:400px;height:auto;padding:12px;gap:10px;bottom:30px;}.mode-toggle.svelte-bs8cbd {margin-right:auto;order:1;}.btn.exit.svelte-bs8cbd {margin-left:auto;order:2;}.divider.svelte-bs8cbd {display:none;}.count.svelte-bs8cbd {width:100%;text-align:center;order:3;padding:8px 0;border-top:1px solid #3a3a3a;border-bottom:1px solid #3a3a3a;margin:4px 0;}.btn.clear.svelte-bs8cbd,\n    .btn.preview.svelte-bs8cbd,\n    .btn.generate.svelte-bs8cbd {flex:1;text-align:center;font-size:12px;padding:8px 4px;order:4;}.btn.generate.svelte-bs8cbd {flex:1.5;}\n  }\n\n  /* ── Swatches ─────────────────────────────────── */.cv-hl-swatches.svelte-bs8cbd {display:flex;gap:6px;align-items:center;}.cv-hl-swatch.svelte-bs8cbd {width:18px;height:18px;border-radius:50%;background:var(--swatch-color);border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.12s ease,\n      border-color 0.12s ease,\n      box-shadow 0.12s ease;box-shadow:0 1px 3px rgba(0, 0, 0, 0.3);}.cv-hl-swatch.svelte-bs8cbd:hover {transform:scale(1.2);box-shadow:0 2px 6px rgba(0, 0, 0, 0.4);}.cv-hl-swatch.active.svelte-bs8cbd {border-color:rgba(255, 255, 255, 0.85);transform:scale(1.15);box-shadow:0 0 0 2px var(--swatch-color),\n      0 2px 8px rgba(0, 0, 0, 0.4);}'
+    	code: '.floating-bar.svelte-bs8cbd {position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background-color:#2c2c2c;color:#f1f1f1;border-radius:8px;padding:8px 12px;box-shadow:0 8px 20px rgba(0, 0, 0, 0.4);display:flex;align-items:center;gap:12px;z-index:99999;font-family:system-ui,\n      -apple-system,\n      sans-serif;font-size:14px;border:1px solid #4a4a4a;pointer-events:auto;white-space:nowrap;min-width:500px;}.mode-toggle.svelte-bs8cbd {display:flex;background:#1a1a1a;border-radius:6px;padding:2px;border:1px solid #4a4a4a;}.mode-btn.svelte-bs8cbd {background:transparent;color:#aeaeae;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:500;font-size:13px;transition:all 0.2s;}.mode-btn.svelte-bs8cbd:hover {color:#fff;}.mode-btn.active.svelte-bs8cbd {background:#4a4a4a;color:#fff;box-shadow:0 1px 3px rgba(0, 0, 0, 0.2);}.divider.svelte-bs8cbd {width:1px;height:20px;background:#4a4a4a;margin:0 4px;}.count.svelte-bs8cbd {font-weight:500;min-width:120px;text-align:center;font-size:13px;color:#ccc;}.label-input.svelte-bs8cbd {background:#1a1a1a;border:1px solid #4a4a4a;color:#fff;padding:5px 8px;border-radius:4px;font-size:13px;width:80px;transition:width 0.2s ease, border-color 0.2s ease;}.label-input.svelte-bs8cbd::placeholder {color:#666;}.label-input.svelte-bs8cbd:focus {width:130px;outline:none;border-color:#0078d4;}.btn.svelte-bs8cbd {background-color:#0078d4;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:500;transition:background-color 0.2s;font-size:13px;}.btn.svelte-bs8cbd:hover {background-color:#005a9e;}.btn.clear.svelte-bs8cbd {background-color:transparent;border:1px solid #5a5a5a;color:#dadada;}.btn.clear.svelte-bs8cbd:hover {background-color:#3a3a3a;color:white;}.btn.preview.svelte-bs8cbd {background-color:#333;border:1px solid #555;}.btn.preview.svelte-bs8cbd:hover {background-color:#444;}.btn.exit.svelte-bs8cbd {background-color:transparent;color:#ff6b6b;padding:6px 10px;}.btn.exit.svelte-bs8cbd:hover {background-color:rgba(255, 107, 107, 0.1);}\n\n  @media (max-width: 600px) {.floating-bar.svelte-bs8cbd {display:flex;flex-wrap:wrap;min-width:unset;width:90%;max-width:400px;height:auto;padding:12px;gap:10px;bottom:30px;}.mode-toggle.svelte-bs8cbd {margin-right:auto;order:1;}.btn.exit.svelte-bs8cbd {margin-left:auto;order:2;}.divider.svelte-bs8cbd {display:none;}.count.svelte-bs8cbd {width:100%;text-align:center;order:3;padding:8px 0;border-top:1px solid #3a3a3a;border-bottom:1px solid #3a3a3a;margin:4px 0;}.label-input.svelte-bs8cbd {order:4;flex:1;width:auto;min-width:80px;}.label-input.svelte-bs8cbd:focus {width:auto;}.btn.clear.svelte-bs8cbd,\n    .btn.preview.svelte-bs8cbd,\n    .btn.generate.svelte-bs8cbd {flex:1;text-align:center;font-size:12px;padding:8px 4px;order:5;}.btn.generate.svelte-bs8cbd {flex:1.5;}\n  }\n\n  /* ── Swatches ─────────────────────────────────── */.cv-hl-swatches.svelte-bs8cbd {display:flex;gap:6px;align-items:center;}.cv-hl-swatch.svelte-bs8cbd {width:18px;height:18px;border-radius:50%;background:var(--swatch-color);border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.12s ease,\n      border-color 0.12s ease,\n      box-shadow 0.12s ease;box-shadow:0 1px 3px rgba(0, 0, 0, 0.3);}.cv-hl-swatch.svelte-bs8cbd:hover {transform:scale(1.2);box-shadow:0 2px 6px rgba(0, 0, 0, 0.4);}.cv-hl-swatch.active.svelte-bs8cbd {border-color:rgba(255, 255, 255, 0.85);transform:scale(1.15);box-shadow:0 0 0 2px var(--swatch-color),\n      0 2px 8px rgba(0, 0, 0, 0.4);}'
     };
 
     function ShareToolbar($$anchor, $$props) {
@@ -15729,7 +15901,11 @@
     	reset(span);
 
     	var button_5 = sibling(span, 2);
-    	var button_6 = sibling(button_5, 2);
+    	var input = sibling(button_5, 2);
+
+    	remove_input_defaults(input);
+
+    	var button_6 = sibling(input, 2);
     	var button_7 = sibling(button_6, 2);
     	var button_8 = sibling(button_7, 2);
 
@@ -15751,6 +15927,7 @@
     	delegated('click', button_2, () => shareStore.setSelectionMode('show'));
     	delegated('click', button_3, () => shareStore.setSelectionMode('hide'));
     	delegated('click', button_5, handleClear);
+    	bind_value(input, () => shareStore.linkLabel, ($$value) => shareStore.linkLabel = $$value);
     	delegated('click', button_6, handlePreview);
     	delegated('click', button_7, handleGenerate);
     	delegated('click', button_8, handleExit);
@@ -18653,9 +18830,7 @@
     	 * Reads the current URL and applies the appropriate focus/highlight mode
     	 */
     	applyModesFromUrl() {
-    		// eslint-disable-next-line svelte/prefer-svelte-reactivity
     		const url = new URL(window.location.href);
-
     		const showDescriptors = url.searchParams.get(PARAM_CV_SHOW);
     		const hideDescriptors = url.searchParams.get(PARAM_CV_HIDE);
     		const boxDescriptors = url.searchParams.get(PARAM_CV_BOX);
@@ -18791,7 +18966,6 @@
     		document.body.classList.add(BODY_SHOW_CLASS);
 
     		// Exclude highlight targets from being hidden so they stay visible
-    		// eslint-disable-next-line svelte/prefer-svelte-reactivity
     		const excludeSet = new Set(excludeTargets);
 
     		const filteredTargets = excludeTargets.length > 0 ? targets.filter((t) => !excludeSet.has(t)) : targets;
@@ -18951,9 +19125,7 @@
     		}
 
     		if (updateUrl) {
-    			// eslint-disable-next-line svelte/prefer-svelte-reactivity
     			const url = new URL(window.location.href);
-
     			let changed = false;
 
     			if (url.searchParams.has(PARAM_CV_SHOW)) {
