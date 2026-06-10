@@ -13454,11 +13454,16 @@
     delegate(['mousedown', 'mouseup', 'click', 'change']);
 
     const ANNOTATION_COLORS = [
-        { key: 'orange', label: 'Orange', hex: '#ff9e5e' },
-        { key: 'green', label: 'Lime Green', hex: '#e2f073' },
-        { key: 'pink', label: 'Pink', hex: '#ff7eb3' },
-        { key: 'yellow', label: 'Yellow', hex: '#ffd447' },
-        { key: 'blue', label: 'Light Blue', hex: '#7ee0f5' },
+        { key: 'orange', label: 'Orange', hex: '#ff9e5e', textColor: '#2c2c2c' },
+        { key: 'green', label: 'Lime Green', hex: '#e2f073', textColor: '#2c2c2c' },
+        { key: 'pink', label: 'Pink', hex: '#ff7eb3', textColor: '#2c2c2c' },
+        { key: 'yellow', label: 'Yellow', hex: '#ffd447', textColor: '#2c2c2c' },
+        { key: 'blue', label: 'Light Blue', hex: '#7ee0f5', textColor: '#2c2c2c' },
+        { key: 'classic-yellow', label: 'Classic Yellow', hex: '#f5f521', textColor: '#2c2c2c' },
+        { key: 'classic-blue', label: 'Classic Blue', hex: '#3b82f6', textColor: '#ffffff' },
+        { key: 'classic-green', label: 'Classic Green', hex: '#22c55e', textColor: '#ffffff' },
+        { key: 'red', label: 'Red', hex: '#ef4444', textColor: '#ffffff' },
+        { key: 'black', label: 'Black', hex: '#1a1a1a', textColor: '#ffffff' },
     ];
     const DEFAULT_ANNOTATION_COLOR_KEY = 'yellow';
 
@@ -14502,7 +14507,7 @@
 
     const $$css$k = {
     	hash: 'svelte-1ctem0h',
-    	code: '\n  /* ==============================\n     CONTAINER (position, drag, opacity)\n     ============================== */.cv-annotation-container.svelte-1ctem0h {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;cursor:default;opacity:0.88;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-1ctem0h:hover {opacity:1;z-index:110;}\n\n  /* ==============================\n     WRAPPER & SHADOW\n     ============================== */.cv-ribbon-wrapper.svelte-1ctem0h {position:relative;transform-origin:center center;}.cv-ribbon-wrapper--intro.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-ribbon-wrapper--periodic.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-ribbon-shadow.svelte-1ctem0h {position:absolute;top:0;left:0;width:140px;height:28px;background:rgba(0, 0, 0, 0.25);transform:translate(3px, 3px);pointer-events:none;z-index:-1;}.cv-ribbon-shadow--empty.svelte-1ctem0h {width:70px;}\n\n  /* ==============================\n     RIBBON (home-plate)\n     ============================== */.cv-annotation-ribbon.svelte-1ctem0h {border:none;padding:6px 20px 6px 8px;width:140px;height:28px;box-sizing:border-box;background:var(--cv-annotation-color, var(--cv-box-color));cursor:default;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);display:flex;align-items:center;justify-content:flex-start;gap:5px;}.cv-annotation-ribbon--right.svelte-1ctem0h {padding:6px 8px 6px 20px;justify-content:flex-end;}.cv-annotation-ribbon--empty.svelte-1ctem0h {width:70px;padding:6px 16px 6px 8px;}.cv-annotation-ribbon--expandable.svelte-1ctem0h {cursor:pointer;}.cv-annotation-ribbon--expandable.svelte-1ctem0h:hover {filter:brightness(1.1);}\n\n  /* ==============================\n     RIBBON TEXT (single line)\n     ============================== */.cv-ribbon-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;color:#2c2c2c;}.cv-ribbon-text--right.svelte-1ctem0h {text-align:right;}.cv-ribbon-chevron.svelte-1ctem0h {font-size:22px;opacity:1;flex-shrink:0;line-height:1;color:#2c2c2c;}.cv-ribbon-chevron--bounce.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-chevron-bounce 3s ease-in-out infinite;}\n\n  /* ==============================\n     DRAG GRIP (6-dot grid on flat side)\n     ============================== */.cv-ribbon-grip.svelte-1ctem0h {display:grid;grid-template-columns:repeat(2, 3px);gap:3px;flex-shrink:0;opacity:0.7;cursor:grab;padding:2px;}.cv-ribbon-grip.svelte-1ctem0h:active {cursor:grabbing;}.cv-ribbon-grip.svelte-1ctem0h > span:where(.svelte-1ctem0h) {width:3px;height:3px;border-radius:50%;background:rgba(44, 44, 44, 0.8);}\n\n  /* ==============================\n     CARD (sticky note)\n     ============================== */.cv-annotation-card.svelte-1ctem0h {background:#fffdf5;border:1.5px solid var(--cv-annotation-color, var(--cv-box-color));border-radius:4px;padding:10px 12px;max-width:280px;min-width:120px;position:relative;z-index:1;box-shadow:3px 3px 0px rgba(0, 0, 0, 0.25);\n    animation: svelte-1ctem0h-cv-cardPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}.cv-card-close.svelte-1ctem0h {position:absolute;top:3px;right:5px;border:none;background:transparent;cursor:pointer;font-size:12px;color:#aaa;padding:2px 4px;line-height:1;font-family:sans-serif;}.cv-card-close.svelte-1ctem0h:hover {color:#555;}.cv-card-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:600;color:#333;line-height:1.45;word-break:break-word;white-space:pre-wrap;padding-right:15px;}\n\n  /* ==============================\n     ANIMATIONS\n     ============================== */\n  @keyframes svelte-1ctem0h-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-cardPop {\n    from {\n      opacity: 0;\n      transform: scale(0.9) translateY(5px);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) translateY(0);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-chevron-bounce {\n    0%,\n    70%,\n    100% {\n      transform: translateY(0);\n    }\n    78% {\n      transform: translateY(-3px);\n    }\n    86% {\n      transform: translateY(1px);\n    }\n    93% {\n      transform: translateY(-1.5px);\n    }\n  }'
+    	code: '\n  /* ==============================\n     CONTAINER (position, drag, opacity)\n     ============================== */.cv-annotation-container.svelte-1ctem0h {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;cursor:default;opacity:0.88;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-1ctem0h:hover {opacity:1;z-index:110;}\n\n  /* ==============================\n     WRAPPER & SHADOW\n     ============================== */.cv-ribbon-wrapper.svelte-1ctem0h {position:relative;transform-origin:center center;}.cv-ribbon-wrapper--intro.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-ribbon-wrapper--periodic.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-ribbon-shadow.svelte-1ctem0h {position:absolute;top:0;left:0;width:140px;height:28px;background:rgba(0, 0, 0, 0.25);transform:translate(3px, 3px);pointer-events:none;z-index:-1;}.cv-ribbon-shadow--empty.svelte-1ctem0h {width:70px;}\n\n  /* ==============================\n     RIBBON (home-plate)\n     ============================== */.cv-annotation-ribbon.svelte-1ctem0h {border:none;padding:6px 20px 6px 8px;width:140px;height:28px;box-sizing:border-box;background:var(--cv-annotation-color, var(--cv-box-color));cursor:default;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);display:flex;align-items:center;justify-content:flex-start;gap:5px;}.cv-annotation-ribbon--right.svelte-1ctem0h {padding:6px 8px 6px 20px;justify-content:flex-end;}.cv-annotation-ribbon--empty.svelte-1ctem0h {width:70px;padding:6px 16px 6px 8px;}.cv-annotation-ribbon--expandable.svelte-1ctem0h {cursor:pointer;}.cv-annotation-ribbon--expandable.svelte-1ctem0h:hover {filter:brightness(1.1);}\n\n  /* ==============================\n     RIBBON TEXT (single line)\n     ============================== */.cv-ribbon-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;color:var(--cv-annotation-text-color, #2c2c2c);}.cv-ribbon-text--right.svelte-1ctem0h {text-align:right;}.cv-ribbon-chevron.svelte-1ctem0h {font-size:22px;opacity:1;flex-shrink:0;line-height:1;color:var(--cv-annotation-text-color, #2c2c2c);}.cv-ribbon-chevron--bounce.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-chevron-bounce 3s ease-in-out infinite;}\n\n  /* ==============================\n     DRAG GRIP (6-dot grid on flat side)\n     ============================== */.cv-ribbon-grip.svelte-1ctem0h {display:grid;grid-template-columns:repeat(2, 3px);gap:3px;flex-shrink:0;opacity:0.7;cursor:grab;padding:2px;}.cv-ribbon-grip.svelte-1ctem0h:active {cursor:grabbing;}.cv-ribbon-grip.svelte-1ctem0h > span:where(.svelte-1ctem0h) {width:3px;height:3px;border-radius:50%;background:var(--cv-annotation-text-color, #2c2c2c);}\n\n  /* ==============================\n     CARD (sticky note)\n     ============================== */.cv-annotation-card.svelte-1ctem0h {background:#fffdf5;border:1.5px solid var(--cv-annotation-color, var(--cv-box-color));border-radius:4px;padding:10px 12px;max-width:280px;min-width:120px;position:relative;z-index:1;box-shadow:3px 3px 0px rgba(0, 0, 0, 0.25);\n    animation: svelte-1ctem0h-cv-cardPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}.cv-card-close.svelte-1ctem0h {position:absolute;top:3px;right:5px;border:none;background:transparent;cursor:pointer;font-size:12px;color:#aaa;padding:2px 4px;line-height:1;font-family:sans-serif;}.cv-card-close.svelte-1ctem0h:hover {color:#555;}.cv-card-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:600;color:#333;line-height:1.45;word-break:break-word;white-space:pre-wrap;padding-right:15px;}\n\n  /* ==============================\n     ANIMATIONS\n     ============================== */\n  @keyframes svelte-1ctem0h-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-cardPop {\n    from {\n      opacity: 0;\n      transform: scale(0.9) translateY(5px);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) translateY(0);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-chevron-bounce {\n    0%,\n    70%,\n    100% {\n      transform: translateY(0);\n    }\n    78% {\n      transform: translateY(-3px);\n    }\n    86% {\n      transform: translateY(1px);\n    }\n    93% {\n      transform: translateY(-1.5px);\n    }\n  }'
     };
 
     function Annotation($$anchor, $$props) {
@@ -14902,28 +14907,19 @@
     }
 
     // ─── Styles ───────────────────────────────────────────────────────────────────
-    const HIGHLIGHT_CSS = `
-::highlight(cv-hl-orange) {
-  background-color: rgba(255, 158, 94, 0.45);
+    function hexToRgba(hex, alpha) {
+    	const r = parseInt(hex.slice(1, 3), 16);
+    	const g = parseInt(hex.slice(3, 5), 16);
+    	const b = parseInt(hex.slice(5, 7), 16);
+
+    	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    const HIGHLIGHT_CSS = ANNOTATION_COLORS.map((c) => `
+::highlight(cv-hl-${c.key}) {
+  background-color: ${hexToRgba(c.hex, 0.45)};
   color: inherit;
-}
-::highlight(cv-hl-green) {
-  background-color: rgba(226, 240, 115, 0.45);
-  color: inherit;
-}
-::highlight(cv-hl-pink) {
-  background-color: rgba(255, 126, 179, 0.45);
-  color: inherit;
-}
-::highlight(cv-hl-yellow) {
-  background-color: rgba(255, 212, 71, 0.45);
-  color: inherit;
-}
-::highlight(cv-hl-blue) {
-  background-color: rgba(126, 224, 245, 0.45);
-  color: inherit;
-}
-`.trim();
+}`).join('').trim();
 
     const FALLBACK_CSS = `
 .cv-hl-fallback {
@@ -14932,26 +14928,11 @@
   clip-path: polygon(3px 0%, 100% 2px, calc(100% - 3px) 100%, 0% calc(100% - 2px));
   mix-blend-mode: multiply;
 }
-.cv-hl-fallback--orange {
-  background-color: rgba(255, 158, 94, 0.45);
+${ANNOTATION_COLORS.map((c) => `
+.cv-hl-fallback--${c.key} {
+  background-color: ${hexToRgba(c.hex, 0.45)};
   color: inherit;
-}
-.cv-hl-fallback--green {
-  background-color: rgba(226, 240, 115, 0.45);
-  color: inherit;
-}
-.cv-hl-fallback--pink {
-  background-color: rgba(255, 126, 179, 0.45);
-  color: inherit;
-}
-.cv-hl-fallback--yellow {
-  background-color: rgba(255, 212, 71, 0.45);
-  color: inherit;
-}
-.cv-hl-fallback--blue {
-  background-color: rgba(126, 224, 245, 0.45);
-  color: inherit;
-}
+}`).join('')}
 `.trim();
 
     let styleInjected = false;
@@ -15190,6 +15171,7 @@
     		const colorDef = ANNOTATION_COLORS.find((c) => c.key === colorKey) ?? ANNOTATION_COLORS.find((c) => c.key === DEFAULT_ANNOTATION_COLOR_KEY);
 
     		wrapper.style.setProperty('--cv-annotation-color', colorDef.hex);
+    		wrapper.style.setProperty('--cv-annotation-text-color', colorDef.textColor);
 
     		const component = mount(Annotation, {
     			target: wrapper,
@@ -15804,7 +15786,7 @@
 
     const $$css$i = {
     	hash: 'svelte-bs8cbd',
-    	code: '.floating-bar.svelte-bs8cbd {position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background-color:#2c2c2c;color:#f1f1f1;border-radius:8px;padding:8px 12px;box-shadow:0 8px 20px rgba(0, 0, 0, 0.4);display:flex;align-items:center;gap:12px;z-index:99999;font-family:system-ui,\n      -apple-system,\n      sans-serif;font-size:14px;border:1px solid #4a4a4a;pointer-events:auto;white-space:nowrap;min-width:500px;}.mode-toggle.svelte-bs8cbd {display:flex;background:#1a1a1a;border-radius:6px;padding:2px;border:1px solid #4a4a4a;}.mode-btn.svelte-bs8cbd {background:transparent;color:#aeaeae;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:500;font-size:13px;transition:all 0.2s;}.mode-btn.svelte-bs8cbd:hover {color:#fff;}.mode-btn.active.svelte-bs8cbd {background:#4a4a4a;color:#fff;box-shadow:0 1px 3px rgba(0, 0, 0, 0.2);}.divider.svelte-bs8cbd {width:1px;height:20px;background:#4a4a4a;margin:0 4px;}.count.svelte-bs8cbd {font-weight:500;min-width:120px;text-align:center;font-size:13px;color:#ccc;}.label-input.svelte-bs8cbd {background:#1a1a1a;border:1px solid #4a4a4a;color:#fff;padding:5px 8px;border-radius:4px;font-size:13px;width:80px;transition:width 0.2s ease, border-color 0.2s ease;}.label-input.svelte-bs8cbd::placeholder {color:#666;}.label-input.svelte-bs8cbd:focus {width:130px;outline:none;border-color:#0078d4;}.btn.svelte-bs8cbd {background-color:#0078d4;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:500;transition:background-color 0.2s;font-size:13px;}.btn.svelte-bs8cbd:hover {background-color:#005a9e;}.btn.clear.svelte-bs8cbd {background-color:transparent;border:1px solid #5a5a5a;color:#dadada;}.btn.clear.svelte-bs8cbd:hover {background-color:#3a3a3a;color:white;}.btn.preview.svelte-bs8cbd {background-color:#333;border:1px solid #555;}.btn.preview.svelte-bs8cbd:hover {background-color:#444;}.btn.exit.svelte-bs8cbd {background-color:transparent;color:#ff6b6b;padding:6px 10px;}.btn.exit.svelte-bs8cbd:hover {background-color:rgba(255, 107, 107, 0.1);}\n\n  @media (max-width: 600px) {.floating-bar.svelte-bs8cbd {display:flex;flex-wrap:wrap;min-width:unset;width:90%;max-width:400px;height:auto;padding:12px;gap:10px;bottom:30px;}.mode-toggle.svelte-bs8cbd {margin-right:auto;order:1;}.btn.exit.svelte-bs8cbd {margin-left:auto;order:2;}.divider.svelte-bs8cbd {display:none;}.count.svelte-bs8cbd {width:100%;text-align:center;order:3;padding:8px 0;border-top:1px solid #3a3a3a;border-bottom:1px solid #3a3a3a;margin:4px 0;}.label-input.svelte-bs8cbd {order:4;flex:1;width:auto;min-width:80px;}.label-input.svelte-bs8cbd:focus {width:auto;}.btn.clear.svelte-bs8cbd,\n    .btn.preview.svelte-bs8cbd,\n    .btn.generate.svelte-bs8cbd {flex:1;text-align:center;font-size:12px;padding:8px 4px;order:5;}.btn.generate.svelte-bs8cbd {flex:1.5;}\n  }\n\n  /* ── Swatches ─────────────────────────────────── */.cv-hl-swatches.svelte-bs8cbd {display:flex;gap:6px;align-items:center;}.cv-hl-swatch.svelte-bs8cbd {width:18px;height:18px;border-radius:50%;background:var(--swatch-color);border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.12s ease,\n      border-color 0.12s ease,\n      box-shadow 0.12s ease;box-shadow:0 1px 3px rgba(0, 0, 0, 0.3);}.cv-hl-swatch.svelte-bs8cbd:hover {transform:scale(1.2);box-shadow:0 2px 6px rgba(0, 0, 0, 0.4);}.cv-hl-swatch.active.svelte-bs8cbd {border-color:rgba(255, 255, 255, 0.85);transform:scale(1.15);box-shadow:0 0 0 2px var(--swatch-color),\n      0 2px 8px rgba(0, 0, 0, 0.4);}'
+    	code: '.floating-bar.svelte-bs8cbd {position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background-color:#2c2c2c;color:#f1f1f1;border-radius:8px;padding:8px 12px;box-shadow:0 8px 20px rgba(0, 0, 0, 0.4);display:flex;align-items:center;gap:12px;z-index:99999;font-family:system-ui,\n      -apple-system,\n      sans-serif;font-size:14px;border:1px solid #4a4a4a;pointer-events:auto;white-space:nowrap;min-width:500px;}.mode-toggle.svelte-bs8cbd {display:flex;background:#1a1a1a;border-radius:6px;padding:2px;border:1px solid #4a4a4a;}.mode-btn.svelte-bs8cbd {background:transparent;color:#aeaeae;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:500;font-size:13px;transition:all 0.2s;}.mode-btn.svelte-bs8cbd:hover {color:#fff;}.mode-btn.active.svelte-bs8cbd {background:#4a4a4a;color:#fff;box-shadow:0 1px 3px rgba(0, 0, 0, 0.2);}.divider.svelte-bs8cbd {width:1px;height:20px;background:#4a4a4a;margin:0 4px;}.count.svelte-bs8cbd {font-weight:500;min-width:120px;text-align:center;font-size:13px;color:#ccc;}.label-input.svelte-bs8cbd {background:#1a1a1a;border:1px solid #4a4a4a;color:#fff;padding:5px 8px;border-radius:4px;font-size:13px;width:80px;transition:width 0.2s ease, border-color 0.2s ease;}.label-input.svelte-bs8cbd::placeholder {color:#666;}.label-input.svelte-bs8cbd:focus {width:130px;outline:none;border-color:#0078d4;}.btn.svelte-bs8cbd {background-color:#0078d4;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:500;transition:background-color 0.2s;font-size:13px;}.btn.svelte-bs8cbd:hover {background-color:#005a9e;}.btn.clear.svelte-bs8cbd {background-color:transparent;border:1px solid #5a5a5a;color:#dadada;}.btn.clear.svelte-bs8cbd:hover {background-color:#3a3a3a;color:white;}.btn.preview.svelte-bs8cbd {background-color:#333;border:1px solid #555;}.btn.preview.svelte-bs8cbd:hover {background-color:#444;}.btn.exit.svelte-bs8cbd {background-color:transparent;color:#ff6b6b;padding:6px 10px;}.btn.exit.svelte-bs8cbd:hover {background-color:rgba(255, 107, 107, 0.1);}\n\n  @media (max-width: 600px) {.floating-bar.svelte-bs8cbd {display:flex;flex-wrap:wrap;min-width:unset;width:90%;max-width:400px;height:auto;padding:12px;gap:10px;bottom:30px;}.mode-toggle.svelte-bs8cbd {margin-right:auto;order:1;}.btn.exit.svelte-bs8cbd {margin-left:auto;order:2;}.divider.svelte-bs8cbd {display:none;}.count.svelte-bs8cbd {width:100%;text-align:center;order:3;padding:8px 0;border-top:1px solid #3a3a3a;border-bottom:1px solid #3a3a3a;margin:4px 0;}.label-input.svelte-bs8cbd {order:4;flex:1;width:auto;min-width:80px;}.label-input.svelte-bs8cbd:focus {width:auto;}.btn.clear.svelte-bs8cbd,\n    .btn.preview.svelte-bs8cbd,\n    .btn.generate.svelte-bs8cbd {flex:1;text-align:center;font-size:12px;padding:8px 4px;order:5;}.btn.generate.svelte-bs8cbd {flex:1.5;}\n  }\n\n  /* ── Swatches ─────────────────────────────────── */.cv-hl-swatches.svelte-bs8cbd {display:grid;grid-template-columns:repeat(5, 18px);gap:6px;align-items:center;justify-items:center;}.cv-hl-swatch.svelte-bs8cbd {width:18px;height:18px;border-radius:50%;background:var(--swatch-color);border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.12s ease,\n      border-color 0.12s ease,\n      box-shadow 0.12s ease;box-shadow:0 1px 3px rgba(0, 0, 0, 0.3);}.cv-hl-swatch.svelte-bs8cbd:hover {transform:scale(1.2);box-shadow:0 2px 6px rgba(0, 0, 0, 0.4);}.cv-hl-swatch.active.svelte-bs8cbd {border-color:rgba(255, 255, 255, 0.85);transform:scale(1.15);box-shadow:0 0 0 2px var(--swatch-color),\n      0 2px 8px rgba(0, 0, 0, 0.4);}'
     };
 
     function ShareToolbar($$anchor, $$props) {
@@ -16127,7 +16109,7 @@
 
     const $$css$g = {
     	hash: 'svelte-1r78n4c',
-    	code: '.cv-color-picker.svelte-1r78n4c {position:fixed;transform:translateX(-50%) translateY(-100%);display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:auto;z-index:9500;\n    /* Nudge down so the trigger peeks above the element edge */margin-top:8px;}.cv-color-trigger.svelte-1r78n4c {width:22px;height:16px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;}.cv-color-trigger.svelte-1r78n4c:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-color-dot.svelte-1r78n4c {width:10px;height:10px;border-radius:50%;display:block;border:1px solid rgba(0, 0, 0, 0.12);}.cv-color-swatches.svelte-1r78n4c {display:flex;flex-direction:row;gap:4px;background:white;border-radius:100px;padding:4px 6px;box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);border:1px solid rgba(0, 0, 0, 0.1);}.cv-color-swatch.svelte-1r78n4c {width:16px;height:16px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.1s,\n      border-color 0.1s;}.cv-color-swatch.svelte-1r78n4c:hover {transform:scale(1.2);border-color:rgba(0, 0, 0, 0.3);}.cv-color-swatch.active.svelte-1r78n4c {border-color:rgba(0, 0, 0, 0.5);transform:scale(1.15);}'
+    	code: '.cv-color-picker.svelte-1r78n4c {position:fixed;transform:translateX(-50%) translateY(-100%);display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:auto;z-index:9500;\n    /* Nudge down so the trigger peeks above the element edge */margin-top:8px;}.cv-color-trigger.svelte-1r78n4c {width:22px;height:16px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;}.cv-color-trigger.svelte-1r78n4c:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-color-dot.svelte-1r78n4c {width:10px;height:10px;border-radius:50%;display:block;border:1px solid rgba(0, 0, 0, 0.12);}.cv-color-swatches.svelte-1r78n4c {display:grid;grid-template-columns:repeat(5, 16px);gap:6px;background:white;border-radius:12px;padding:8px;box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);border:1px solid rgba(0, 0, 0, 0.1);}.cv-color-swatch.svelte-1r78n4c {width:16px;height:16px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.1s,\n      border-color 0.1s;}.cv-color-swatch.svelte-1r78n4c:hover {transform:scale(1.2);border-color:rgba(0, 0, 0, 0.3);}.cv-color-swatch.active.svelte-1r78n4c {border-color:rgba(0, 0, 0, 0.5);transform:scale(1.15);}'
     };
 
     function HighlightColorPicker($$anchor, $$props) {
@@ -16665,6 +16647,11 @@
         pink: { body: '#f472b6', tip: '#be185d' },
         yellow: { body: '#facc15', tip: '#a16207' },
         blue: { body: '#7dd3fc', tip: '#0369a1' },
+        'classic-yellow': { body: '#fef08a', tip: '#854d0e' },
+        'classic-blue': { body: '#60a5fa', tip: '#1d4ed8' },
+        'classic-green': { body: '#4ade80', tip: '#15803d' },
+        red: { body: '#f87171', tip: '#b91c1c' },
+        black: { body: '#52525b', tip: '#18181b' },
     };
 
     var root_2$6 = from_html(`<!> <!>`, 1);
@@ -18365,6 +18352,12 @@
     		return ANNOTATION_COLORS.find((c) => c.key === key)?.hex ?? ANNOTATION_COLORS[0].hex;
     	}
 
+    	function getTextColorHex(rect) {
+    		const key = rect.color ?? DEFAULT_ANNOTATION_COLOR_KEY;
+
+    		return ANNOTATION_COLORS.find((c) => c.key === key)?.textColor ?? '#2c2c2c';
+    	}
+
     	function scrollToRect(rect) {
     		rect.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     	}
@@ -18427,7 +18420,12 @@
     		}
 
     		reset(div_1);
-    		template_effect(($0) => set_style(div_1, `top: ${get(rect).top ?? ''}px; left: ${get(rect).left ?? ''}px; width: ${get(rect).width ?? ''}px; height: ${get(rect).height ?? ''}px; --cv-box-color: ${$0 ?? ''};`), [() => getColorHex(get(rect))]);
+
+    		template_effect(($0, $1) => set_style(div_1, `top: ${get(rect).top ?? ''}px; left: ${get(rect).left ?? ''}px; width: ${get(rect).width ?? ''}px; height: ${get(rect).height ?? ''}px; --cv-box-color: ${$0 ?? ''}; --cv-annotation-text-color: ${$1 ?? ''};`), [
+    			() => getColorHex(get(rect)),
+    			() => getTextColorHex(get(rect))
+    		]);
+
     		append($$anchor, div_1);
     	});
 
