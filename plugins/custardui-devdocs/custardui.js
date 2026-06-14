@@ -11254,13 +11254,13 @@
 
     var root$y = from_html(`<div><div role="alert"><button type="button" class="close-btn svelte-ysaqmb" aria-label="Dismiss intro">×</button> <p class="text svelte-ysaqmb"> </p></div></div>`);
 
-    const $$css$r = {
+    const $$css$s = {
     	hash: 'svelte-ysaqmb',
     	code: '\n  /* Animation */\n  @keyframes svelte-ysaqmb-popIn {\n    0% {\n      opacity: 0;\n      transform: scale(0.9) translateY(-50%);\n    }\n    100% {\n      opacity: 1;\n      transform: scale(1) translateY(-50%);\n    }\n  }\n\n  /* Reset transform for top/bottom positions */\n  @keyframes svelte-ysaqmb-popInVertical {\n    0% {\n      opacity: 0;\n      transform: scale(0.9);\n    }\n    100% {\n      opacity: 1;\n      transform: scale(1);\n    }\n  }\n\n  /* Simplified Pulse Animation - Shadow Only */\n  @keyframes svelte-ysaqmb-pulse {\n    0% {\n      transform: scale(1);\n      box-shadow:\n        0 4px 6px -1px rgba(0, 0, 0, 0.1),\n        0 0 0 0 rgba(62, 132, 244, 0.7);\n    }\n    50% {\n      transform: scale(1);\n      box-shadow:\n        0 4px 6px -1px rgba(0, 0, 0, 0.1),\n        0 0 0 10px rgba(62, 132, 244, 0);\n    }\n    100% {\n      transform: scale(1);\n      box-shadow:\n        0 4px 6px -1px rgba(0, 0, 0, 0.1),\n        0 0 0 0 rgba(62, 132, 244, 0);\n    }\n  }\n\n  /* Wrapper handles Positioning & Entry Animation */.cv-callout-wrapper.svelte-ysaqmb {position:fixed;z-index:9999;\n\n    /* Default animation (centered ones) */\n    animation: svelte-ysaqmb-popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;}\n\n  /* Inner handles Visuals & Pulse Animation */.cv-callout.svelte-ysaqmb {background:var(--cv-callout-bg, var(--cv-bg));padding:1rem 1.25rem;border-radius:0.5rem;box-shadow:0 4px 6px -1px var(--cv-shadow),\n      0 2px 4px -1px var(--cv-shadow); /* adapt shadow? */max-width:250px;font-size:0.9rem;line-height:1.5;color:var(--cv-callout-text, var(--cv-text));display:flex;align-items:flex-start;gap:0.75rem;font-family:inherit;border:2px solid var(--cv-border);}\n\n  /* Apply pulse to inner callout if enabled */.cv-callout.cv-pulse.svelte-ysaqmb {\n    animation: svelte-ysaqmb-pulse 2s infinite 0.5s;}\n\n  /* Arrow Base */.cv-callout.svelte-ysaqmb::before {content:\'\';position:absolute;width:1rem;height:1rem;background:var(--cv-callout-bg, var(--cv-bg));transform:rotate(45deg);border:2px solid var(--cv-border);z-index:-1;}.close-btn.svelte-ysaqmb {background:transparent;border:none;color:currentColor;opacity:0.7;font-size:1.25rem;line-height:1;cursor:pointer;padding:0;margin:-0.25rem -0.5rem 0 0;transition:opacity 0.15s;flex-shrink:0;}.close-btn.svelte-ysaqmb:hover {color:currentColor;opacity:1;}.text.svelte-ysaqmb {margin:0;flex:1;font-weight:500;}\n\n  /* \n     Position Specifics (Applied to Wrapper)\n  */\n\n  /* Right-side positions (Icon on Right -> Callout on Left) */.pos-top-right.svelte-ysaqmb,\n  .pos-middle-right.svelte-ysaqmb,\n  .pos-bottom-right.svelte-ysaqmb {right:80px;}.pos-top-right.svelte-ysaqmb,\n  .pos-bottom-right.svelte-ysaqmb {\n    animation-name: svelte-ysaqmb-popInVertical;}\n\n  /* X Button Spacing Adjustments */.pos-top-right.svelte-ysaqmb .close-btn:where(.svelte-ysaqmb),\n  .pos-middle-right.svelte-ysaqmb .close-btn:where(.svelte-ysaqmb),\n  .pos-bottom-right.svelte-ysaqmb .close-btn:where(.svelte-ysaqmb) {margin-right:0;margin-left:-0.5rem;}\n\n  /* Left-side positions (Icon on Left -> Callout on Right) */.pos-top-left.svelte-ysaqmb,\n  .pos-middle-left.svelte-ysaqmb,\n  .pos-bottom-left.svelte-ysaqmb {left:80px;}.pos-top-left.svelte-ysaqmb .close-btn:where(.svelte-ysaqmb),\n  .pos-middle-left.svelte-ysaqmb .close-btn:where(.svelte-ysaqmb),\n  .pos-bottom-left.svelte-ysaqmb .close-btn:where(.svelte-ysaqmb) {order:2; /* Move to end */margin-right:-0.5rem;margin-left:0;}.pos-top-left.svelte-ysaqmb,\n  .pos-bottom-left.svelte-ysaqmb {\n    animation-name: svelte-ysaqmb-popInVertical;}\n\n  /* Vertical Alignment */.pos-middle-right.svelte-ysaqmb,\n  .pos-middle-left.svelte-ysaqmb {top:50%;\n    /* transform handled by popIn animation (translateY -50%) */}.pos-top-right.svelte-ysaqmb,\n  .pos-top-left.svelte-ysaqmb {top:20px;}.pos-bottom-right.svelte-ysaqmb,\n  .pos-bottom-left.svelte-ysaqmb {bottom:20px;}\n\n  /* Arrow Positioning (Child of .callout, dependent on Wrapper .pos-*) */\n\n  /* Pointing Right */.pos-top-right.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before,\n  .pos-middle-right.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before,\n  .pos-bottom-right.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before {right:-0.5rem;border-left:none;border-bottom:none;}\n\n  /* Pointing Left */.pos-top-left.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before,\n  .pos-middle-left.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before,\n  .pos-bottom-left.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before {left:-0.5rem;border-right:none;border-top:none;}\n\n  /* Vertical placement of arrow */.pos-middle-right.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before,\n  .pos-middle-left.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before {top:50%;margin-top:-0.5rem;}.pos-top-right.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before,\n  .pos-top-left.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before {top:1.25rem;}.pos-bottom-right.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before,\n  .pos-bottom-left.svelte-ysaqmb .cv-callout:where(.svelte-ysaqmb)::before {bottom:1.25rem;}\n\n  @media print {.cv-callout-wrapper.svelte-ysaqmb {display:none !important;}\n  }'
     };
 
     function IntroCallout($$anchor, $$props) {
-    	append_styles$1($$anchor, $$css$r);
+    	append_styles$1($$anchor, $$css$s);
 
     	let position = prop($$props, 'position', 3, 'middle-left'),
     		message = prop($$props, 'message', 3, 'Customize your reading experience here.'),
@@ -11327,17 +11327,17 @@
     	append($$anchor, svg);
     }
 
-    var root_1$j = from_html(`<button type="button" class="cv-dismiss-btn svelte-122ln5" aria-label="Dismiss settings icon">✕</button>`);
+    var root_1$k = from_html(`<button type="button" class="cv-dismiss-btn svelte-122ln5" aria-label="Dismiss settings icon">✕</button>`);
     var root$w = from_html(`<div role="none"><button type="button" class="cv-settings-main-btn svelte-122ln5"><span class="cv-gear svelte-122ln5"><!></span></button> <button type="button" class="cv-collapse-btn svelte-122ln5" aria-label="Collapse settings icon"> </button> <!></div>`);
 
-    const $$css$q = {
+    const $$css$r = {
     	hash: 'svelte-122ln5',
     	code: '.cv-settings-main-btn.svelte-122ln5 {appearance:none;-webkit-appearance:none;background:transparent;border:none;padding:0;margin:0;flex:1;height:100%;width:100%;display:flex;align-items:inherit;justify-content:inherit;color:inherit;cursor:inherit;border-radius:inherit;}.cv-settings-main-btn.svelte-122ln5:focus-visible {outline:2px solid currentColor;outline-offset:-2px;}.cv-gear.svelte-122ln5 {display:flex;align-items:center;justify-content:center;width:18px;height:18px;}.cv-gear.svelte-122ln5 svg {width:18px;height:18px;}.cv-gear.svelte-122ln5 svg path {fill:currentColor;}.cv-settings-icon.svelte-122ln5 {position:fixed;background:var(--cv-icon-bg, rgba(255, 255, 255, 0.92));color:var(--cv-icon-color, rgba(0, 0, 0, 0.9));opacity:var(--cv-icon-opacity, 0.6);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;cursor:grab; /* Default cursor */box-shadow:0 4px 12px rgba(0, 0, 0, 0.15);border:2px solid rgba(0, 0, 0, 0.2);z-index:9998;transition:width 0.3s ease,\n      background 0.3s ease,\n      color 0.3s ease,\n      opacity 0.3s ease,\n      border-color 0.3s ease,\n      transform 0.4s ease; /* transform transition drives the peek slide animation */touch-action:none; /* Crucial for touch dragging */font-family:-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif;box-sizing:border-box;user-select:none; /* Prevent text selection while dragging */}.cv-settings-icon.svelte-122ln5:active {cursor:grabbing;}.cv-settings-icon.svelte-122ln5:hover {background:var(--cv-icon-bg, rgba(255, 255, 255, 1));color:var(--cv-icon-color, rgba(0, 0, 0, 1));opacity:1;border-color:rgba(0, 0, 0, 0.3);}\n\n  /* Remove transform transition during drag so it tracks the pointer without lag */.cv-settings-icon.cv-is-dragging.svelte-122ln5 {transition:width 0.3s ease,\n      background 0.3s ease,\n      color 0.3s ease,\n      opacity 0.3s ease,\n      border-color 0.3s ease;}\n\n  /* When collapsed, dim the strip */.cv-settings-icon.cv-is-collapsed.svelte-122ln5 {opacity:0.5;}.cv-settings-icon.cv-is-collapsed.svelte-122ln5:hover {opacity:0.85;}.cv-collapse-btn.svelte-122ln5 {position:absolute;top:0;bottom:0;width:16px;display:flex;align-items:center;justify-content:center;background:rgba(0, 0, 0, 0.12);border:none;padding:0;cursor:pointer;font-size:13px;line-height:1;color:inherit;opacity:0.5;transition:opacity 0.15s ease,\n      background 0.15s ease;}.cv-collapse-btn[data-side=\'left\'].svelte-122ln5 {left:0; /* outer = screen-edge side for left icons */border-radius:0 6px 6px 0;}.cv-collapse-btn[data-side=\'right\'].svelte-122ln5 {right:0; /* outer = screen-edge side for right icons */border-radius:6px 0 0 6px;}.cv-collapse-btn.svelte-122ln5:hover {opacity:1;background:rgba(0, 0, 0, 0.22);}\n\n  /* Hide collapse tab when already collapsed */.cv-settings-icon.cv-is-collapsed.svelte-122ln5 .cv-collapse-btn:where(.svelte-122ln5) {display:none;}.cv-dismiss-btn.svelte-122ln5 {position:absolute;bottom:calc(100% + 4px);width:16px;height:16px;display:flex;align-items:center;justify-content:center;background:rgba(0, 0, 0, 0.15);border:none;border-radius:50%;padding:0;cursor:pointer;font-size:9px;line-height:1;color:inherit;opacity:0.5;transition:opacity 0.15s ease,\n      background 0.15s ease;}.cv-dismiss-btn[data-side=\'left\'].svelte-122ln5 {left:0;}.cv-dismiss-btn[data-side=\'right\'].svelte-122ln5 {right:0;}.cv-dismiss-btn.svelte-122ln5:hover {opacity:1;background:rgba(0, 0, 0, 0.25);}\n\n  /* Top-right */.cv-settings-top-right.svelte-122ln5 {top:20px;right:0;border-radius:18px 0 0 18px;padding-left:6px;justify-content:flex-start;border-right:none;}\n\n  /* Top-left */.cv-settings-top-left.svelte-122ln5 {top:20px;left:0;border-radius:0 18px 18px 0;padding-right:6px;justify-content:flex-end;border-left:none;}\n\n  /* Bottom-right */.cv-settings-bottom-right.svelte-122ln5 {bottom:20px;right:0;border-radius:18px 0 0 18px;padding-left:6px;justify-content:flex-start;border-right:none;}\n\n  /* Bottom-left */.cv-settings-bottom-left.svelte-122ln5 {bottom:20px;left:0;border-radius:0 18px 18px 0;padding-right:6px;justify-content:flex-end;border-left:none;}\n\n  /* Middle-left */.cv-settings-middle-left.svelte-122ln5 {top:50%;left:0;\n    /* transform handled by inline style now */border-radius:0 18px 18px 0;padding-right:6px;justify-content:flex-end;border-left:none;}\n\n  /* Middle-right */.cv-settings-middle-right.svelte-122ln5 {top:50%;right:0;\n    /* transform handled by inline style now */border-radius:18px 0 0 18px;padding-left:6px;justify-content:flex-start;border-right:none;}.cv-settings-top-right.svelte-122ln5,\n  .cv-settings-middle-right.svelte-122ln5,\n  .cv-settings-bottom-right.svelte-122ln5,\n  .cv-settings-top-left.svelte-122ln5,\n  .cv-settings-middle-left.svelte-122ln5,\n  .cv-settings-bottom-left.svelte-122ln5 {height:36px;width:36px;}.cv-settings-middle-right.svelte-122ln5:hover,\n  .cv-settings-top-right.svelte-122ln5:hover,\n  .cv-settings-bottom-right.svelte-122ln5:hover,\n  .cv-settings-top-left.svelte-122ln5:hover,\n  .cv-settings-middle-left.svelte-122ln5:hover,\n  .cv-settings-bottom-left.svelte-122ln5:hover {width:55px;}.cv-pulse {\n    animation: svelte-122ln5-pulse 2s infinite;}\n\n  @keyframes svelte-122ln5-pulse {\n    0% {\n      box-shadow:\n        0 4px 12px rgba(0, 0, 0, 0.15),\n        0 0 0 0 rgba(62, 132, 244, 0.7);\n    }\n    70% {\n      box-shadow:\n        0 4px 12px rgba(0, 0, 0, 0.15),\n        0 0 0 10px rgba(62, 132, 244, 0);\n    }\n    100% {\n      box-shadow:\n        0 4px 12px rgba(0, 0, 0, 0.15),\n        0 0 0 0 rgba(62, 132, 244, 0);\n    }\n  }\n\n  @media (max-width: 768px) {.cv-settings-top-right.svelte-122ln5,\n    .cv-settings-top-left.svelte-122ln5 {top:10px;}.cv-settings-bottom-right.svelte-122ln5,\n    .cv-settings-bottom-left.svelte-122ln5 {bottom:10px;}.cv-settings-top-right.svelte-122ln5,\n    .cv-settings-bottom-right.svelte-122ln5,\n    .cv-settings-middle-right.svelte-122ln5 {right:0;}.cv-settings-top-left.svelte-122ln5,\n    .cv-settings-bottom-left.svelte-122ln5,\n    .cv-settings-middle-left.svelte-122ln5 {left:0;}.cv-settings-icon.svelte-122ln5 {width:60px;height:32px;}.cv-settings-icon.svelte-122ln5:hover {width:75px;}\n  }\n\n  @media print {.cv-settings-icon.svelte-122ln5 {display:none !important;}\n  }'
     };
 
     function SettingsIcon($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$q);
+    	append_styles$1($$anchor, $$css$r);
 
     	/* eslint-disable @typescript-eslint/no-explicit-any */
     	const iconSettingsStore = getContext(ICON_SETTINGS_CTX);
@@ -11569,7 +11569,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var button_2 = root_1$j();
+    			var button_2 = root_1$k();
 
     			template_effect(() => set_attribute(button_2, 'data-side', get(isRight) ? 'left' : 'right'));
 
@@ -12477,18 +12477,18 @@
     	append($$anchor, svg);
     }
 
-    var root_2$d = from_html(`<span class="segment-icon svelte-1osj0o5"><!></span>`);
-    var root_1$i = from_html(`<button type="button"><!> <span class="segment-label svelte-1osj0o5"> </span></button>`);
+    var root_2$e = from_html(`<span class="segment-icon svelte-1osj0o5"><!></span>`);
+    var root_1$j = from_html(`<button type="button"><!> <span class="segment-label svelte-1osj0o5"> </span></button>`);
     var root$m = from_html(`<div role="group"></div>`);
 
-    const $$css$p = {
+    const $$css$q = {
     	hash: 'svelte-1osj0o5',
     	code: '.segmented.svelte-1osj0o5 {display:inline-flex;border:1px solid var(--cv-border);border-radius:0.375rem;overflow:hidden;flex-shrink:0;}.segmented.standalone.svelte-1osj0o5 {margin-left:0.25rem;margin-right:0.25rem;}.segment-btn.svelte-1osj0o5 {display:flex;align-items:center;gap:0.25rem;background:transparent;border:none;border-left:1px solid var(--cv-border);padding:0.3rem 0.6rem;font-size:0.8rem;font-weight:500;color:var(--cv-text-secondary);cursor:pointer;transition:background 0.15s ease,\n      color 0.15s ease;font-family:inherit;line-height:1;}.segment-btn.svelte-1osj0o5:first-child {border-left:none;}.segment-btn.svelte-1osj0o5:hover:not(.active) {background:var(--cv-bg-hover);color:var(--cv-text);}.segment-btn.active.svelte-1osj0o5 {background:var(--cv-primary);color:white;box-shadow:0 1px 3px rgba(0, 0, 0, 0.15);}.segment-icon.svelte-1osj0o5 {display:flex;align-items:center;justify-content:center;width:14px;height:14px;flex-shrink:0;}.segment-icon.svelte-1osj0o5 svg {width:100%;height:100%;}.segment-label.svelte-1osj0o5 {font-size:0.75rem;}'
     };
 
     function ToggleSegmentedControl($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$p);
+    	append_styles$1($$anchor, $$css$q);
 
     	let value = prop($$props, 'value', 7),
     		onchange = prop($$props, 'onchange', 7),
@@ -12539,13 +12539,13 @@
     	let classes;
 
     	each(div, 20, () => ['hide', 'peek', 'show'], (option) => option, ($$anchor, option) => {
-    		var button = root_1$i();
+    		var button = root_1$j();
     		var node = child(button);
 
     		{
     			var consequent = ($$anchor) => {
     				const Icon = user_derived(() => icons[option]);
-    				var span = root_2$d();
+    				var span = root_2$e();
     				var node_1 = child(span);
 
     				component(node_1, () => get(Icon), ($$anchor, Icon_1) => {
@@ -12599,17 +12599,17 @@
     delegate(['click']);
     create_custom_element(ToggleSegmentedControl, { value: {}, onchange: {}, ariaLabel: {}, standalone: {} }, [], [], { mode: 'open' });
 
-    var root_1$h = from_html(`<p class="description svelte-gwkhja"> </p>`);
+    var root_1$i = from_html(`<p class="description svelte-gwkhja"> </p>`);
     var root$l = from_html(`<div class="card svelte-gwkhja"><div class="content svelte-gwkhja"><div><p class="title svelte-gwkhja"> </p> <!></div> <!></div></div>`);
 
-    const $$css$o = {
+    const $$css$p = {
     	hash: 'svelte-gwkhja',
     	code: '.card.svelte-gwkhja {background:var(--cv-bg);border:1px solid var(--cv-border);border-radius:var(--cv-card-radius, 0.5rem);transition:background 0.15s ease;}.card.svelte-gwkhja:hover {background:var(--cv-bg-hover);}.content.svelte-gwkhja {display:flex;align-items:center;justify-content:space-between;padding:0.75rem;gap:0.75rem;}.title.svelte-gwkhja {font-weight:500;font-size:0.875rem;color:var(--cv-text);margin:0;}.description.svelte-gwkhja {font-size:0.75rem;color:var(--cv-text-secondary);margin:0.125rem 0 0 0;}'
     };
 
     function ToggleItem($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$o);
+    	append_styles$1($$anchor, $$css$p);
 
     	let value = prop($$props, 'value', 15, 'show'),
     		onchange = prop($$props, 'onchange', 3, () => {});
@@ -12626,7 +12626,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var p_1 = root_1$h();
+    			var p_1 = root_1$i();
     			var text_1 = child(p_1, true);
 
     			reset(p_1);
@@ -12661,18 +12661,18 @@
     	pop();
     }
 
-    var root_1$g = from_html(`<p class="description svelte-uub3h8"> </p>`);
-    var root_2$c = from_html(`<option> </option>`);
+    var root_1$h = from_html(`<p class="description svelte-uub3h8"> </p>`);
+    var root_2$d = from_html(`<option> </option>`);
     var root$k = from_html(`<div class="root svelte-uub3h8"><div class="header svelte-uub3h8"><label class="label svelte-uub3h8"> </label> <!></div> <select class="select svelte-uub3h8"></select></div>`);
 
-    const $$css$n = {
+    const $$css$o = {
     	hash: 'svelte-uub3h8',
     	code: '.root.svelte-uub3h8 {display:flex;flex-direction:column;gap:0.5rem;padding:0.75rem;background:var(--cv-bg);border:1px solid var(--cv-border);border-radius:var(--cv-card-radius, 0.5rem);transition:background 0.15s ease;}.root.svelte-uub3h8:hover {background:var(--cv-bg-hover);}\n\n  /* Remove special handling for last child since they are now separate cards */.root.svelte-uub3h8:last-child {border-bottom:1px solid var(--cv-border);}.header.svelte-uub3h8 {display:flex;flex-direction:column;gap:0.25rem;}.label.svelte-uub3h8 {font-size:0.875rem;color:var(--cv-text);margin:0;line-height:1.4;font-weight:500;display:block;cursor:pointer;}.description.svelte-uub3h8 {font-size:0.75rem;color:var(--cv-text-secondary);margin:0;line-height:1.4;}.select.svelte-uub3h8 {width:100%;border-radius:0.5rem;background:var(--cv-input-bg);border:1px solid var(--cv-input-border);color:var(--cv-text);padding:0.5rem 0.75rem;font-size:0.875rem;cursor:pointer;transition:all 0.15s ease;font-family:inherit;}.select.svelte-uub3h8:hover {border-color:var(--cv-text-secondary);}.select.svelte-uub3h8:focus {outline:none;border-color:var(--cv-primary);box-shadow:0 0 0 2px var(--cv-focus-ring);}'
     };
 
     function TabGroupItem($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$n);
+    	append_styles$1($$anchor, $$css$o);
 
     	let activeTabId = prop($$props, 'activeTabId', 15, ''),
     		onchange = prop($$props, 'onchange', 3, () => {});
@@ -12695,7 +12695,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var p = root_1$g();
+    			var p = root_1$h();
     			var text_1 = child(p, true);
 
     			reset(p);
@@ -12713,7 +12713,7 @@
     	var select = sibling(div_1, 2);
 
     	each(select, 21, () => $$props.group.tabs, (tab) => tab.tabId, ($$anchor, tab) => {
-    		var option = root_2$c();
+    		var option = root_2$d();
     		var text_2 = child(option, true);
 
     		reset(option);
@@ -12774,17 +12774,17 @@
     	append($$anchor, svg);
     }
 
-    var root_1$f = from_html(`<p class="placeholder-description svelte-1vp05mb"> </p>`);
+    var root_1$g = from_html(`<p class="placeholder-description svelte-1vp05mb"> </p>`);
     var root$i = from_html(`<div class="placeholder-item svelte-1vp05mb"><div class="label-group svelte-1vp05mb"><label class="placeholder-label svelte-1vp05mb"> </label> <!></div> <div class="input-container svelte-1vp05mb"><input class="placeholder-input svelte-1vp05mb" type="text"/> <span class="edit-icon svelte-1vp05mb" aria-hidden="true"><!></span></div></div>`);
 
-    const $$css$m = {
+    const $$css$n = {
     	hash: 'svelte-1vp05mb',
     	code: '.placeholder-item.svelte-1vp05mb {display:flex;flex-direction:column;gap:0.5rem;padding:0.75rem;background:var(--cv-bg);border:1px solid var(--cv-border);border-radius:var(--cv-card-radius, 0.5rem);transition:background 0.15s ease;}.placeholder-item.svelte-1vp05mb:hover {background:var(--cv-bg-hover);}.label-group.svelte-1vp05mb {display:flex;flex-direction:column;gap:0.125rem;}.placeholder-label.svelte-1vp05mb {font-size:0.875rem;font-weight:500;color:var(--cv-text);margin:0;}.placeholder-description.svelte-1vp05mb {font-size:0.75rem;color:var(--cv-text-secondary);margin:0;line-height:1.4;}.input-container.svelte-1vp05mb {position:relative;display:flex;align-items:center;width:100%;}.edit-icon.svelte-1vp05mb {position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);display:flex;align-items:center;pointer-events:none;color:var(--cv-text-secondary);opacity:0.7;}.edit-icon.svelte-1vp05mb svg {width:0.75rem;height:0.75rem;}.placeholder-input.svelte-1vp05mb {width:100%;padding:0.5rem 0.75rem;padding-right:1.6rem;border:1px solid var(--cv-input-border);border-radius:var(--cv-card-radius, 0.5rem);font-size:0.9rem;transition:border-color 0.2s;background:var(--cv-input-bg);color:var(--cv-text);}.placeholder-input.svelte-1vp05mb:focus {outline:none;border-color:var(--cv-primary);box-shadow:0 0 0 2px var(--cv-focus-ring);}'
     };
 
     function PlaceholderItem($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$m);
+    	append_styles$1($$anchor, $$css$n);
 
     	let value = prop($$props, 'value', 15, ''),
     		onchange = prop($$props, 'onchange', 3, () => {});
@@ -12808,7 +12808,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var p = root_1$f();
+    			var p = root_1$g();
     			var text_1 = child(p, true);
 
     			reset(p);
@@ -12892,13 +12892,13 @@
         }
     }
 
-    var root_1$e = from_html(`<button type="button">Customize</button>`);
+    var root_1$f = from_html(`<button type="button">Customize</button>`);
     var root_3$8 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
     var root_5$2 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Toggles</div> <div class="toggles-container svelte-16uy9h6"></div></div>`);
     var root_7$1 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Placeholders</div> <div class="placeholders-container svelte-16uy9h6"></div></div>`);
     var root_9 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Tab Groups</div> <div class="tabgroups-container svelte-16uy9h6"><div class="tabgroup-card header-card svelte-16uy9h6" role="group"><div class="tabgroup-row svelte-16uy9h6"><div class="logo-box svelte-16uy9h6" id="cv-nav-icon-box"><div class="nav-icon svelte-16uy9h6"><!></div></div> <div class="tabgroup-info svelte-16uy9h6"><div class="tabgroup-title-container"><p class="tabgroup-title svelte-16uy9h6">Show only the selected tab</p></div> <p class="tabgroup-description svelte-16uy9h6">Hide the navigation headers</p></div> <label class="toggle-switch nav-toggle svelte-16uy9h6"><input class="nav-pref-input svelte-16uy9h6" type="checkbox" aria-label="Show only the selected tab"/> <span class="switch-bg svelte-16uy9h6"></span> <span class="switch-knob svelte-16uy9h6"></span></label></div></div> <div class="tab-groups-list svelte-16uy9h6"></div></div></div>`);
     var root_4$4 = from_html(`<!> <!> <!>`, 1);
-    var root_2$b = from_html(`<div class="tab-content active svelte-16uy9h6"><!> <!></div>`);
+    var root_2$c = from_html(`<div class="tab-content active svelte-16uy9h6"><!> <!></div>`);
     var root_15 = from_html(`<div class="link-label-container svelte-16uy9h6"><label for="settings-link-label" class="svelte-16uy9h6">Link Label (Optional)</label> <input type="text" id="settings-link-label" class="link-label-input svelte-16uy9h6" placeholder="e.g. default-settings"/></div> <button type="button" class="share-action-btn copy-url-btn svelte-16uy9h6"><span class="btn-icon svelte-16uy9h6"><!></span> <span><!></span></button>`, 1);
 
     var root_14 = from_html(`<div class="tab-content active svelte-16uy9h6"><div class="share-content svelte-16uy9h6"><div class="share-instruction svelte-16uy9h6">Create a shareable link for your current customization, or select specific parts of
@@ -12908,14 +12908,14 @@
     var root_21 = from_html(`<div></div>`);
     var root$h = from_html(`<div class="modal-overlay svelte-16uy9h6" role="presentation"><div class="modal-box cv-custom-state-modal svelte-16uy9h6" role="dialog" aria-modal="true"><header class="header svelte-16uy9h6"><div class="header-content svelte-16uy9h6"><div class="modal-icon svelte-16uy9h6"><!></div> <div class="title svelte-16uy9h6"> </div></div> <button type="button" class="close-btn svelte-16uy9h6" aria-label="Close modal"><!></button></header> <main class="main svelte-16uy9h6"><div class="tabs svelte-16uy9h6"><!> <button type="button">Share</button></div> <!></main> <footer class="footer svelte-16uy9h6"><!> <div class="footer-attribution svelte-16uy9h6"><span class="footer-tagline svelte-16uy9h6">Browser-side page customisations provided by</span> <div class="footer-link-container svelte-16uy9h6"><a href="https://custardui.js.org" target="_blank" rel="noopener noreferrer" class="footer-link svelte-16uy9h6">custardui.js.org</a> <span class="footer-version svelte-16uy9h6"></span></div></div> <button type="button" class="done-btn svelte-16uy9h6">Done</button></footer></div></div>`);
 
-    const $$css$l = {
+    const $$css$m = {
     	hash: 'svelte-16uy9h6',
     	code: '\n  /* Modal Overlay & Modal Frame */.modal-overlay.svelte-16uy9h6 {position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0, 0, 0, 0.5);display:flex;align-items:center;justify-content:center;z-index:10002;}.modal-box.svelte-16uy9h6 {background:var(--cv-bg);border-radius:var(--cv-modal-radius, 0.75rem);box-shadow:0 25px 50px -12px var(--cv-shadow);max-width:32rem;width:90vw;max-height:80vh;display:flex;flex-direction:column;}.header.svelte-16uy9h6 {display:flex;align-items:center;justify-content:space-between;padding:0.5rem 1rem;border-bottom:1px solid var(--cv-border);}.header-content.svelte-16uy9h6 {display:flex;align-items:center;gap:0.75rem;}.modal-icon.svelte-16uy9h6 {position:relative;width:1rem;height:1rem;display:flex;align-items:center;justify-content:center;border-radius:9999px;color:var(--cv-text);}.modal-icon.svelte-16uy9h6 svg {fill:currentColor;}.title.svelte-16uy9h6 {font-size:1.125rem;font-weight:bold;color:var(--cv-text);margin:0;}.close-btn.svelte-16uy9h6 {width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;border-radius:9999px;background:transparent;border:none;color:var(--cv-text-secondary);cursor:pointer;transition:all 0.2s ease;}.close-btn.svelte-16uy9h6:hover {background:rgba(62, 132, 244, 0.1);color:var(--cv-primary);}.main.svelte-16uy9h6 {padding:1rem;flex:1;display:flex;flex-direction:column;overflow-y:auto;max-height:calc(80vh - 8rem);min-height:var(--cv-modal-min-height, 20rem);}.description.svelte-16uy9h6 {font-size:0.875rem;color:var(--cv-text);margin:0 0 1rem 0;line-height:1.4;}\n\n  /* Tabs */.tabs.svelte-16uy9h6 {display:flex;margin-bottom:1rem;border-bottom:2px solid var(--cv-border);}.tab.svelte-16uy9h6 {background:transparent;border:none;padding:0.5rem 1rem;font-size:0.9rem;font-weight:600;color:var(--cv-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;}.tab.active.svelte-16uy9h6 {color:var(--cv-primary);border-bottom-color:var(--cv-primary);}.tab-content.svelte-16uy9h6 {display:none;}.tab-content.active.svelte-16uy9h6 {display:block;}\n\n  /* Section Styling */.section.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.5rem;}.section-heading.svelte-16uy9h6 {font-size:0.7rem;font-weight:600;color:var(--cv-text-secondary);text-transform:var(--cv-section-label-transform, uppercase);letter-spacing:0.08em;margin:0;}.toggles-container.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.5rem;overflow:hidden;}\n\n  /* Tab Groups Section specific */.tabgroups-container.svelte-16uy9h6 {border-radius:0.5rem;}\n\n  /* Nav Toggle Card */.tabgroup-card.svelte-16uy9h6 {background:var(--cv-bg);border-bottom:1px solid var(--cv-border);}.tabgroup-card.header-card.svelte-16uy9h6 {display:flex;align-items:center;justify-content:space-between;padding:0.75rem;border:1px solid var(--cv-border);border-radius:0.5rem;margin-bottom:0.75rem;}.tabgroup-row.svelte-16uy9h6 {display:flex;align-items:center;justify-content:space-between;width:100%;gap:1rem;}.logo-box.svelte-16uy9h6 {width:3rem;height:3rem;background:var(--cv-modal-icon-bg);border-radius:0.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}.nav-icon.svelte-16uy9h6 {width:2rem;height:2rem;color:var(--cv-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color 0.2s ease;}.tabgroup-info.svelte-16uy9h6 {flex:1;display:flex;flex-direction:column;gap:0.25rem;}.tabgroup-title.svelte-16uy9h6 {font-weight:500;font-size:0.875rem;color:var(--cv-text);margin:0 0 0 0;}.tabgroup-description.svelte-16uy9h6 {font-size:0.75rem;color:var(--cv-text-secondary);margin:0;line-height:1.3;}\n\n  /* Toggle Switch */.toggle-switch.svelte-16uy9h6 {position:relative;display:inline-flex;align-items:center;width:44px;height:24px;background:var(--cv-switch-bg);border-radius:9999px;padding:2px;box-sizing:border-box;cursor:pointer;transition:background-color 0.2s ease;border:none;}.toggle-switch.svelte-16uy9h6 input:where(.svelte-16uy9h6) {display:none;}.toggle-switch.svelte-16uy9h6 .switch-bg:where(.svelte-16uy9h6) {position:absolute;inset:0;border-radius:9999px;background:var(--cv-switch-bg);transition:background-color 0.2s ease;pointer-events:none;}.toggle-switch.svelte-16uy9h6 .switch-knob:where(.svelte-16uy9h6) {position:relative;width:20px;height:20px;background:var(--cv-switch-knob);border-radius:50%;box-shadow:0 1px 2px rgba(0, 0, 0, 0.1);transition:transform 0.2s ease;transform:translateX(0);}.toggle-switch.svelte-16uy9h6 input:where(.svelte-16uy9h6):checked ~ .switch-knob:where(.svelte-16uy9h6) {transform:translateX(20px);}.toggle-switch.svelte-16uy9h6 input:where(.svelte-16uy9h6):checked ~ .switch-bg:where(.svelte-16uy9h6) {background:var(--cv-primary);}\n\n  /* Tab Groups List */.tab-groups-list.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.75rem;}\n\n  /* Footer */.footer.svelte-16uy9h6 {padding:0.75rem 1rem;border-top:1px solid var(--cv-border);display:flex;align-items:center;justify-content:space-between;background:var(--cv-bg);border-bottom-left-radius:var(--cv-modal-radius, 0.75rem);border-bottom-right-radius:var(--cv-modal-radius, 0.75rem);}.footer-attribution.svelte-16uy9h6 {display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.1rem;opacity:0.5;transition:opacity 0.15s ease;}.footer-attribution.svelte-16uy9h6:hover {opacity:1;}.footer-tagline.svelte-16uy9h6 {font-size:0.6rem;color:var(--cv-text-secondary);letter-spacing:0.04em;}.footer-link.svelte-16uy9h6 {color:var(--cv-text-secondary);text-decoration:none;font-size:0.68rem;font-weight:600;letter-spacing:0.08em;transition:color 0.15s ease;}.footer-link.svelte-16uy9h6:hover {color:var(--cv-primary);}.footer-link-container.svelte-16uy9h6 {display:flex;align-items:center;gap:0.35rem;}.footer-version.svelte-16uy9h6 {font-size:0.65rem;color:var(--cv-text);opacity:0.9;letter-spacing:0.04em;}.reset-btn.svelte-16uy9h6 {display:flex;align-items:center;gap:0.4rem;background:transparent;border:none;font-size:0.875rem;font-weight:500;color:var(--cv-text-secondary);cursor:pointer;padding:0.4rem 0.5rem;border-radius:0.5rem;transition:all 0.2s ease;}.reset-btn.svelte-16uy9h6:hover {background:var(--cv-danger-bg);color:var(--cv-danger);}.done-btn.svelte-16uy9h6 {background:var(--cv-primary);color:white;border:none;padding:0.5rem 1.1rem;border-radius:0.5rem;font-weight:600;font-size:0.875rem;cursor:pointer;box-shadow:0 1px 3px rgba(0, 0, 0, 0.12),\n      0 1px 2px rgba(0, 0, 0, 0.08);transition:background-color 0.15s ease,\n      box-shadow 0.15s ease;}.done-btn.svelte-16uy9h6:hover {background:var(--cv-primary-hover);box-shadow:0 3px 6px rgba(0, 0, 0, 0.12),\n      0 2px 4px rgba(0, 0, 0, 0.08);}\n\n  /* Share Tab Styles */.share-content.svelte-16uy9h6 {display:flex;flex-direction:column;gap:1rem;align-items:center;text-align:center;padding:1rem 0;}.share-instruction.svelte-16uy9h6 {font-size:0.95rem;color:var(--cv-text-secondary);margin-bottom:0.5rem;}.share-action-btn.svelte-16uy9h6 {display:flex;align-items:center;justify-content:center;gap:0.75rem;width:100%;max-width:320px;padding:0.75rem 1rem;border-radius:0.5rem;font-weight:500;font-size:0.95rem;cursor:pointer;transition:all 0.2s ease;border:1px solid var(--cv-border);background:var(--cv-bg);color:var(--cv-text);}.share-action-btn.svelte-16uy9h6:hover {border-color:var(--cv-primary);color:var(--cv-primary);background:var(--cv-bg-hover);}.share-action-btn.primary.svelte-16uy9h6 {background:var(--cv-primary);border-color:var(--cv-primary);color:white;}.share-action-btn.primary.svelte-16uy9h6:hover {background:var(--cv-primary-hover);border-color:var(--cv-primary-hover);}.btn-icon.svelte-16uy9h6 {display:flex;align-items:center;justify-content:center;width:1.25rem;height:1.25rem;}\n\n  /* Placeholder Inputs */.placeholders-container.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.75rem;}\n\n  /* Link Label */.link-label-container.svelte-16uy9h6 {display:flex;flex-direction:column;gap:0.5rem;width:100%;max-width:320px;text-align:left;margin-bottom:0.5rem;}.link-label-container.svelte-16uy9h6 label:where(.svelte-16uy9h6) {font-size:0.85rem;font-weight:500;color:var(--cv-text-secondary);}.link-label-input.svelte-16uy9h6 {width:100%;padding:0.6rem 0.75rem;border-radius:0.5rem;border:1px solid var(--cv-border);background:var(--cv-bg);color:var(--cv-text);font-size:0.95rem;box-sizing:border-box;transition:border-color 0.2s ease, box-shadow 0.2s ease;}.link-label-input.svelte-16uy9h6:focus {outline:none;border-color:var(--cv-primary);box-shadow:0 0 0 2px rgba(62, 132, 244, 0.2);}'
     };
 
     function Modal($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$l);
+    	append_styles$1($$anchor, $$css$m);
 
     	/* eslint-disable @typescript-eslint/no-explicit-any */
     	let onclose = prop($$props, 'onclose', 3, () => {}),
@@ -13089,7 +13089,7 @@
 
     	{
     		var consequent = ($$anchor) => {
-    			var button_1 = root_1$e();
+    			var button_1 = root_1$f();
 
     			template_effect(() => set_class(button_1, 1, `tab ${get(activeTab) === 'customize' ? 'active' : ''}`, 'svelte-16uy9h6'));
     			delegated('click', button_1, () => set(activeTab, 'customize'));
@@ -13109,7 +13109,7 @@
 
     	{
     		var consequent_7 = ($$anchor) => {
-    			var div_6 = root_2$b();
+    			var div_6 = root_2$c();
     			var node_4 = child(div_6);
 
     			{
@@ -14501,18 +14501,18 @@
     var root_3$7 = from_html(`<span class="cv-ribbon-text cv-ribbon-text--right svelte-1ctem0h"> </span> <!> <span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span>`, 1);
     var root_6$1 = from_html(`<span>▾</span>`);
     var root_5$1 = from_html(`<span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span> <span class="cv-ribbon-text svelte-1ctem0h"> </span> <!>`, 1);
-    var root_1$d = from_html(`<div><div aria-hidden="true"></div> <button type="button"><!></button></div>`);
+    var root_1$e = from_html(`<div><div aria-hidden="true"></div> <button type="button"><!></button></div>`);
     var root_7 = from_html(`<div class="cv-annotation-card svelte-1ctem0h" role="region" aria-label="Annotation"><button type="button" class="cv-card-close svelte-1ctem0h" aria-label="Collapse annotation">✕</button> <span class="cv-card-text svelte-1ctem0h"> </span></div>`);
     var root$g = from_html(`<div role="presentation"><!></div>`);
 
-    const $$css$k = {
+    const $$css$l = {
     	hash: 'svelte-1ctem0h',
     	code: '\n  /* ==============================\n     CONTAINER (position, drag, opacity)\n     ============================== */.cv-annotation-container.svelte-1ctem0h {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;cursor:default;opacity:0.88;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-1ctem0h:hover {opacity:1;z-index:110;}\n\n  /* ==============================\n     WRAPPER & SHADOW\n     ============================== */.cv-ribbon-wrapper.svelte-1ctem0h {position:relative;transform-origin:center center;}.cv-ribbon-wrapper--intro.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-ribbon-wrapper--periodic.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-ribbon-shadow.svelte-1ctem0h {position:absolute;top:0;left:0;width:140px;height:28px;background:rgba(0, 0, 0, 0.25);transform:translate(3px, 3px);pointer-events:none;z-index:-1;}.cv-ribbon-shadow--empty.svelte-1ctem0h {width:70px;}\n\n  /* ==============================\n     RIBBON (home-plate)\n     ============================== */.cv-annotation-ribbon.svelte-1ctem0h {border:none;padding:6px 20px 6px 8px;width:140px;height:28px;box-sizing:border-box;background:var(--cv-annotation-color, var(--cv-box-color));cursor:default;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);display:flex;align-items:center;justify-content:flex-start;gap:5px;}.cv-annotation-ribbon--right.svelte-1ctem0h {padding:6px 8px 6px 20px;justify-content:flex-end;}.cv-annotation-ribbon--empty.svelte-1ctem0h {width:70px;padding:6px 16px 6px 8px;}.cv-annotation-ribbon--expandable.svelte-1ctem0h {cursor:pointer;}.cv-annotation-ribbon--expandable.svelte-1ctem0h:hover {filter:brightness(1.1);}\n\n  /* ==============================\n     RIBBON TEXT (single line)\n     ============================== */.cv-ribbon-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;color:var(--cv-annotation-text-color, #2c2c2c);}.cv-ribbon-text--right.svelte-1ctem0h {text-align:right;}.cv-ribbon-chevron.svelte-1ctem0h {font-size:22px;opacity:1;flex-shrink:0;line-height:1;color:var(--cv-annotation-text-color, #2c2c2c);}.cv-ribbon-chevron--bounce.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-chevron-bounce 3s ease-in-out infinite;}\n\n  /* ==============================\n     DRAG GRIP (6-dot grid on flat side)\n     ============================== */.cv-ribbon-grip.svelte-1ctem0h {display:grid;grid-template-columns:repeat(2, 3px);gap:3px;flex-shrink:0;opacity:0.7;cursor:grab;padding:2px;}.cv-ribbon-grip.svelte-1ctem0h:active {cursor:grabbing;}.cv-ribbon-grip.svelte-1ctem0h > span:where(.svelte-1ctem0h) {width:3px;height:3px;border-radius:50%;background:var(--cv-annotation-text-color, #2c2c2c);}\n\n  /* ==============================\n     CARD (sticky note)\n     ============================== */.cv-annotation-card.svelte-1ctem0h {background:#fffdf5;border:1.5px solid var(--cv-annotation-color, var(--cv-box-color));border-radius:4px;padding:10px 12px;max-width:280px;min-width:120px;position:relative;z-index:1;box-shadow:3px 3px 0px rgba(0, 0, 0, 0.25);\n    animation: svelte-1ctem0h-cv-cardPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}.cv-card-close.svelte-1ctem0h {position:absolute;top:3px;right:5px;border:none;background:transparent;cursor:pointer;font-size:12px;color:#aaa;padding:2px 4px;line-height:1;font-family:sans-serif;}.cv-card-close.svelte-1ctem0h:hover {color:#555;}.cv-card-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:600;color:#333;line-height:1.45;word-break:break-word;white-space:pre-wrap;padding-right:15px;}\n\n  /* ==============================\n     ANIMATIONS\n     ============================== */\n  @keyframes svelte-1ctem0h-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-cardPop {\n    from {\n      opacity: 0;\n      transform: scale(0.9) translateY(5px);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) translateY(0);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-chevron-bounce {\n    0%,\n    70%,\n    100% {\n      transform: translateY(0);\n    }\n    78% {\n      transform: translateY(-3px);\n    }\n    86% {\n      transform: translateY(1px);\n    }\n    93% {\n      transform: translateY(-1.5px);\n    }\n  }'
     };
 
     function Annotation($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$k);
+    	append_styles$1($$anchor, $$css$l);
 
     	let verticalOffset = prop($$props, 'verticalOffset', 3, 14);
     	const corner = user_derived(() => $$props.annotationCorner ?? DEFAULT_ANNOTATION_CORNER);
@@ -14717,7 +14717,7 @@
 
     	{
     		var consequent_4 = ($$anchor) => {
-    			var div_1 = root_1$d();
+    			var div_1 = root_1$e();
     			let classes_1;
     			var div_2 = child(div_1);
     			let classes_2;
@@ -15743,23 +15743,23 @@ ${ANNOTATION_COLORS.map((c) => `
     	return zoom;
     }
 
-    var root_1$c = from_html(`<div role="alert" aria-live="polite"> </div>`);
+    var root_1$d = from_html(`<div role="alert" aria-live="polite"> </div>`);
     var root$f = from_html(`<div class="toast-container svelte-14irt8g"></div>`);
 
-    const $$css$j = {
+    const $$css$k = {
     	hash: 'svelte-14irt8g',
     	code: '.toast-container.svelte-14irt8g {position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:20000;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none; /* Let clicks pass through container */}.toast-item.svelte-14irt8g {background:rgba(0, 0, 0, 0.85);color:white;padding:10px 20px;border-radius:4px;font-size:14px;box-shadow:0 4px 6px rgba(0, 0, 0, 0.1);pointer-events:auto; /* Re-enable clicks on toasts */max-width:300px;text-align:center;}'
     };
 
     function Toast($$anchor, $$props) {
     	push($$props, false);
-    	append_styles$1($$anchor, $$css$j);
+    	append_styles$1($$anchor, $$css$k);
     	init();
 
     	var div = root$f();
 
     	each(div, 13, () => toast.items, (t) => t.id, ($$anchor, t) => {
-    		var div_1 = root_1$c();
+    		var div_1 = root_1$d();
     		var text = child(div_1, true);
 
     		reset(div_1);
@@ -15780,18 +15780,18 @@ ${ANNOTATION_COLORS.map((c) => `
     	pop();
     }
 
-    var root_2$a = from_html(`<button type="button"></button>`);
-    var root_1$b = from_html(`<div class="cv-hl-swatches svelte-bs8cbd" role="group" aria-label="Highlight color"></div> <span class="divider svelte-bs8cbd"></span>`, 1);
+    var root_2$b = from_html(`<button type="button"></button>`);
+    var root_1$c = from_html(`<div class="cv-hl-swatches svelte-bs8cbd" role="group" aria-label="Highlight color"></div> <span class="divider svelte-bs8cbd"></span>`, 1);
     var root$e = from_html(`<div class="floating-bar svelte-bs8cbd"><div class="mode-toggle svelte-bs8cbd"><button type="button" title="Highlight selected text">Highlight</button> <button type="button" title="Box selected elements">Box</button> <button type="button" title="Show only selected elements">Show</button> <button type="button" title="Hide selected elements">Hide</button></div> <span class="divider svelte-bs8cbd"></span> <!> <span class="count svelte-bs8cbd"><!></span> <button type="button" class="btn clear svelte-bs8cbd">Clear</button> <input type="text" class="label-input svelte-bs8cbd" placeholder="Label Link" aria-label="Optional link label"/> <button type="button" class="btn preview svelte-bs8cbd">Preview</button> <button type="button" class="btn generate svelte-bs8cbd">Copy Link</button> <button type="button" class="btn exit svelte-bs8cbd">Exit</button></div>`);
 
-    const $$css$i = {
+    const $$css$j = {
     	hash: 'svelte-bs8cbd',
     	code: '.floating-bar.svelte-bs8cbd {position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background-color:#2c2c2c;color:#f1f1f1;border-radius:8px;padding:8px 12px;box-shadow:0 8px 20px rgba(0, 0, 0, 0.4);display:flex;align-items:center;gap:12px;z-index:99999;font-family:system-ui,\n      -apple-system,\n      sans-serif;font-size:14px;border:1px solid #4a4a4a;pointer-events:auto;white-space:nowrap;min-width:500px;}.mode-toggle.svelte-bs8cbd {display:flex;background:#1a1a1a;border-radius:6px;padding:2px;border:1px solid #4a4a4a;}.mode-btn.svelte-bs8cbd {background:transparent;color:#aeaeae;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:500;font-size:13px;transition:all 0.2s;}.mode-btn.svelte-bs8cbd:hover {color:#fff;}.mode-btn.active.svelte-bs8cbd {background:#4a4a4a;color:#fff;box-shadow:0 1px 3px rgba(0, 0, 0, 0.2);}.divider.svelte-bs8cbd {width:1px;height:20px;background:#4a4a4a;margin:0 4px;}.count.svelte-bs8cbd {font-weight:500;min-width:120px;text-align:center;font-size:13px;color:#ccc;}.label-input.svelte-bs8cbd {background:#1a1a1a;border:1px solid #4a4a4a;color:#fff;padding:5px 8px;border-radius:4px;font-size:13px;width:80px;transition:width 0.2s ease, border-color 0.2s ease;}.label-input.svelte-bs8cbd::placeholder {color:#666;}.label-input.svelte-bs8cbd:focus {width:130px;outline:none;border-color:#0078d4;}.btn.svelte-bs8cbd {background-color:#0078d4;color:white;border:none;padding:6px 12px;border-radius:5px;cursor:pointer;font-weight:500;transition:background-color 0.2s;font-size:13px;}.btn.svelte-bs8cbd:hover {background-color:#005a9e;}.btn.clear.svelte-bs8cbd {background-color:transparent;border:1px solid #5a5a5a;color:#dadada;}.btn.clear.svelte-bs8cbd:hover {background-color:#3a3a3a;color:white;}.btn.preview.svelte-bs8cbd {background-color:#333;border:1px solid #555;}.btn.preview.svelte-bs8cbd:hover {background-color:#444;}.btn.exit.svelte-bs8cbd {background-color:transparent;color:#ff6b6b;padding:6px 10px;}.btn.exit.svelte-bs8cbd:hover {background-color:rgba(255, 107, 107, 0.1);}\n\n  @media (max-width: 600px) {.floating-bar.svelte-bs8cbd {display:flex;flex-wrap:wrap;min-width:unset;width:90%;max-width:400px;height:auto;padding:12px;gap:10px;bottom:30px;}.mode-toggle.svelte-bs8cbd {margin-right:auto;order:1;}.btn.exit.svelte-bs8cbd {margin-left:auto;order:2;}.divider.svelte-bs8cbd {display:none;}.count.svelte-bs8cbd {width:100%;text-align:center;order:3;padding:8px 0;border-top:1px solid #3a3a3a;border-bottom:1px solid #3a3a3a;margin:4px 0;}.label-input.svelte-bs8cbd {order:4;flex:1;width:auto;min-width:80px;}.label-input.svelte-bs8cbd:focus {width:auto;}.btn.clear.svelte-bs8cbd,\n    .btn.preview.svelte-bs8cbd,\n    .btn.generate.svelte-bs8cbd {flex:1;text-align:center;font-size:12px;padding:8px 4px;order:5;}.btn.generate.svelte-bs8cbd {flex:1.5;}\n  }\n\n  /* ── Swatches ─────────────────────────────────── */.cv-hl-swatches.svelte-bs8cbd {display:grid;grid-template-columns:repeat(5, 18px);gap:6px;align-items:center;justify-items:center;}.cv-hl-swatch.svelte-bs8cbd {width:18px;height:18px;border-radius:50%;background:var(--swatch-color);border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.12s ease,\n      border-color 0.12s ease,\n      box-shadow 0.12s ease;box-shadow:0 1px 3px rgba(0, 0, 0, 0.3);}.cv-hl-swatch.svelte-bs8cbd:hover {transform:scale(1.2);box-shadow:0 2px 6px rgba(0, 0, 0, 0.4);}.cv-hl-swatch.active.svelte-bs8cbd {border-color:rgba(255, 255, 255, 0.85);transform:scale(1.15);box-shadow:0 0 0 2px var(--swatch-color),\n      0 2px 8px rgba(0, 0, 0, 0.4);}'
     };
 
     function ShareToolbar($$anchor, $$props) {
     	push($$props, false);
-    	append_styles$1($$anchor, $$css$i);
+    	append_styles$1($$anchor, $$css$j);
 
     	function handleClear() {
     		shareStore.clearAllSelections();
@@ -15824,11 +15824,11 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent = ($$anchor) => {
-    			var fragment = root_1$b();
+    			var fragment = root_1$c();
     			var div_2 = first_child(fragment);
 
     			each(div_2, 5, () => ANNOTATION_COLORS, (col) => col.key, ($$anchor, col) => {
-    				var button_4 = root_2$a();
+    				var button_4 = root_2$b();
     				let classes;
 
     				template_effect(() => {
@@ -15920,18 +15920,18 @@ ${ANNOTATION_COLORS.map((c) => `
 
     delegate(['click']);
 
-    var root_2$9 = from_html(`<span class="id-badge svelte-64gpkh" title="ID detection active"> </span>`);
+    var root_2$a = from_html(`<span class="id-badge svelte-64gpkh" title="ID detection active"> </span>`);
     var root_3$6 = from_html(`<button type="button" class="action-btn up svelte-64gpkh" title="Select Parent">↰</button>`);
-    var root_1$a = from_html(`<div class="hover-helper svelte-64gpkh"><div class="info svelte-64gpkh"><span class="tag svelte-64gpkh"> </span> <!></div> <button type="button"> </button> <!></div>`);
+    var root_1$b = from_html(`<div class="hover-helper svelte-64gpkh"><div class="info svelte-64gpkh"><span class="tag svelte-64gpkh"> </span> <!></div> <button type="button"> </button> <!></div>`);
 
-    const $$css$h = {
+    const $$css$i = {
     	hash: 'svelte-64gpkh',
     	code: '.hover-helper.svelte-64gpkh {position:fixed;z-index:99999;background-color:#333;color:white;padding:4px 8px;border-radius:4px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 5px rgba(0, 0, 0, 0.2);font-family:monospace;pointer-events:auto;}.info.svelte-64gpkh {display:flex;flex-direction:column;align-items:flex-start;line-height:1;gap:2px;}.tag.svelte-64gpkh {font-size:12px;font-weight:bold;color:#aeaeae;}.id-badge.svelte-64gpkh {font-size:10px;color:#64d2ff;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.action-btn.svelte-64gpkh {background:#555;border:none;color:white;border-radius:3px;cursor:pointer;padding:2px 6px;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:background-color 0.1s;}.action-btn.svelte-64gpkh:hover {background:#777;}.action-btn.deselect.svelte-64gpkh {background-color:#d13438;}.action-btn.deselect.svelte-64gpkh:hover {background-color:#a42628;}'
     };
 
     function HoverHelper($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$h);
+    	append_styles$1($$anchor, $$css$i);
 
     	// Derived state for easier access
     	let target = user_derived(() => shareStore.currentHoverTarget);
@@ -16030,7 +16030,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent_2 = ($$anchor) => {
-    			var div = root_1$a();
+    			var div = root_1$b();
     			var div_1 = child(div);
     			var span = child(div_1);
     			var text = child(span, true);
@@ -16041,7 +16041,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     			{
     				var consequent = ($$anchor) => {
-    					var span_1 = root_2$9();
+    					var span_1 = root_2$a();
     					var text_1 = child(span_1);
 
     					reset(span_1);
@@ -16103,18 +16103,18 @@ ${ANNOTATION_COLORS.map((c) => `
 
     delegate(['click']);
 
-    var root_2$8 = from_html(`<button type="button"></button>`);
-    var root_1$9 = from_html(`<div class="cv-color-swatches svelte-1r78n4c" role="none"></div>`);
+    var root_2$9 = from_html(`<button type="button"></button>`);
+    var root_1$a = from_html(`<div class="cv-color-swatches svelte-1r78n4c" role="none"></div>`);
     var root$d = from_html(`<div class="cv-color-picker svelte-1r78n4c" role="none"><button type="button" class="cv-color-trigger svelte-1r78n4c" title="Choose highlight color" aria-label="Choose highlight color"><span class="cv-color-dot svelte-1r78n4c"></span></button> <!></div>`);
 
-    const $$css$g = {
+    const $$css$h = {
     	hash: 'svelte-1r78n4c',
     	code: '.cv-color-picker.svelte-1r78n4c {position:fixed;transform:translateX(-50%) translateY(-100%);display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:auto;z-index:9500;\n    /* Nudge down so the trigger peeks above the element edge */margin-top:8px;}.cv-color-trigger.svelte-1r78n4c {width:22px;height:16px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;}.cv-color-trigger.svelte-1r78n4c:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-color-dot.svelte-1r78n4c {width:10px;height:10px;border-radius:50%;display:block;border:1px solid rgba(0, 0, 0, 0.12);}.cv-color-swatches.svelte-1r78n4c {display:grid;grid-template-columns:repeat(5, 16px);gap:6px;background:white;border-radius:12px;padding:8px;box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);border:1px solid rgba(0, 0, 0, 0.1);}.cv-color-swatch.svelte-1r78n4c {width:16px;height:16px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.1s,\n      border-color 0.1s;}.cv-color-swatch.svelte-1r78n4c:hover {transform:scale(1.2);border-color:rgba(0, 0, 0, 0.3);}.cv-color-swatch.active.svelte-1r78n4c {border-color:rgba(0, 0, 0, 0.5);transform:scale(1.15);}'
     };
 
     function HighlightColorPicker($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$g);
+    	append_styles$1($$anchor, $$css$h);
 
     	let isExpanded = state(false);
     	let rect = state(proxy({ top: 0, left: 0, width: 0 }));
@@ -16185,10 +16185,10 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent = ($$anchor) => {
-    			var div_1 = root_1$9();
+    			var div_1 = root_1$a();
 
     			each(div_1, 21, () => ANNOTATION_COLORS, (color) => color.key, ($$anchor, color) => {
-    				var button_1 = root_2$8();
+    				var button_1 = root_2$9();
     				let classes;
 
     				template_effect(() => {
@@ -16228,21 +16228,21 @@ ${ANNOTATION_COLORS.map((c) => `
 
     delegate(['click', 'dblclick']);
 
-    var root_2$7 = from_html(`<span class="cv-annotation-tab-chevron svelte-1r1spmr">▾</span>`);
-    var root_1$8 = from_html(`<span class="cv-annotation-tab-preview svelte-1r1spmr"> </span> <!>`, 1);
+    var root_2$8 = from_html(`<span class="cv-annotation-tab-chevron svelte-1r1spmr">▾</span>`);
+    var root_1$9 = from_html(`<span class="cv-annotation-tab-preview svelte-1r1spmr"> </span> <!>`, 1);
     var root_3$5 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
     var root_5 = from_html(`<button type="button"> </button>`);
     var root_4$2 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
     var root$c = from_html(`<div class="cv-annotation-editor svelte-1r1spmr" role="none"><button type="button" aria-label="Annotation"><!></button> <!></div>`);
 
-    const $$css$f = {
+    const $$css$g = {
     	hash: 'svelte-1r1spmr',
     	code: '.cv-annotation-editor.svelte-1r1spmr {position:fixed;z-index:9400;pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}.cv-annotation-tab.svelte-1r1spmr {height:20px;padding:0 8px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;max-width:160px;overflow:hidden;}.cv-annotation-tab.svelte-1r1spmr:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-annotation-tab--has-text.svelte-1r1spmr {background:#fffbe6;border-color:rgba(180, 83, 9, 0.4);}.cv-annotation-tab-icon.svelte-1r1spmr {font-size:10px;line-height:1;color:#6b7280;}.cv-annotation-tab-preview.svelte-1r1spmr {font-size:9px;font-weight:600;color:#1a1a1a;font-family:ui-sans-serif, system-ui, sans-serif;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:130px;}.cv-annotation-tab-chevron.svelte-1r1spmr {font-size:12px;line-height:1;color:#6b7280;margin-left:2px;}.cv-annotation-panel.svelte-1r1spmr {background:white;border-radius:8px;border:1px solid rgba(0, 0, 0, 0.12);box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);padding:8px;width:220px;display:flex;flex-direction:column;gap:6px;}.cv-annotation-textarea.svelte-1r1spmr {width:100%;box-sizing:border-box;resize:vertical;border:1px solid rgba(0, 0, 0, 0.15);border-radius:4px;padding:5px 7px;font-size:11px;font-family:ui-sans-serif, system-ui, sans-serif;color:#1a1a1a;line-height:1.5;outline:none;min-height:56px;}.cv-annotation-textarea.svelte-1r1spmr:focus {border-color:#b45309;box-shadow:0 0 0 2px rgba(180, 83, 9, 0.15);}.cv-annotation-footer.svelte-1r1spmr {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;}.cv-corner-selector.svelte-1r1spmr {display:flex;gap:2px;}.cv-corner-btn.svelte-1r1spmr {height:20px;padding:0 5px;border-radius:4px;border:1px solid rgba(0, 0, 0, 0.12);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;transition:background 0.1s,\n      border-color 0.1s;}.cv-corner-btn.svelte-1r1spmr:hover {background:#fef3c7;border-color:#b45309;color:#1a1a1a;}.cv-corner-btn.active.svelte-1r1spmr {background:#fef3c7;border-color:#b45309;color:#92400e;font-weight:700;}.cv-char-counter.svelte-1r1spmr {font-size:9px;color:#9ca3af;font-family:ui-sans-serif, system-ui, sans-serif;font-variant-numeric:tabular-nums;margin-left:auto;}'
     };
 
     function HighlightAnnotationEditor($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$f);
+    	append_styles$1($$anchor, $$css$g);
 
     	let isExpanded = state(false);
 
@@ -16315,7 +16315,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent_1 = ($$anchor) => {
-    			var fragment = root_1$8();
+    			var fragment = root_1$9();
     			var span = first_child(fragment);
     			var text = child(span, true);
 
@@ -16325,7 +16325,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     			{
     				var consequent = ($$anchor) => {
-    					var span_1 = root_2$7();
+    					var span_1 = root_2$8();
 
     					append($$anchor, span_1);
     				};
@@ -16654,18 +16654,18 @@ ${ANNOTATION_COLORS.map((c) => `
         black: { body: '#52525b', tip: '#18181b' },
     };
 
-    var root_2$6 = from_html(`<!> <!>`, 1);
+    var root_2$7 = from_html(`<!> <!>`, 1);
     var root_6 = from_html(`<div><span class="selection-label svelte-1dbf58w"> </span></div>`);
     var root$b = from_html(`<div class="share-overlay-ui"><!> <!> <!> <!> <!></div>`);
 
-    const $$css$e = {
+    const $$css$f = {
     	hash: 'svelte-1dbf58w',
     	code: '\n  /* Global styles injected when active */body.cv-share-active {cursor:default;user-select:none;-webkit-user-select:none;}\n\n  /* Box target outlines */.cv-box-target {outline:2px dashed #0078d4 !important;outline-offset:2px;cursor:crosshair;}.cv-share-selected {outline:3px solid #005a9e !important;outline-offset:2px;background-color:rgba(0, 120, 212, 0.05);}.cv-box-target-hide {outline:2px dashed #d13438 !important;outline-offset:2px;cursor:crosshair;}.cv-share-selected-hide {outline:3px solid #a4262c !important;outline-offset:2px;background-color:rgba(209, 52, 56, 0.05);}.cv-box-target-mode {outline:2px dashed #d97706 !important;outline-offset:2px;cursor:crosshair;}.cv-share-selected-box {outline:3px solid #b45309 !important;outline-offset:2px;background-color:rgba(245, 158, 11, 0.05);}\n\n  /* Text highlight mode — allow native text selection (cursor overridden inline per color) */body.cv-share-active-highlight {user-select:text !important;-webkit-user-select:text !important;}.selection-box.svelte-1dbf58w {position:fixed;border:1px solid rgba(0, 120, 212, 0.4);background-color:rgba(0, 120, 212, 0.1);pointer-events:none;z-index:10000;box-sizing:border-box;}.selection-box.hide-mode.svelte-1dbf58w {border:1px solid rgba(209, 52, 56, 0.4);background-color:rgba(209, 52, 56, 0.1);}.selection-box.box-mode.svelte-1dbf58w {border:1px solid rgba(255, 140, 0, 0.6);background-color:rgba(255, 140, 0, 0.1);}.selection-label.svelte-1dbf58w {position:absolute;top:-24px;left:0;background:#0078d4;color:white;padding:2px 6px;font-size:11px;border-radius:3px;white-space:nowrap;font-family:sans-serif;opacity:0.9;}.hide-mode.svelte-1dbf58w .selection-label:where(.svelte-1dbf58w) {background:#d13438;}.box-mode.svelte-1dbf58w .selection-label:where(.svelte-1dbf58w) {background:#d97706;}'
     };
 
     function ShareOverlay($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$e);
+    	append_styles$1($$anchor, $$css$f);
 
     	let excludedTags = prop($$props, 'excludedTags', 19, () => ['HEADER', 'NAV', 'FOOTER']),
     		excludedIds = prop($$props, 'excludedIds', 19, () => []);
@@ -16990,7 +16990,7 @@ ${ANNOTATION_COLORS.map((c) => `
     			var node_4 = first_child(fragment);
 
     			each(node_4, 16, () => [...shareStore.selectedElements], (el) => el, ($$anchor, el) => {
-    				var fragment_1 = root_2$6();
+    				var fragment_1 = root_2$7();
     				var node_5 = first_child(fragment_1);
 
     				HighlightColorPicker(node_5, {
@@ -17118,16 +17118,16 @@ ${ANNOTATION_COLORS.map((c) => `
     	pop();
     }
 
-    var root_1$7 = from_html(`<div class="cv-focus-banner-wrapper svelte-1yqpn7e"><div id="cv-exit-focus-banner" data-cv-scroll-offset="" class="svelte-1yqpn7e"><span>You are viewing a 'focused view' generated by CustardUI.</span> <button type="button" class="svelte-1yqpn7e">See Original Page</button></div></div>`);
+    var root_1$8 = from_html(`<div class="cv-focus-banner-wrapper svelte-1yqpn7e"><div id="cv-exit-focus-banner" data-cv-scroll-offset="" class="svelte-1yqpn7e"><span>You are viewing a 'focused view' generated by CustardUI.</span> <button type="button" class="svelte-1yqpn7e">See Original Page</button></div></div>`);
 
-    const $$css$d = {
+    const $$css$e = {
     	hash: 'svelte-1yqpn7e',
     	code: '.cv-focus-banner-wrapper.svelte-1yqpn7e {position:fixed;top:0;left:0;right:0;z-index:9000;background-color:#f3cb52;box-shadow:0 2px 8px rgba(44, 26, 14, 0.15);font-family:system-ui, sans-serif;}#cv-exit-focus-banner.svelte-1yqpn7e {color:#2c1a0e;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:16px;}button.svelte-1yqpn7e {background:#804b18;color:#fdf6e3;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-weight:600;}button.svelte-1yqpn7e:hover {background:#c4853a;}'
     };
 
     function FocusBanner($$anchor, $$props) {
     	push($$props, false);
-    	append_styles$1($$anchor, $$css$d);
+    	append_styles$1($$anchor, $$css$e);
 
     	function handleExit() {
     		focusStore.exit();
@@ -17140,7 +17140,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent = ($$anchor) => {
-    			var div = root_1$7();
+    			var div = root_1$8();
     			var div_1 = child(div);
     			var button = sibling(child(div_1), 2);
 
@@ -17450,14 +17450,14 @@ ${ANNOTATION_COLORS.map((c) => `
 
     var root$a = from_html(`<div class="cv-widget-root" data-cv-share-ignore=""><!> <!> <!> <!> <!> <!></div>`);
 
-    const $$css$c = {
+    const $$css$d = {
     	hash: 'svelte-1vlfixd',
     	code: '\n  /* --cv-* defaults (light) — on :root so custom properties cascade into all shadow DOM */:root {--cv-bg: white;--cv-text: rgba(0, 0, 0, 0.9);--cv-text-secondary: rgba(0, 0, 0, 0.6);--cv-border: rgba(0, 0, 0, 0.1);--cv-bg-hover: rgba(0, 0, 0, 0.05);--cv-primary: #3e84f4;--cv-primary-hover: #2563eb;--cv-danger: #dc2626;--cv-danger-bg: rgba(220, 38, 38, 0.1);--cv-shadow: rgba(0, 0, 0, 0.25);--cv-input-bg: white;--cv-input-border: rgba(0, 0, 0, 0.15);--cv-switch-bg: rgba(0, 0, 0, 0.1);--cv-switch-knob: white;--cv-modal-icon-bg: rgba(0, 0, 0, 0.08);--cv-icon-bg: rgba(255, 255, 255, 0.92);--cv-icon-color: rgba(0, 0, 0, 0.9);--cv-focus-ring: rgba(62, 132, 244, 0.2);--cv-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);--cv-modal-radius: 0.75rem;--cv-card-radius: 0.5rem;--cv-section-label-transform: uppercase;}\n\n  /* Dark Theme — triggered by data-cv-theme="dark" on <html> */:root[data-cv-theme=\'dark\'] {--cv-bg: #101722;--cv-text: #e2e8f0;--cv-text-secondary: rgba(255, 255, 255, 0.6);--cv-border: rgba(255, 255, 255, 0.1);--cv-bg-hover: rgba(255, 255, 255, 0.05);--cv-primary: #3e84f4;--cv-primary-hover: #60a5fa;--cv-danger: #f87171;--cv-danger-bg: rgba(248, 113, 113, 0.1);--cv-shadow: rgba(0, 0, 0, 0.5);--cv-input-bg: #1e293b;--cv-input-border: rgba(255, 255, 255, 0.1);--cv-switch-bg: rgba(255, 255, 255, 0.1);--cv-switch-knob: #e2e8f0;--cv-modal-icon-bg: rgba(255, 255, 255, 0.08);--cv-icon-bg: #1e293b;--cv-icon-color: #e2e8f0;--cv-focus-ring: rgba(62, 132, 244, 0.5);--cv-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);--cv-modal-radius: 0.75rem;--cv-card-radius: 0.5rem;--cv-section-label-transform: uppercase;}\n\n  /* Fixed zero-size overlay — pointer-events none so clicks pass through to the page */.cv-widget-root {position:fixed;top:0;left:0;width:0;height:0;z-index:9999;pointer-events:none;font-family:inherit;}\n\n  /* Interactive children need pointer-events restored */.cv-widget-root > * {pointer-events:auto;}\n\n  /* ShareOverlay manages its own pointer-events internally */.cv-widget-root .cv-share-overlay {pointer-events:none;}.cv-hidden {display:none !important;}'
     };
 
     function UIRoot($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$c);
+    	append_styles$1($$anchor, $$css$d);
 
     	const { persistenceManager, resetToDefault } = getContext(RUNTIME_CALLBACKS_CTX);
     	const iconSettingsStore = getContext(ICON_SETTINGS_CTX);
@@ -18060,14 +18060,14 @@ ${ANNOTATION_COLORS.map((c) => `
 
     var root$9 = from_html(`<div class="cv-context-divider svelte-1a535nn" role="button" tabindex="0"> </div>`);
 
-    const $$css$b = {
+    const $$css$c = {
     	hash: 'svelte-1a535nn',
     	code: '.cv-context-divider.svelte-1a535nn {padding:12px;margin:16px 0;background-color:#f8f8f8;border-top:1px dashed #ccc;border-bottom:1px dashed #ccc;color:#555;text-align:center;cursor:pointer;font-family:system-ui, sans-serif;font-size:13px;transition:background-color 0.2s;}.cv-context-divider.svelte-1a535nn:hover {background-color:#e8e8e8;color:#333;}'
     };
 
     function FocusDivider($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$b);
+    	append_styles$1($$anchor, $$css$c);
 
     	// Component is mounted manually via `mount`, use props for communication.
     	let hiddenCount = prop($$props, 'hiddenCount', 3, 0);
@@ -18207,15 +18207,15 @@ ${ANNOTATION_COLORS.map((c) => `
         return groups;
     }
 
-    var root_1$6 = from_html(`<div class="cv-annotation-container svelte-pq6dvi"><div><div class="cv-ribbon-shadow svelte-pq6dvi" aria-hidden="true"></div> <div role="img" aria-label="Annotation marker"></div></div> <button type="button" class="cv-empty-dismiss svelte-pq6dvi" aria-label="Dismiss marker">✕</button></div>`);
+    var root_1$7 = from_html(`<div class="cv-annotation-container svelte-pq6dvi"><div><div class="cv-ribbon-shadow svelte-pq6dvi" aria-hidden="true"></div> <div role="img" aria-label="Annotation marker"></div></div> <button type="button" class="cv-empty-dismiss svelte-pq6dvi" aria-label="Dismiss marker">✕</button></div>`);
 
-    const $$css$a = {
+    const $$css$b = {
     	hash: 'svelte-pq6dvi',
     	code: '.cv-annotation-container.svelte-pq6dvi {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;opacity:0.95;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-pq6dvi:hover {opacity:1;z-index:110;}.cv-ribbon-wrapper.svelte-pq6dvi {position:relative;transform-origin:center center;}.cv-ribbon-wrapper--intro.svelte-pq6dvi {\n    animation: svelte-pq6dvi-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-ribbon-wrapper--periodic.svelte-pq6dvi {\n    animation: svelte-pq6dvi-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-ribbon-shadow.svelte-pq6dvi {position:absolute;top:0;left:0;width:70px;height:28px;background:rgba(0, 0, 0, 0.25);transform:translate(3px, 3px);pointer-events:none;z-index:-1;}.cv-empty-ribbon.svelte-pq6dvi {width:70px;height:28px;box-sizing:border-box;background:var(--cv-annotation-color, var(--cv-box-color));display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0, 0, 0, 0.18),\n      inset 0 1px 0 rgba(255, 255, 255, 0.22);padding:5px 22px 5px 10px;opacity:0.95;transition:opacity 0.2s ease;}.cv-annotation-container.svelte-pq6dvi:hover .cv-empty-ribbon:where(.svelte-pq6dvi) {opacity:1;}.cv-empty-ribbon--right.svelte-pq6dvi {padding:5px 10px 5px 22px;}\n\n  /* Dismiss button — hidden until container is hovered */.cv-empty-dismiss.svelte-pq6dvi {position:absolute;border:none;background:rgba(100, 100, 100, 0.55);color:#fff;font-size:8px;cursor:pointer;width:14px;height:14px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;border-radius:50%;box-shadow:0 1px 4px rgba(0, 0, 0, 0.2);opacity:0;pointer-events:none;transition:opacity 0.15s ease,\n      background 0.15s ease,\n      color 0.15s ease;}.cv-annotation-container.svelte-pq6dvi:hover .cv-empty-dismiss:where(.svelte-pq6dvi) {opacity:1;pointer-events:auto;}.cv-empty-dismiss.svelte-pq6dvi:hover {background:rgba(80, 80, 80, 0.8);box-shadow:0 1px 6px rgba(0, 0, 0, 0.28);}\n\n  @keyframes svelte-pq6dvi-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-pq6dvi-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }'
     };
 
     function EmptyAnnotation($$anchor, $$props) {
-    	append_styles$1($$anchor, $$css$a);
+    	append_styles$1($$anchor, $$css$b);
 
     	let verticalOffset = prop($$props, 'verticalOffset', 3, 14);
     	const corner = user_derived(() => $$props.annotationCorner ?? DEFAULT_ANNOTATION_CORNER);
@@ -18281,7 +18281,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent = ($$anchor) => {
-    			var div = root_1$6();
+    			var div = root_1$7();
     			var div_1 = child(div);
     			let classes;
     			var div_2 = child(div_1);
@@ -18331,18 +18331,18 @@ ${ANNOTATION_COLORS.map((c) => `
 
     delegate(['click']);
 
-    var root_2$5 = from_html(`<button type="button" aria-label="Previous highlight">↑</button> <button type="button" aria-label="Next highlight">↓</button>`, 1);
-    var root_1$5 = from_html(`<div class="cv-box-group svelte-tkm0rc"><div class="cv-box-marker svelte-tkm0rc"></div> <!> <div class="cv-box-pill svelte-tkm0rc"><a href="https://custardui.js.org" target="_blank" rel="noopener noreferrer" class="svelte-tkm0rc">Annotated by: CustardUI↗</a></div> <!></div>`);
+    var root_2$6 = from_html(`<button type="button" aria-label="Previous highlight">↑</button> <button type="button" aria-label="Next highlight">↓</button>`, 1);
+    var root_1$6 = from_html(`<div class="cv-box-group svelte-tkm0rc"><div class="cv-box-marker svelte-tkm0rc"></div> <!> <div class="cv-box-pill svelte-tkm0rc"><a href="https://custardui.js.org" target="_blank" rel="noopener noreferrer" class="svelte-tkm0rc">Annotated by: CustardUI↗</a></div> <!></div>`);
     var root$8 = from_html(`<div class="cv-box-overlay svelte-tkm0rc"></div>`);
 
-    const $$css$9 = {
+    const $$css$a = {
     	hash: 'svelte-tkm0rc',
     	code: '.cv-box-overlay.svelte-tkm0rc {position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:8000;}.cv-box-group.svelte-tkm0rc {position:absolute;pointer-events:none;}.cv-box-marker.svelte-tkm0rc {position:absolute;inset:0;pointer-events:none;\n\n    /* Marker Style */border:3.5px solid var(--cv-box-color);border-radius:200px 15px 225px 15px / 15px 225px 15px 255px;transform:rotate(-0.5deg);\n\n    /* 3D INTERNAL VOLUME */box-shadow:inset 0 1px 2px rgba(129, 73, 25, 0.2),\n      inset 0 -1px 1px rgba(255, 255, 255, 0.7);\n\n    /* CRISP DROP SHADOW */filter:drop-shadow(4px 4px 1px rgba(0, 0, 0, 0.25));\n\n    animation: svelte-tkm0rc-boxFadeIn 0.3s ease-out forwards;}.cv-nav-arrow.svelte-tkm0rc {position:absolute;z-index:10;right:-5px;pointer-events:auto;width:14px;height:14px;border-radius:100px;border:1px solid var(--cv-box-color);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:7px;color:#814919;font-weight:700;font-family:ui-sans-serif, system-ui, sans-serif;line-height:1;padding:0;box-shadow:0 4px 12px rgba(44, 26, 14, 0.15);opacity:0.7;}.cv-nav-arrow.svelte-tkm0rc:hover {opacity:1;}.cv-nav-arrow--up.svelte-tkm0rc {top:0px;}.cv-nav-arrow--down.svelte-tkm0rc {bottom:0px;}.cv-nav-arrow--hidden.svelte-tkm0rc {visibility:hidden;pointer-events:none;}.cv-box-pill.svelte-tkm0rc {position:absolute;z-index:10;bottom:-2px;right:14px;background:white;height:14px;padding:0 8px;display:flex;align-items:center;border-radius:100px;border:1px solid var(--cv-box-color);pointer-events:auto;white-space:nowrap;box-shadow:0 4px 12px rgba(44, 26, 14, 0.15);}.cv-box-pill.svelte-tkm0rc a:where(.svelte-tkm0rc) {font-size:8px;font-weight:700;color:#814919;text-decoration:none;font-family:ui-sans-serif, system-ui, sans-serif;line-height:1;}.cv-box-pill.svelte-tkm0rc:hover a:where(.svelte-tkm0rc) {opacity:0.8;}\n\n  @keyframes svelte-tkm0rc-boxFadeIn {\n    from {\n      opacity: 0;\n      transform: scale(0.98) rotate(-1deg);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) rotate(-0.5deg);\n    }\n  }'
     };
 
     function BoxOverlay($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$9);
+    	append_styles$1($$anchor, $$css$a);
 
     	let rects = user_derived(() => $$props.box.rects);
 
@@ -18365,12 +18365,12 @@ ${ANNOTATION_COLORS.map((c) => `
     	var div = root$8();
 
     	each(div, 23, () => get(rects), (rect) => rect.element, ($$anchor, rect, i) => {
-    		var div_1 = root_1$5();
+    		var div_1 = root_1$6();
     		var node = sibling(child(div_1), 2);
 
     		{
     			var consequent = ($$anchor) => {
-    				var fragment = root_2$5();
+    				var fragment = root_2$6();
     				var button = first_child(fragment);
     				let classes;
     				var button_1 = sibling(button, 2);
@@ -19751,7 +19751,7 @@ ${ANNOTATION_COLORS.map((c) => `
     		if (node.nodeType === Node.ELEMENT_NODE) {
     			const el = node;
 
-    			if (el.tagName === 'CV-PLACEHOLDER' || el.tagName === 'CV-PLACEHOLDER-INPUT') {
+    			if (el.tagName === 'CV-PLACEHOLDER' || el.tagName === 'CV-PLACEHOLDER-INPUT' || el.tagName === 'CV-INSERTION') {
     				return;
     			}
     		}
@@ -19793,6 +19793,161 @@ ${ANNOTATION_COLORS.map((c) => `
     		}
     	}
     }
+
+    const DEFAULT_INSERTIONS_FILENAME = 'insertions.html';
+    /**
+     * Fetches and parses the adopter-provided insertions file for the active adaptation.
+     *
+     * The file is resolved as:
+     *   `{baseUrl}/{adaptationsPath}/{id}/{insertionsFile}`
+     *
+     * where `insertionsFile` defaults to `insertions.html` but can be overridden via
+     * `adaptationConfig.insertionsFile`.
+     *
+     * The file is expected to contain zero or more `<div id="...">` elements. Each div's
+     * `id` becomes the insertion key and its `innerHTML` the insertion content.
+     *
+     * Example `insertions.html`:
+     * ```html
+     * <div id="lesson1-preamble">
+     *   <p>NUS students: complete this before your tutorial.</p>
+     * </div>
+     * ```
+     */
+    class InsertionLoader {
+        /**
+         * Loads and parses the insertions file for the given adaptation config.
+         *
+         * @param baseUrl      The site's base URL (from `data-base-url`, default `''`)
+         * @param config       The active AdaptationConfig, or `null` if no adaptation is active
+         * @param adaptationsPath  Subfolder under baseUrl where adaptation folders live (default `'versions'`)
+         * @returns            Parsed InsertionMap, or `null` if no adaptation is active or the file
+         *                     could not be fetched (404, network error, etc.)
+         */
+        static async init(baseUrl = '', config, adaptationsPath = 'versions') {
+            if (!config)
+                return null;
+            const filename = (config.insertionsFile ?? DEFAULT_INSERTIONS_FILENAME).trim();
+            if (!filename)
+                return null;
+            const url = this.buildUrl(baseUrl, adaptationsPath, config.id, filename);
+            if (!url)
+                return null;
+            return this.fetchAndParse(url, config.id);
+        }
+        // ---------------------------------------------------------------------------
+        // Private helpers
+        // ---------------------------------------------------------------------------
+        static buildUrl(baseUrl, adaptationsPath, id, filename) {
+            try {
+                const safeId = encodeURIComponent(id.trim());
+                const normalizedPath = adaptationsPath.trim().replace(/^\/+|\/+$/g, '');
+                const safePath = normalizedPath ? `${normalizedPath}/` : '';
+                const filePath = `${safePath}${safeId}/${filename}`;
+                // Mirror the same URL resolution used in AdaptationManager.loadAdaptationConfig
+                const directoryBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+                return new URL(filePath, new URL(directoryBase, window.location.origin)).toString();
+            }
+            catch {
+                return null;
+            }
+        }
+        static async fetchAndParse(url, id) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    if (response.status !== 404) {
+                        // 404 is expected when no insertions file exists — only log unexpected errors
+                        console.warn(`[CustardUI] Insertions file for adaptation "${id}" could not be loaded (HTTP ${response.status}).`);
+                    }
+                    return null;
+                }
+                const html = await response.text();
+                return this.parseInsertions(html);
+            }
+            catch (err) {
+                console.warn(`[CustardUI] Failed to fetch insertions for adaptation "${id}":`, err);
+                return null;
+            }
+        }
+        /**
+         * Parses an HTML string and extracts `<div id="...">` blocks into an InsertionMap.
+         * Also reads an optional `label` attribute on each div for per-insertion attribution.
+         * Uses the browser's `DOMParser` for safe, standards-compliant parsing.
+         */
+        static parseInsertions(html) {
+            const map = {};
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const divs = doc.querySelectorAll('div[id]');
+                divs.forEach((div) => {
+                    const insertionId = div.id;
+                    if (insertionId) {
+                        const labelAttr = div.getAttribute('label');
+                        const colorAttr = div.getAttribute('color');
+                        map[insertionId] = {
+                            content: div.innerHTML,
+                            ...(labelAttr ? { label: labelAttr } : {}),
+                            ...(colorAttr ? { color: colorAttr } : {}),
+                        };
+                    }
+                });
+            }
+            catch (err) {
+                console.warn('[CustardUI] Failed to parse insertions HTML:', err);
+            }
+            return map;
+        }
+    }
+
+    /* insertion-store.svelte.ts generated by Svelte v5.55.10 */
+
+    class InsertionStore {
+    	#map = /**
+    	 * The parsed insertion map for the active adaptation.
+    	 * `null` means no adaptation is active (or loading has not completed).
+    	 * An empty object means an adaptation is active but has no insertions file
+    	 * (or the file is empty / failed to load).
+    	 */
+    	state(null);
+
+    	get map() {
+    		return get(this.#map);
+    	}
+
+    	set map(value) {
+    		set(this.#map, value, true);
+    	}
+
+    	#adaptationLabel = state(null);
+
+    	get adaptationLabel() {
+    		return get(this.#adaptationLabel);
+    	}
+
+    	set adaptationLabel(value) {
+    		set(this.#adaptationLabel, value, true);
+    	}
+
+    	#isAdaptationActive = state(false);
+
+    	get isAdaptationActive() {
+    		return get(this.#isAdaptationActive);
+    	}
+
+    	set isAdaptationActive(value) {
+    		set(this.#isAdaptationActive, value, true);
+    	}
+
+    	init(map, adaptationLabel, isAdaptationActive) {
+    		this.map = map;
+    		this.adaptationLabel = adaptationLabel;
+    		this.isAdaptationActive = isAdaptationActive;
+    	}
+    }
+
+    const insertionStore = new InsertionStore();
 
     var root$7 = from_svg(`<svg><polyline points="6 9 12 15 18 9"></polyline></svg>`);
 
@@ -19836,20 +19991,20 @@ ${ANNOTATION_COLORS.map((c) => `
     	append($$anchor, svg);
     }
 
-    var root_1$4 = from_html(`<div class="cv-toggle-label svelte-1ka2eec"> </div>`);
+    var root_1$5 = from_html(`<div class="cv-toggle-label svelte-1ka2eec"> </div>`);
     var root_3$4 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show less</span>`, 1);
     var root_4$1 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show more</span>`, 1);
-    var root_2$4 = from_html(`<button type="button" class="cv-expand-btn svelte-1ka2eec"><!></button>`);
+    var root_2$5 = from_html(`<button type="button" class="cv-expand-btn svelte-1ka2eec"><!></button>`);
     var root$5 = from_html(`<div><!> <div class="cv-toggle-content svelte-1ka2eec"><div class="cv-toggle-inner svelte-1ka2eec"><!></div></div> <!></div>`);
 
-    const $$css$8 = {
+    const $$css$9 = {
     	hash: 'svelte-1ka2eec',
     	code: ':host {display:block;position:relative;z-index:1;overflow:visible;}\n\n  /* Inline mode: renders the host as inline so it flows with surrounding text */:host([inline]) {display:inline;vertical-align:baseline;}\n\n  /* Host visibility control */:host([hidden]) {display:none;}.cv-toggle-wrapper.svelte-1ka2eec {position:relative;width:100%;transition:margin-bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1);margin-bottom:4px;}\n\n  /* In inline mode, don\'t force block-level width or margins */.cv-toggle-wrapper.inline-mode.svelte-1ka2eec {display:inline;width:auto;margin-bottom:0;vertical-align:baseline;}.cv-toggle-wrapper.inline-mode.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec),\n  .cv-toggle-wrapper.inline-mode.svelte-1ka2eec .cv-toggle-inner:where(.svelte-1ka2eec) {display:inline;}.cv-toggle-wrapper.hidden.svelte-1ka2eec {margin-bottom:0;}.cv-toggle-wrapper.hidden.inline-mode.svelte-1ka2eec {display:none;}.cv-toggle-wrapper.peek-mode.svelte-1ka2eec {margin-bottom:28px;}.cv-toggle-content.svelte-1ka2eec {overflow:hidden;transition:max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),\n      opacity 0.3s ease,\n      overflow 0s 0s;}.cv-toggle-inner.svelte-1ka2eec {display:flow-root; /* Ensures margins of children are contained */}\n\n  /* Hidden State */.hidden.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec) {opacity:0;pointer-events:none;}\n\n  /* Bordered State */.has-border.svelte-1ka2eec {box-sizing:border-box;border:2px dashed rgba(0, 0, 0, 0.15);border-bottom:none;box-shadow:0 2px 8px rgba(0, 0, 0, 0.05),\n      inset 0 -15px 10px -10px rgba(0, 0, 0, 0.1);border-radius:8px 8px 0 0;padding:12px 0 0 0;margin-top:4px;}\n\n  /* Visible / Expanded State */.expanded.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec) {opacity:1;transform:translateY(0);overflow:visible;transition:max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),\n      opacity 0.3s ease,\n      overflow 0s 0.35s;}\n\n  /* When expanded, complete the border */.has-border.expanded.svelte-1ka2eec {border-bottom:2px dashed rgba(0, 0, 0, 0.15);border-radius:8px;padding-bottom:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.05);}\n\n  /* Peek State — smoother gradient */.peeking.svelte-1ka2eec .cv-toggle-content:where(.svelte-1ka2eec) {opacity:1;mask-image:linear-gradient(to bottom, black 30%, rgba(0, 0, 0, 0.5) 70%, transparent 100%);-webkit-mask-image:linear-gradient(\n      to bottom,\n      black 30%,\n      rgba(0, 0, 0, 0.5) 70%,\n      transparent 100%\n    );}\n\n  /* Label Style */.cv-toggle-label.svelte-1ka2eec {position:absolute;top:-12px;left:0;background:#e0e0e0;color:#333;font-size:0.75rem;font-weight:600;padding:2px 8px;border-radius:4px;z-index:10;pointer-events:auto;box-shadow:0 1px 2px rgba(0, 0, 0, 0.1);}\n\n  /* Adjust label position if bordered */.has-border.svelte-1ka2eec .cv-toggle-label:where(.svelte-1ka2eec) {top:-10px;left:0;}\n\n  /* Expand Button — upgraded to pill style */.cv-expand-btn.svelte-1ka2eec {position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:rgba(0, 0, 0, 0.04);border:1px solid rgba(0, 0, 0, 0.08);border-radius:999px;padding:3px 12px;cursor:pointer;z-index:100;color:#666;font-size:0.7rem;font-weight:500;font-family:inherit;line-height:1;transition:all 0.2s ease;}.cv-expand-btn.svelte-1ka2eec:hover {background:rgba(0, 0, 0, 0.08);border-color:rgba(0, 0, 0, 0.15);color:#333;transform:translateX(-50%) scale(1.02);}.cv-expand-btn.svelte-1ka2eec svg {display:block;width:14px;height:14px;opacity:0.6;flex-shrink:0;}.cv-expand-btn.svelte-1ka2eec:hover svg {opacity:1;}.cv-expand-label.svelte-1ka2eec {white-space:nowrap;}'
     };
 
     function Toggle($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$8);
+    	append_styles$1($$anchor, $$css$9);
 
     	// Props using Svelte 5 runes
     	let toggleId = prop($$props, 'toggleId', 7, ''),
@@ -20059,7 +20214,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent = ($$anchor) => {
-    			var div_1 = root_1$4();
+    			var div_1 = root_1$5();
     			var text = child(div_1, true);
 
     			reset(div_1);
@@ -20087,7 +20242,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent_2 = ($$anchor) => {
-    			var button = root_2$4();
+    			var button = root_2$5();
     			var node_3 = child(button);
 
     			{
@@ -20167,16 +20322,16 @@ ${ANNOTATION_COLORS.map((c) => `
     ));
 
     var root_3$3 = from_html(`<p class="description svelte-1lfe2lv"> </p>`);
-    var root_2$3 = from_html(`<div class="card svelte-1lfe2lv"><div class="content svelte-1lfe2lv"><div><p class="label svelte-1lfe2lv"> </p> <!></div> <!></div></div>`);
+    var root_2$4 = from_html(`<div class="card svelte-1lfe2lv"><div class="content svelte-1lfe2lv"><div><p class="label svelte-1lfe2lv"> </p> <!></div> <!></div></div>`);
 
-    const $$css$7 = {
+    const $$css$8 = {
     	hash: 'svelte-1lfe2lv',
     	code: ':host {display:contents;}.card.svelte-1lfe2lv {background:var(--cv-bg);border:1px solid var(--cv-border);border-radius:var(--cv-card-radius, 0.5rem);transition:background 0.15s ease;}.content.svelte-1lfe2lv {display:flex;align-items:center;justify-content:space-between;padding:0.75rem;gap:0.75rem;}.label.svelte-1lfe2lv {font-weight:500;font-size:0.875rem;color:var(--cv-text);margin:0;line-height:1.4;}.description.svelte-1lfe2lv {font-size:0.75rem;color:var(--cv-text-secondary);margin:0.125rem 0 0 0;line-height:1.4;}'
     };
 
     function ToggleControl($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$7);
+    	append_styles$1($$anchor, $$css$8);
 
     	let toggleId = prop($$props, 'toggleId', 7, ''),
     		inline = prop($$props, 'inline', 7, false);
@@ -20236,7 +20391,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var div = root_2$3();
+    					var div = root_2$4();
     					var div_1 = child(div);
     					var div_2 = child(div_1);
     					var p = child(div_2);
@@ -20333,14 +20488,14 @@ ${ANNOTATION_COLORS.map((c) => `
 
     var root$4 = from_html(`<div><!></div>`);
 
-    const $$css$6 = {
+    const $$css$7 = {
     	hash: 'svelte-8qj5x2',
     	code: ':host {display:block;}:host(.cv-hidden) {display:none !important;}:host(.cv-visible) {display:block !important;}:host([active=\'true\']) {display:block;}.cv-tab-content.svelte-8qj5x2 {display:none;\n    animation: svelte-8qj5x2-fade-in 0.2s ease-in-out;padding-top:1rem;padding-bottom:0.5rem;padding-left:0;padding-right:0;}.cv-tab-content.active.svelte-8qj5x2 {display:block;}\n\n  /* Hide cv-tab-header source element; content is extracted to nav link */.svelte-8qj5x2::slotted(cv-tab-header) {display:none !important;}\n\n  /* Allow cv-tab-body to flow naturally */.svelte-8qj5x2::slotted(cv-tab-body) {display:block;}\n\n  @keyframes svelte-8qj5x2-fade-in {\n    from {\n      opacity: 0;\n    }\n    to {\n      opacity: 1;\n    }\n  }'
     };
 
     function Tab($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$6);
+    	append_styles$1($$anchor, $$css$7);
 
     	// Props using Svelte 5 runes
     	// tabId and header are used in TabGroup directly.
@@ -20382,8 +20537,8 @@ ${ANNOTATION_COLORS.map((c) => `
     	{ mode: 'open' }
     ));
 
-    var root_1$3 = from_svg(`<path d="M4 2v13l4-2.5L12 15V2H4z"></path>`);
-    var root_2$2 = from_svg(`<path d="M4 2v13l4-2.5L12 15V2H4zm1 1h6v10.5l-3-1.88L5 13.5V3z"></path>`);
+    var root_1$4 = from_svg(`<path d="M4 2v13l4-2.5L12 15V2H4z"></path>`);
+    var root_2$3 = from_svg(`<path d="M4 2v13l4-2.5L12 15V2H4zm1 1h6v10.5l-3-1.88L5 13.5V3z"></path>`);
     var root$3 = from_svg(`<svg><!></svg>`);
 
     function IconMark($$anchor, $$props) {
@@ -20409,13 +20564,13 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent = ($$anchor) => {
-    			var path = root_1$3();
+    			var path = root_1$4();
 
     			append($$anchor, path);
     		};
 
     		var alternate = ($$anchor) => {
-    			var path_1 = root_2$2();
+    			var path_1 = root_2$3();
 
     			append($$anchor, path_1);
     		};
@@ -20429,20 +20584,20 @@ ${ANNOTATION_COLORS.map((c) => `
     	append($$anchor, svg);
     }
 
-    var root_2$1 = from_html(`<li class="cv-tabgroup-item svelte-1ujqpe3"><div><a role="tab" title="Double-click a tab to 'mark' it in all similar tab groups."><span class="cv-tab-header-text svelte-1ujqpe3"></span></a> <button type="button"><!></button></div></li>`);
-    var root_1$2 = from_html(`<ul class="cv-tabgroup-nav svelte-1ujqpe3" role="tablist"></ul>`);
+    var root_2$2 = from_html(`<li class="cv-tabgroup-item svelte-1ujqpe3"><div><a role="tab" title="Double-click a tab to 'mark' it in all similar tab groups."><span class="cv-tab-header-text svelte-1ujqpe3"></span></a> <button type="button"><!></button></div></li>`);
+    var root_1$3 = from_html(`<ul class="cv-tabgroup-nav svelte-1ujqpe3" role="tablist"></ul>`);
     var root_3$2 = from_html(`<link rel="stylesheet"/>`);
     var root_4 = from_html(`<div class="cv-tabgroup-bottom-border svelte-1ujqpe3"></div>`);
     var root$2 = from_html(`<div class="cv-tabgroup-container svelte-1ujqpe3"><!> <!> <div class="cv-tabgroup-content"><!></div> <!></div>`);
 
-    const $$css$5 = {
+    const $$css$6 = {
     	hash: 'svelte-1ujqpe3',
     	code: ':host {display:block;}.cv-tabgroup-container.svelte-1ujqpe3 {margin-bottom:24px;}\n\n  /* Tab navigation styles */ul.cv-tabgroup-nav.svelte-1ujqpe3 {display:flex;flex-wrap:wrap;padding-left:0;margin-top:0.5rem;margin-bottom:0;list-style:none;border-bottom:1px solid var(--cv-border, rgba(128, 128, 128, 0.3));align-items:stretch;gap:0.5rem;}.cv-tabgroup-item.svelte-1ujqpe3 {margin-bottom:-1px;list-style:none;display:flex;align-items:stretch;}.cv-tabgroup-link.svelte-1ujqpe3 {display:flex;align-items:center;justify-content:center;padding:0.5rem 0.75rem;color:inherit;opacity:0.7;text-decoration:none;background-color:transparent !important;border:none;transition:opacity 0.15s ease-in-out,\n      border-color 0.15s ease-in-out;cursor:pointer;min-height:2.5rem;box-sizing:border-box;font-weight:500;}.cv-tabgroup-link.svelte-1ujqpe3 p {margin:0;display:inline;}.cv-tabgroup-link.svelte-1ujqpe3:hover,\n  .cv-tabgroup-link.svelte-1ujqpe3:focus {opacity:1;border-bottom-color:var(--cv-border, rgba(128, 128, 128, 0.3));isolation:isolate;}.cv-tabgroup-link.active.svelte-1ujqpe3 {opacity:1;background-color:transparent !important;}.cv-tabgroup-link.svelte-1ujqpe3:focus {outline:0;}.cv-tab-wrapper.svelte-1ujqpe3 {display:flex;align-items:center;border-bottom:2px solid transparent;transition:border-color 0.15s ease-in-out;}.cv-tab-wrapper.svelte-1ujqpe3:hover,\n  .cv-tab-wrapper.svelte-1ujqpe3:focus-within {border-bottom-color:var(--cv-border, rgba(128, 128, 128, 0.3));}.cv-tab-wrapper.active.svelte-1ujqpe3 {border-bottom-color:currentColor;}.cv-tab-header-text.svelte-1ujqpe3 {line-height:1;}.cv-tab-marked-icon.svelte-1ujqpe3 {display:inline-flex;align-items:center;justify-content:center;line-height:0;flex-shrink:0;opacity:0;transition:opacity 0.15s ease-out;background:none;border:none;padding:0 8px 0 0;margin:0;cursor:pointer;color:inherit;height:100%;}.cv-tab-wrapper.svelte-1ujqpe3:hover .cv-tab-marked-icon:where(.svelte-1ujqpe3),\n  .cv-tab-wrapper.svelte-1ujqpe3:focus-within .cv-tab-marked-icon:where(.svelte-1ujqpe3),\n  .cv-tab-marked-icon.is-marked.svelte-1ujqpe3 {opacity:1;}.cv-tab-marked-icon.svelte-1ujqpe3 svg {vertical-align:middle;width:14px;height:14px;}.cv-tabgroup-bottom-border.svelte-1ujqpe3 {border-bottom:1px solid var(--cv-border, rgba(128, 128, 128, 0.3));}\n\n  @media print {ul.cv-tabgroup-nav.svelte-1ujqpe3 {display:none !important;}\n  }'
     };
 
     function TabGroup($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$5);
+    	append_styles$1($$anchor, $$css$6);
 
     	//  ID of the tabgroup Group
     	let groupId = prop($$props, 'groupId', 7),
@@ -20688,10 +20843,10 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent = ($$anchor) => {
-    			var ul = root_1$2();
+    			var ul = root_1$3();
 
     			each(ul, 21, () => get(derivedTabs), (tab) => tab.id, ($$anchor, tab) => {
-    				var li = root_2$1();
+    				var li = root_2$2();
     				var div_1 = child(li);
     				let classes;
     				var a = child(div_1);
@@ -20804,13 +20959,13 @@ ${ANNOTATION_COLORS.map((c) => `
     	{ mode: 'open' }
     ));
 
-    const $$css$4 = {
+    const $$css$5 = {
     	hash: 'svelte-1hl11lz',
     	code: ':host {display:none; /* Semantic container only, usually read by parent and hidden */}'
     };
 
     function TabHeader($$anchor, $$props) {
-    	append_styles$1($$anchor, $$css$4);
+    	append_styles$1($$anchor, $$css$5);
 
     	var fragment = comment();
     	var node = first_child(fragment);
@@ -20822,10 +20977,10 @@ ${ANNOTATION_COLORS.map((c) => `
 
     customElements.define('cv-tab-header', create_custom_element(TabHeader, {}, ['default'], [], { mode: 'open' }));
 
-    const $$css$3 = { hash: 'svelte-eizj8y', code: ':host {display:block;}' };
+    const $$css$4 = { hash: 'svelte-eizj8y', code: ':host {display:block;}' };
 
     function TabBody($$anchor, $$props) {
-    	append_styles$1($$anchor, $$css$3);
+    	append_styles$1($$anchor, $$css$4);
 
     	var fragment = comment();
     	var node = first_child(fragment);
@@ -20838,11 +20993,11 @@ ${ANNOTATION_COLORS.map((c) => `
     customElements.define('cv-tab-body', create_custom_element(TabBody, {}, ['default'], [], { mode: 'open' }));
 
     var root$1 = from_html(`<span class="cv-var"> </span>`);
-    const $$css$2 = { hash: 'svelte-1tffxwo', code: ':host {display:inline;}' };
+    const $$css$3 = { hash: 'svelte-1tffxwo', code: ':host {display:inline;}' };
 
     function Placeholder($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$2);
+    	append_styles$1($$anchor, $$css$3);
 
     	let name = prop($$props, 'name', 7),
     		fallback = prop($$props, 'fallback', 7),
@@ -20966,19 +21121,19 @@ ${ANNOTATION_COLORS.map((c) => `
     	{ mode: 'open' }
     ));
 
-    var root_2 = from_html(`<p class="placeholder-description svelte-dpk3ag"> </p>`);
-    var root_1$1 = from_html(`<div class="label-group svelte-dpk3ag"><label class="placeholder-label svelte-dpk3ag"> </label> <!></div>`);
+    var root_2$1 = from_html(`<p class="placeholder-description svelte-dpk3ag"> </p>`);
+    var root_1$2 = from_html(`<div class="label-group svelte-dpk3ag"><label class="placeholder-label svelte-dpk3ag"> </label> <!></div>`);
     var root_3$1 = from_html(`<label class="placeholder-label svelte-dpk3ag"> </label>`);
     var root = from_html(`<div><!> <div class="input-container svelte-dpk3ag"><input type="text"/> <span class="edit-icon svelte-dpk3ag" aria-hidden="true"><!></span></div></div>`);
 
-    const $$css$1 = {
+    const $$css$2 = {
     	hash: 'svelte-dpk3ag',
     	code: ':host {display:inline-block;width:auto;margin:0 0.25rem; /* Add breathing room for inline text */}\n\n  /* Host display overrides based on layout */:host([layout=\'stacked\']),\n  :host([layout=\'horizontal\']),\n  :host([layout=\'card\']) {display:block;width:100%;margin:0 0 0.5rem 0; /* Reset margins for block layouts */}\n\n  /* Wrapper Grid/Flex Layouts */.cv-input-wrapper.svelte-dpk3ag {display:flex;width:100%;box-sizing:border-box;}\n\n  /* INLINE */.cv-input-wrapper.inline.svelte-dpk3ag {display:inline-block;width:auto;}\n\n  /* STACKED */.cv-input-wrapper.stacked.svelte-dpk3ag {flex-direction:column;gap:0.25rem;}\n\n  /* HORIZONTAL */.cv-input-wrapper.horizontal.svelte-dpk3ag {flex-direction:row;align-items:center;gap:0.75rem;}\n\n  /* CARD */.cv-input-wrapper.card.svelte-dpk3ag {flex-direction:row;align-items:center;justify-content:space-between;padding:0.75rem;gap:0.75rem;background:var(--cv-bg);border:1px solid var(--cv-border);border-radius:var(--cv-card-radius, 0.5rem);transition:background 0.15s ease;}.label-group.svelte-dpk3ag {display:flex;flex-direction:column;}.card.svelte-dpk3ag .label-group:where(.svelte-dpk3ag) {flex:1;min-width:0;}.card.svelte-dpk3ag .placeholder-label:where(.svelte-dpk3ag) {font-size:0.875rem;font-weight:500;white-space:normal;}.placeholder-description.svelte-dpk3ag {font-size:0.75rem;color:var(--cv-text-secondary);margin:0.125rem 0 0 0;line-height:1.4;}.card.svelte-dpk3ag .placeholder-input:where(.svelte-dpk3ag) {width:100%;}\n\n  /* Label Styles */.placeholder-label.svelte-dpk3ag {font-size:0.85rem;font-weight:500;color:var(--cv-text, #333);white-space:nowrap;}.stacked.svelte-dpk3ag .placeholder-label:where(.svelte-dpk3ag) {margin-bottom:2px;width:100%; /* Ensure label context is full width */text-align:left; /* Reset text align */}\n\n  /* Input Styles */.placeholder-input.svelte-dpk3ag {padding:0.5rem 0.75rem;border:1px solid var(--cv-input-border, rgba(0, 0, 0, 0.1));border-radius:0.375rem;font-size:0.9rem;transition:all 0.2s;background:var(--cv-input-bg, white);color:var(--cv-text, #333);box-sizing:border-box;width:100%;}.stacked.svelte-dpk3ag .placeholder-input:where(.svelte-dpk3ag) {width:100%;}.inline.svelte-dpk3ag .placeholder-input:where(.svelte-dpk3ag) {width:var(--cv-input-width, auto);padding:0.3rem 1.35rem 0.3rem 0.5rem;display:inline-block;text-align:center;}\n\n  /* Input container — positions the pencil icon */.input-container.svelte-dpk3ag {position:relative;display:flex;align-items:center;}.inline.svelte-dpk3ag .input-container:where(.svelte-dpk3ag) {display:inline-flex;}.stacked.svelte-dpk3ag .input-container:where(.svelte-dpk3ag) {width:100%;}.horizontal.svelte-dpk3ag .input-container:where(.svelte-dpk3ag) {flex:1;}.card.svelte-dpk3ag .input-container:where(.svelte-dpk3ag) {flex:1;min-width:6rem;}.edit-icon.svelte-dpk3ag {position:absolute;right:0.3rem;top:50%;transform:translateY(-50%);display:flex;align-items:center;pointer-events:none;color:var(--cv-text-secondary, rgba(0, 0, 0, 0.5));opacity:0.7;}.edit-icon.svelte-dpk3ag svg {width:0.75rem;height:0.75rem;}\n\n  /* More breathing room for block layouts */.stacked.svelte-dpk3ag .edit-icon:where(.svelte-dpk3ag),\n  .horizontal.svelte-dpk3ag .edit-icon:where(.svelte-dpk3ag),\n  .card.svelte-dpk3ag .edit-icon:where(.svelte-dpk3ag) {right:0.5rem;}.horizontal.svelte-dpk3ag .placeholder-input:where(.svelte-dpk3ag) {width:var(--cv-input-width, auto);flex:1;}\n\n  /* APPEARANCES */\n\n  /* Outline (Default) - handled by base styles above */\n\n  /* Underline */.placeholder-input.underline.svelte-dpk3ag {border:none;border-bottom:1px solid var(--cv-input-border, rgba(0, 0, 0, 0.2));border-radius:0;background:transparent;padding-left:0;padding-right:0;}.placeholder-input.underline.svelte-dpk3ag:focus {box-shadow:none;border-bottom-color:var(--cv-primary, #3e84f4);}\n\n  /* Ghost */.placeholder-input.ghost.svelte-dpk3ag {border-color:transparent;background:transparent;}.placeholder-input.ghost.svelte-dpk3ag:hover {background:var(--cv-input-bg-hover, rgba(0, 0, 0, 0.05));}.placeholder-input.ghost.svelte-dpk3ag:focus {background:var(--cv-input-bg, white);border-color:var(--cv-primary, #3e84f4);box-shadow:0 0 0 2px var(--cv-focus-ring, rgba(62, 132, 244, 0.2));}\n\n  /* Focus states for standard inputs */.placeholder-input.svelte-dpk3ag:not(.underline):focus {outline:none;border-color:var(--cv-primary, #3e84f4);box-shadow:0 0 0 2px var(--cv-focus-ring, rgba(62, 132, 244, 0.2));}\n\n  /* Icon padding for block layouts — after appearance rules so underline can\'t override */.stacked.svelte-dpk3ag .placeholder-input:where(.svelte-dpk3ag),\n  .horizontal.svelte-dpk3ag .placeholder-input:where(.svelte-dpk3ag),\n  .card.svelte-dpk3ag .placeholder-input:where(.svelte-dpk3ag) {padding-right:1.6rem;}'
     };
 
     function PlaceholderInput($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css$1);
+    	append_styles$1($$anchor, $$css$2);
 
     	let name = prop($$props, 'name', 7),
     		label = prop($$props, 'label', 7),
@@ -21091,7 +21246,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent_1 = ($$anchor) => {
-    			var div_1 = root_1$1();
+    			var div_1 = root_1$2();
     			var label_1 = child(div_1);
     			var text = child(label_1, true);
 
@@ -21101,7 +21256,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     			{
     				var consequent = ($$anchor) => {
-    					var p = root_2();
+    					var p = root_2$1();
     					var text_1 = child(p, true);
 
     					reset(p);
@@ -21245,16 +21400,16 @@ ${ANNOTATION_COLORS.map((c) => `
     }
 
     var root_3 = from_html(`<link rel="stylesheet"/>`);
-    var root_1 = from_html(`<!> <span class="cv-label svelte-10fc57e"><!></span>`, 1);
+    var root_1$1 = from_html(`<!> <span class="cv-label svelte-10fc57e"><!></span>`, 1);
 
-    const $$css = {
+    const $$css$1 = {
     	hash: 'svelte-10fc57e',
     	code: ':host {display:inline;}.cv-label.svelte-10fc57e {display:inline-flex;align-items:center;padding:1px 8px;border-radius:999px;font-size:0.75em;font-weight:600;white-space:nowrap;line-height:1.5;letter-spacing:0.02em;vertical-align:middle;}'
     };
 
     function Label($$anchor, $$props) {
     	push($$props, true);
-    	append_styles$1($$anchor, $$css);
+    	append_styles$1($$anchor, $$css$1);
 
     	let name = prop($$props, 'name', 7, ''),
     		color = prop($$props, 'color', 7, '');
@@ -21308,7 +21463,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent_2 = ($$anchor) => {
-    			var fragment_1 = root_1();
+    			var fragment_1 = root_1$1();
     			var node_1 = first_child(fragment_1);
 
     			{
@@ -21391,6 +21546,164 @@ ${ANNOTATION_COLORS.map((c) => `
     	{ mode: 'open' }
     ));
 
+    var root_2 = from_html(`<div class="cv-insertion-header svelte-1tlqvu0"><span class="cv-insertion-label svelte-1tlqvu0"> </span></div>`);
+    var root_1 = from_html(`<aside class="cv-insertion-block svelte-1tlqvu0"><!> <div class="cv-insertion-content svelte-1tlqvu0"></div></aside>`);
+
+    const $$css = {
+    	hash: 'svelte-1tlqvu0',
+    	code: ':host {display:block;}\n\n  /* ------------------------------------------------------------------ */\n  /* Callout wrapper                                                      */\n  /* ------------------------------------------------------------------ */.cv-insertion-block.svelte-1tlqvu0 {display:block;position:relative;margin:1rem 0;padding:0.75rem 1rem 0.75rem 1.25rem;border-left:4px solid var(--cv-insertion-color, var(--cv-primary, #814c20));border-radius:0 6px 6px 0;background:color-mix(in srgb, var(--cv-insertion-color, var(--cv-primary, #814c20)) 8%, transparent);font-style:normal;box-sizing:border-box;}\n\n  /* ------------------------------------------------------------------ */\n  /* Header row (icon + label)                                           */\n  /* ------------------------------------------------------------------ */.cv-insertion-header.svelte-1tlqvu0 {display:flex;align-items:center;margin-bottom:0.5rem;}.cv-insertion-label.svelte-1tlqvu0 {font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--cv-insertion-color, var(--cv-primary, #814c20));line-height:1;}\n\n  /* ------------------------------------------------------------------ */\n  /* Injected content area                                               */\n  /* ------------------------------------------------------------------ */.cv-insertion-content.svelte-1tlqvu0 {font-size:0.95rem;line-height:1.6;\n    /* Collapse excess vertical whitespace from injected markup */overflow:hidden;}.cv-insertion-content.svelte-1tlqvu0 p:first-child {margin-top:0;}.cv-insertion-content.svelte-1tlqvu0 p:last-child {margin-bottom:0;}'
+    };
+
+    function Insertion($$anchor, $$props) {
+    	push($$props, true);
+    	append_styles$1($$anchor, $$css);
+
+    	let insertionId = prop($$props, 'insertionId', 7, ''),
+    		label = prop($$props, 'label', 7, ''),
+    		color = prop($$props, 'color', 7, '');
+
+    	/**
+    	 * The HTML content to inject, resolved from the insertion store.
+    	 * `null` means "show the default slot instead".
+    	 */
+    	let insertedHtml = user_derived(() => {
+    		if (!insertionId()) return null;
+    		if (!insertionStore.isAdaptationActive) return null;
+
+    		const map = insertionStore.map;
+
+    		if (!map) return null;
+
+    		const entry = map[insertionId()];
+
+    		return entry !== undefined ? entry.content : null;
+    	});
+
+    	/** Attribution label: per-tag `label` prop > per-insertion `label` from HTML > adaptation label > adaptation id */
+    	let attributionLabel = user_derived(() => {
+    		if (label()?.trim()) return label().trim();
+
+    		const entry = insertionStore.map?.[insertionId()];
+
+    		if (entry?.label?.trim()) return entry.label.trim();
+
+    		return insertionStore.adaptationLabel || null;
+    	});
+
+    	/** Attribution color: per-tag `color` prop > per-insertion `color` from HTML > null */
+    	let attributionColor = user_derived(() => {
+    		if (color()?.trim()) return color().trim();
+
+    		const entry = insertionStore.map?.[insertionId()];
+
+    		if (entry?.color?.trim()) return entry.color.trim();
+
+    		return null;
+    	});
+
+    	let hasInsertion = user_derived(() => get(insertedHtml) !== null);
+
+    	var $$exports = {
+    		get insertionId() {
+    			return insertionId();
+    		},
+
+    		set insertionId($$value = '') {
+    			insertionId($$value);
+    			flushSync();
+    		},
+
+    		get label() {
+    			return label();
+    		},
+
+    		set label($$value = '') {
+    			label($$value);
+    			flushSync();
+    		},
+
+    		get color() {
+    			return color();
+    		},
+
+    		set color($$value = '') {
+    			color($$value);
+    			flushSync();
+    		}
+    	};
+
+    	var fragment = comment();
+    	var node = first_child(fragment);
+
+    	{
+    		var consequent_1 = ($$anchor) => {
+    			var aside = root_1();
+    			var node_1 = child(aside);
+
+    			{
+    				var consequent = ($$anchor) => {
+    					var div = root_2();
+    					var span = child(div);
+    					var text = child(span, true);
+
+    					reset(span);
+    					reset(div);
+    					template_effect(() => set_text(text, get(attributionLabel)));
+    					append($$anchor, div);
+    				};
+
+    				if_block(node_1, ($$render) => {
+    					if (get(attributionLabel)) $$render(consequent);
+    				});
+    			}
+
+    			var div_1 = sibling(node_1, 2);
+
+    			html(div_1, () => get(insertedHtml), true);
+    			reset(div_1);
+    			reset(aside);
+
+    			template_effect(() => {
+    				set_attribute(aside, 'aria-label', get(attributionLabel) || 'Adopter note');
+
+    				set_style(aside, get(attributionColor)
+    					? `--cv-insertion-color: ${get(attributionColor)};`
+    					: undefined);
+    			});
+
+    			append($$anchor, aside);
+    		};
+
+    		var alternate = ($$anchor) => {
+    			var fragment_1 = comment();
+    			var node_2 = first_child(fragment_1);
+
+    			slot(node_2, $$props, 'default', {});
+    			append($$anchor, fragment_1);
+    		};
+
+    		if_block(node, ($$render) => {
+    			if (get(hasInsertion)) $$render(consequent_1); else $$render(alternate, -1);
+    		});
+    	}
+
+    	append($$anchor, fragment);
+
+    	return pop($$exports);
+    }
+
+    customElements.define('cv-insertion', create_custom_element(
+    	Insertion,
+    	{
+    		insertionId: { attribute: 'insertion-id', type: 'String' },
+    		label: { attribute: 'label', type: 'String' },
+    		color: { attribute: 'color', type: 'String' }
+    	},
+    	['default'],
+    	[],
+    	{ mode: 'open' }
+    ));
+
     // --- No Public API Exports ---
     // The script auto-initializes via initializeFromScript().
     /**
@@ -21425,6 +21738,11 @@ ${ANNOTATION_COLORS.map((c) => `
                 if (adaptationConfig?.id) {
                     AdaptationManager.rewriteUrlIndicator(adaptationConfig.id);
                 }
+                // Load adopter insertions (parallel concern to adaptation theme / preset).
+                // Fetch is fire-and-go before AppRuntime.start() so cv-insertion elements
+                // have data on first mount without needing a second render cycle.
+                const insertionMap = await InsertionLoader.init(effectiveBaseURL, adaptationConfig, configFile.adaptationsPath);
+                insertionStore.init(insertionMap, adaptationConfig?.name ?? adaptationConfig?.id ?? null, adaptationConfig !== null);
                 const coreOptions = {
                     configFile,
                     rootEl: document.body,

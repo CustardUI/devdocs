@@ -65,6 +65,25 @@
       "headingKeywords": {}
     },
     {
+      "src": "authorGuide/adaptations/insertions.md",
+      "title": "Author Guide - Adaptation Insertions",
+      "headings": {
+        "insertions": "Insertions",
+        "basic-syntax": "Basic Syntax",
+        "insertions-html-format": "insertions.html Format",
+        "attributes-of-cv-insertion": "Attributes of &lt;cv-insertion&gt;",
+        "attributes-of-div-in-insertions-html": "Attributes of &lt;div&gt; (in insertions.html)",
+        "with-attribution-label": "With Attribution Label",
+        "with-custom-color": "With Custom Color",
+        "no-default-content": "No Default Content",
+        "file-placement": "File Placement",
+        "custom-filename": "Custom Filename",
+        "adaptation-config": "Adaptation Config",
+        "troubleshooting": "Troubleshooting"
+      },
+      "headingKeywords": {}
+    },
+    {
       "src": "authorGuide/adaptations/samplePage.md",
       "title": "Author Guide - Sample Page",
       "headings": {
@@ -76,7 +95,11 @@
         "exercise-4-peer-review-and-amp-submission": "Exercise 4 — Peer Review &amp; Submission ",
         "institution-resources": "Institution Resources",
         "nus-resources": "NUS Resources",
-        "sample-institution-resources": "Sample Institution Resources"
+        "sample-institution-resources": "Sample Institution Resources",
+        "adopter-insertions": "Adopter Insertions",
+        "before-exercise-1": "Before Exercise 1",
+        "before-exercise-2": "Before Exercise 2",
+        "before-exercise-3": "Before Exercise 3"
       },
       "headingKeywords": {}
     },
@@ -510,6 +533,11 @@
     },
     {
       "src": "versions/nus/index.md",
+      "headings": {},
+      "headingKeywords": {}
+    },
+    {
+      "src": "versions/nus/insertions.md",
       "headings": {},
       "headingKeywords": {}
     },
