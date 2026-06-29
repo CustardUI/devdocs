@@ -20907,11 +20907,11 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	var node_2 = sibling(node, 2);
 
-    	each(node_2, 16, () => Array.from(document.querySelectorAll('link[rel="stylesheet"]')), (link) => link.href, ($$anchor, link) => {
-    		var link_1 = root_3$2();
+    	each(node_2, 16, () => Array.from(new Set(Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.href))), (href) => href, ($$anchor, href) => {
+    		var link = root_3$2();
 
-    		template_effect(() => set_attribute(link_1, 'href', link.href));
-    		append($$anchor, link_1);
+    		template_effect(() => set_attribute(link, 'href', href));
+    		append($$anchor, link);
     	});
 
     	var div_2 = sibling(node_2, 2);
@@ -21471,11 +21471,11 @@ ${ANNOTATION_COLORS.map((c) => `
     					var fragment_2 = comment();
     					var node_2 = first_child(fragment_2);
 
-    					each(node_2, 16, () => Array.from(document.querySelectorAll('link[rel="stylesheet"]')), (link) => link.href, ($$anchor, link) => {
-    						var link_1 = root_3();
+    					each(node_2, 16, () => Array.from(new Set(Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.href))), (href) => href, ($$anchor, href) => {
+    						var link = root_3();
 
-    						template_effect(() => set_attribute(link_1, 'href', link.href));
-    						append($$anchor, link_1);
+    						template_effect(() => set_attribute(link, 'href', href));
+    						append($$anchor, link);
     					});
 
     					append($$anchor, fragment_2);
@@ -21741,7 +21741,10 @@ ${ANNOTATION_COLORS.map((c) => `
                 // Load adopter insertions (parallel concern to adaptation theme / preset).
                 // Fetch is fire-and-go before AppRuntime.start() so cv-insertion elements
                 // have data on first mount without needing a second render cycle.
-                const insertionMap = await InsertionLoader.init(effectiveBaseURL, adaptationConfig, configFile.adaptationsPath);
+                let insertionMap = null;
+                if (document.querySelector('cv-insertion')) {
+                    insertionMap = await InsertionLoader.init(effectiveBaseURL, adaptationConfig, configFile.adaptationsPath);
+                }
                 insertionStore.init(insertionMap, adaptationConfig?.name ?? adaptationConfig?.id ?? null, adaptationConfig !== null);
                 const coreOptions = {
                     configFile,
