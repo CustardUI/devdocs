@@ -1,5 +1,5 @@
 /*!
- * @custardui/custardui v2.3.1-beta.1
+ * @custardui/custardui v3.0.0
  * (c) 2026 Chan Ger Teck
  * Released under the MIT License.
  */
@@ -13421,7 +13421,7 @@
     	var div_23 = sibling(child(div_22), 2);
     	var span_3 = sibling(child(div_23), 2);
 
-    	span_3.textContent = 'v2.3.1-beta.1';
+    	span_3.textContent = 'v3.0.0';
     	reset(div_23);
     	reset(div_22);
 
