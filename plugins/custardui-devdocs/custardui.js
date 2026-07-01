@@ -7860,6 +7860,25 @@
     	});
     }
 
+    /** @import { ActionPayload } from '#client' */
+
+    /**
+     * @template P
+     * @param {Element} dom
+     * @param {(dom: Element, value?: P) => ActionPayload<P>} action
+     * @param {() => P} [get_value]
+     * @returns {void}
+     */
+    function action(dom, action, get_value) {
+    	effect(() => {
+    		var payload = untrack(() => action(dom, get_value?.()) || {});
+
+    		if (payload?.destroy) {
+    			return () => /** @type {Function} */ (payload.destroy)();
+    		}
+    	});
+    }
+
     /** @import { Effect } from '#client' */
 
     // TODO in 6.0 or 7.0, when we remove legacy mode, we can simplify this by
@@ -12477,7 +12496,7 @@
     	append($$anchor, svg);
     }
 
-    var root_2$e = from_html(`<span class="segment-icon svelte-1osj0o5"><!></span>`);
+    var root_2$d = from_html(`<span class="segment-icon svelte-1osj0o5"><!></span>`);
     var root_1$j = from_html(`<button type="button"><!> <span class="segment-label svelte-1osj0o5"> </span></button>`);
     var root$m = from_html(`<div role="group"></div>`);
 
@@ -12545,7 +12564,7 @@
     		{
     			var consequent = ($$anchor) => {
     				const Icon = user_derived(() => icons[option]);
-    				var span = root_2$e();
+    				var span = root_2$d();
     				var node_1 = child(span);
 
     				component(node_1, () => get(Icon), ($$anchor, Icon_1) => {
@@ -12662,7 +12681,7 @@
     }
 
     var root_1$h = from_html(`<p class="description svelte-uub3h8"> </p>`);
-    var root_2$d = from_html(`<option> </option>`);
+    var root_2$c = from_html(`<option> </option>`);
     var root$k = from_html(`<div class="root svelte-uub3h8"><div class="header svelte-uub3h8"><label class="label svelte-uub3h8"> </label> <!></div> <select class="select svelte-uub3h8"></select></div>`);
 
     const $$css$o = {
@@ -12713,7 +12732,7 @@
     	var select = sibling(div_1, 2);
 
     	each(select, 21, () => $$props.group.tabs, (tab) => tab.tabId, ($$anchor, tab) => {
-    		var option = root_2$d();
+    		var option = root_2$c();
     		var text_2 = child(option, true);
 
     		reset(option);
@@ -12893,12 +12912,12 @@
     }
 
     var root_1$f = from_html(`<button type="button">Customize</button>`);
-    var root_3$8 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
-    var root_5$3 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Toggles</div> <div class="toggles-container svelte-16uy9h6"></div></div>`);
+    var root_3$9 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
+    var root_5$4 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Toggles</div> <div class="toggles-container svelte-16uy9h6"></div></div>`);
     var root_7$1 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Placeholders</div> <div class="placeholders-container svelte-16uy9h6"></div></div>`);
     var root_9 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Tab Groups</div> <div class="tabgroups-container svelte-16uy9h6"><div class="tabgroup-card header-card svelte-16uy9h6" role="group"><div class="tabgroup-row svelte-16uy9h6"><div class="logo-box svelte-16uy9h6" id="cv-nav-icon-box"><div class="nav-icon svelte-16uy9h6"><!></div></div> <div class="tabgroup-info svelte-16uy9h6"><div class="tabgroup-title-container"><p class="tabgroup-title svelte-16uy9h6">Show only the selected tab</p></div> <p class="tabgroup-description svelte-16uy9h6">Hide the navigation headers</p></div> <label class="toggle-switch nav-toggle svelte-16uy9h6"><input class="nav-pref-input svelte-16uy9h6" type="checkbox" aria-label="Show only the selected tab"/> <span class="switch-bg svelte-16uy9h6"></span> <span class="switch-knob svelte-16uy9h6"></span></label></div></div> <div class="tab-groups-list svelte-16uy9h6"></div></div></div>`);
-    var root_4$4 = from_html(`<!> <!> <!>`, 1);
-    var root_2$c = from_html(`<div class="tab-content active svelte-16uy9h6"><!> <!></div>`);
+    var root_4$5 = from_html(`<!> <!> <!>`, 1);
+    var root_2$b = from_html(`<div class="tab-content active svelte-16uy9h6"><!> <!></div>`);
     var root_15 = from_html(`<div class="link-label-container svelte-16uy9h6"><label for="settings-link-label" class="svelte-16uy9h6">Link Label (Optional)</label> <input type="text" id="settings-link-label" class="link-label-input svelte-16uy9h6" placeholder="e.g. default-settings"/></div> <button type="button" class="share-action-btn copy-url-btn svelte-16uy9h6"><span class="btn-icon svelte-16uy9h6"><!></span> <span><!></span></button>`, 1);
 
     var root_14 = from_html(`<div class="tab-content active svelte-16uy9h6"><div class="share-content svelte-16uy9h6"><div class="share-instruction svelte-16uy9h6">Create a shareable link for your current customization, or select specific parts of
@@ -13109,12 +13128,12 @@
 
     	{
     		var consequent_7 = ($$anchor) => {
-    			var div_6 = root_2$c();
+    			var div_6 = root_2$b();
     			var node_4 = child(div_6);
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var p_1 = root_3$8();
+    					var p_1 = root_3$9();
     					var text_1 = child(p_1, true);
 
     					reset(p_1);
@@ -13130,12 +13149,12 @@
     			var node_5 = sibling(node_4, 2);
 
     			each(node_5, 16, () => get(sectionOrder), (section) => section, ($$anchor, section) => {
-    				var fragment = root_4$4();
+    				var fragment = root_4$5();
     				var node_6 = first_child(fragment);
 
     				{
     					var consequent_2 = ($$anchor) => {
-    						var div_7 = root_5$3();
+    						var div_7 = root_5$4();
     						var div_8 = sibling(child(div_7), 2);
 
     						each(div_8, 21, () => get(toggles), (toggle) => toggle.toggleId, ($$anchor, toggle) => {
@@ -14497,10 +14516,10 @@
         return null;
     }
 
-    var root_4$3 = from_html(`<span>▾</span>`);
-    var root_3$7 = from_html(`<span> </span> <!> <span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span>`, 1);
+    var root_4$4 = from_html(`<span>▾</span>`);
+    var root_3$8 = from_html(`<span> </span> <!> <span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span>`, 1);
     var root_6$1 = from_html(`<span>▾</span>`);
-    var root_5$2 = from_html(`<span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span> <span> </span> <!>`, 1);
+    var root_5$3 = from_html(`<span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span> <span> </span> <!>`, 1);
     var root_1$e = from_html(`<div><div aria-hidden="true"></div> <button type="button"><!></button></div>`);
     var root_7 = from_html(`<div class="cv-annotation-card svelte-1ctem0h" role="region" aria-label="Annotation"><button type="button" class="cv-card-close svelte-1ctem0h" aria-label="Collapse annotation">✕</button> <span class="cv-card-text svelte-1ctem0h"> </span></div>`);
     var root$g = from_html(`<div role="presentation"><!></div>`);
@@ -14691,7 +14710,7 @@
 
     					{
     						var consequent_1 = ($$anchor) => {
-    							var fragment_1 = root_3$7();
+    							var fragment_1 = root_3$8();
     							var span = first_child(fragment_1);
     							let classes_4;
     							var text = child(span, true);
@@ -14702,7 +14721,7 @@
 
     							{
     								var consequent = ($$anchor) => {
-    									var span_1 = root_4$3();
+    									var span_1 = root_4$4();
     									let classes_5;
 
     									template_effect(() => classes_5 = set_class(span_1, 1, 'cv-ribbon-chevron svelte-1ctem0h', null, classes_5, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
@@ -14732,7 +14751,7 @@
     						};
 
     						var alternate = ($$anchor) => {
-    							var fragment_2 = root_5$2();
+    							var fragment_2 = root_5$3();
     							var span_2 = sibling(first_child(fragment_2), 2);
     							let classes_6;
     							var text_1 = child(span_2, true);
@@ -15790,7 +15809,7 @@ ${ANNOTATION_COLORS.map((c) => `
     	pop();
     }
 
-    var root_2$b = from_html(`<button type="button"></button>`);
+    var root_2$a = from_html(`<button type="button"></button>`);
     var root_1$c = from_html(`<div class="cv-hl-swatches svelte-bs8cbd" role="group" aria-label="Highlight color"></div> <span class="divider svelte-bs8cbd"></span>`, 1);
     var root$e = from_html(`<div class="floating-bar svelte-bs8cbd"><div class="mode-toggle svelte-bs8cbd"><button type="button" title="Highlight selected text">Highlight</button> <button type="button" title="Box selected elements">Box</button> <button type="button" title="Show only selected elements">Show</button> <button type="button" title="Hide selected elements">Hide</button></div> <span class="divider svelte-bs8cbd"></span> <!> <span class="count svelte-bs8cbd"><!></span> <button type="button" class="btn clear svelte-bs8cbd">Clear</button> <label class="label-wrapper svelte-bs8cbd"><span class="label-text svelte-bs8cbd">Label:</span> <input type="text" class="label-input svelte-bs8cbd" placeholder="Optional link label" aria-label="Optional link label"/></label> <button type="button" class="btn preview svelte-bs8cbd">Preview</button> <button type="button" class="btn generate svelte-bs8cbd">Copy Link</button> <button type="button" class="btn exit svelte-bs8cbd">Exit</button></div>`);
 
@@ -15838,7 +15857,7 @@ ${ANNOTATION_COLORS.map((c) => `
     			var div_2 = first_child(fragment);
 
     			each(div_2, 5, () => ANNOTATION_COLORS, (col) => col.key, ($$anchor, col) => {
-    				var button_4 = root_2$b();
+    				var button_4 = root_2$a();
     				let classes;
 
     				template_effect(() => {
@@ -15932,8 +15951,8 @@ ${ANNOTATION_COLORS.map((c) => `
 
     delegate(['click']);
 
-    var root_2$a = from_html(`<span class="id-badge svelte-64gpkh" title="ID detection active"> </span>`);
-    var root_3$6 = from_html(`<button type="button" class="action-btn up svelte-64gpkh" title="Select Parent">↰</button>`);
+    var root_2$9 = from_html(`<span class="id-badge svelte-64gpkh" title="ID detection active"> </span>`);
+    var root_3$7 = from_html(`<button type="button" class="action-btn up svelte-64gpkh" title="Select Parent">↰</button>`);
     var root_1$b = from_html(`<div class="hover-helper svelte-64gpkh"><div class="info svelte-64gpkh"><span class="tag svelte-64gpkh"> </span> <!></div> <button type="button"> </button> <!></div>`);
 
     const $$css$i = {
@@ -16053,7 +16072,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     			{
     				var consequent = ($$anchor) => {
-    					var span_1 = root_2$a();
+    					var span_1 = root_2$9();
     					var text_1 = child(span_1);
 
     					reset(span_1);
@@ -16077,7 +16096,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var button_1 = root_3$6();
+    					var button_1 = root_3$7();
 
     					delegated('click', button_1, handleSelectParent);
     					append($$anchor, button_1);
@@ -16115,7 +16134,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     delegate(['click']);
 
-    var root_2$9 = from_html(`<button type="button"></button>`);
+    var root_2$8 = from_html(`<button type="button"></button>`);
     var root_1$a = from_html(`<div class="cv-color-swatches svelte-1r78n4c" role="none"></div>`);
     var root$d = from_html(`<div role="none"><button type="button" class="cv-color-trigger svelte-1r78n4c" title="Choose highlight color" aria-label="Choose highlight color"><span class="cv-color-dot svelte-1r78n4c"></span></button> <!></div>`);
 
@@ -16202,7 +16221,7 @@ ${ANNOTATION_COLORS.map((c) => `
     			var div_1 = root_1$a();
 
     			each(div_1, 21, () => ANNOTATION_COLORS, (color) => color.key, ($$anchor, color) => {
-    				var button_1 = root_2$9();
+    				var button_1 = root_2$8();
     				let classes_1;
 
     				template_effect(() => {
@@ -16243,11 +16262,11 @@ ${ANNOTATION_COLORS.map((c) => `
 
     delegate(['click', 'dblclick']);
 
-    var root_2$8 = from_html(`<span class="cv-annotation-tab-chevron svelte-1r1spmr">▾</span>`);
+    var root_2$7 = from_html(`<span class="cv-annotation-tab-chevron svelte-1r1spmr">▾</span>`);
     var root_1$9 = from_html(`<span class="cv-annotation-tab-preview svelte-1r1spmr"> </span> <!>`, 1);
-    var root_3$5 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
-    var root_5$1 = from_html(`<button type="button"> </button>`);
-    var root_4$2 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
+    var root_3$6 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
+    var root_5$2 = from_html(`<button type="button"> </button>`);
+    var root_4$3 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
     var root$c = from_html(`<div role="none"><button type="button" aria-label="Annotation"><!></button> <!></div>`);
 
     const $$css$g = {
@@ -16341,7 +16360,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     			{
     				var consequent = ($$anchor) => {
-    					var span_1 = root_2$8();
+    					var span_1 = root_2$7();
 
     					append($$anchor, span_1);
     				};
@@ -16356,7 +16375,7 @@ ${ANNOTATION_COLORS.map((c) => `
     		};
 
     		var alternate = ($$anchor) => {
-    			var span_2 = root_3$5();
+    			var span_2 = root_3$6();
     			var text_1 = child(span_2, true);
 
     			reset(span_2);
@@ -16375,7 +16394,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent_2 = ($$anchor) => {
-    			var div_1 = root_4$2();
+    			var div_1 = root_4$3();
     			var textarea = child(div_1);
 
     			remove_textarea_child(textarea);
@@ -16386,7 +16405,7 @@ ${ANNOTATION_COLORS.map((c) => `
     			each(div_3, 21, () => CORNER_ICONS, ({ key, icon }) => key, ($$anchor, $$item) => {
     				let key = () => get($$item).key;
     				let icon = () => get($$item).icon;
-    				var button_1 = root_5$1();
+    				var button_1 = root_5$2();
     				let classes_2;
     				var text_2 = child(button_1, true);
 
@@ -16671,8 +16690,8 @@ ${ANNOTATION_COLORS.map((c) => `
         black: { body: '#52525b', tip: '#18181b' },
     };
 
-    var root_2$7 = from_html(`<!> <!>`, 1);
-    var root_5 = from_html(`<!> <!>`, 1);
+    var root_2$6 = from_html(`<!> <!>`, 1);
+    var root_5$1 = from_html(`<!> <!>`, 1);
     var root_6 = from_html(`<div><span class="selection-label svelte-1dbf58w"> </span></div>`);
     var root$b = from_html(`<div class="share-overlay-ui"><!> <!> <!> <!> <!></div>`);
 
@@ -17031,7 +17050,7 @@ ${ANNOTATION_COLORS.map((c) => `
     			var node_4 = first_child(fragment);
 
     			each(node_4, 16, () => [...shareStore.selectedElements], (el) => el, ($$anchor, el) => {
-    				var fragment_1 = root_2$7();
+    				var fragment_1 = root_2$6();
     				var node_5 = first_child(fragment_1);
 
     				{
@@ -17092,7 +17111,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     				{
     					var consequent_1 = ($$anchor) => {
-    						var fragment_4 = root_5();
+    						var fragment_4 = root_5$1();
     						var node_10 = first_child(fragment_4);
 
     						{
@@ -18404,7 +18423,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     delegate(['click']);
 
-    var root_2$6 = from_html(`<button type="button" aria-label="Previous highlight">↑</button> <button type="button" aria-label="Next highlight">↓</button>`, 1);
+    var root_2$5 = from_html(`<button type="button" aria-label="Previous highlight">↑</button> <button type="button" aria-label="Next highlight">↓</button>`, 1);
     var root_1$6 = from_html(`<div class="cv-box-group svelte-tkm0rc"><div class="cv-box-marker svelte-tkm0rc"></div> <!> <div class="cv-box-pill svelte-tkm0rc"><a href="https://custardui.js.org" target="_blank" rel="noopener noreferrer" class="svelte-tkm0rc">Annotated by: CustardUI↗</a></div> <!></div>`);
     var root$8 = from_html(`<div class="cv-box-overlay svelte-tkm0rc"></div>`);
 
@@ -18443,7 +18462,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     		{
     			var consequent = ($$anchor) => {
-    				var fragment = root_2$6();
+    				var fragment = root_2$5();
     				var button = first_child(fragment);
     				let classes;
     				var button_1 = sibling(button, 2);
@@ -19974,7 +19993,6 @@ ${ANNOTATION_COLORS.map((c) => `
         }
         /**
          * Parses an HTML string and extracts `<div id="...">` blocks into an InsertionMap.
-         * Also reads an optional `label` attribute on each div for per-insertion attribution.
          * Uses the browser's `DOMParser` for safe, standards-compliant parsing.
          */
         static parseInsertions(html) {
@@ -19986,12 +20004,14 @@ ${ANNOTATION_COLORS.map((c) => `
                 divs.forEach((div) => {
                     const insertionId = div.id;
                     if (insertionId) {
-                        const labelAttr = div.getAttribute('label');
                         const colorAttr = div.getAttribute('color');
+                        const alignAttr = div.getAttribute('align');
+                        const outlineAttr = div.getAttribute('outline');
                         map[insertionId] = {
                             content: div.innerHTML,
-                            ...(labelAttr ? { label: labelAttr } : {}),
                             ...(colorAttr ? { color: colorAttr } : {}),
+                            ...(alignAttr ? { align: alignAttr } : {}),
+                            ...(outlineAttr ? { outline: outlineAttr } : {}),
                         };
                     }
                 });
@@ -20094,9 +20114,9 @@ ${ANNOTATION_COLORS.map((c) => `
     }
 
     var root_1$5 = from_html(`<div class="cv-toggle-label svelte-1ka2eec"> </div>`);
-    var root_3$4 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show less</span>`, 1);
-    var root_4$1 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show more</span>`, 1);
-    var root_2$5 = from_html(`<button type="button" class="cv-expand-btn svelte-1ka2eec"><!></button>`);
+    var root_3$5 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show less</span>`, 1);
+    var root_4$2 = from_html(`<!> <span class="cv-expand-label svelte-1ka2eec">Show more</span>`, 1);
+    var root_2$4 = from_html(`<button type="button" class="cv-expand-btn svelte-1ka2eec"><!></button>`);
     var root$5 = from_html(`<div><!> <div class="cv-toggle-content svelte-1ka2eec"><div class="cv-toggle-inner svelte-1ka2eec"><!></div></div> <!></div>`);
 
     const $$css$9 = {
@@ -20344,12 +20364,12 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent_2 = ($$anchor) => {
-    			var button = root_2$5();
+    			var button = root_2$4();
     			var node_3 = child(button);
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var fragment = root_3$4();
+    					var fragment = root_3$5();
     					var node_4 = first_child(fragment);
 
     					IconChevronUp(node_4, {});
@@ -20358,7 +20378,7 @@ ${ANNOTATION_COLORS.map((c) => `
     				};
 
     				var alternate = ($$anchor) => {
-    					var fragment_1 = root_4$1();
+    					var fragment_1 = root_4$2();
     					var node_5 = first_child(fragment_1);
 
     					IconChevronDown(node_5, {});
@@ -20423,8 +20443,8 @@ ${ANNOTATION_COLORS.map((c) => `
     	{ mode: 'open' }
     ));
 
-    var root_3$3 = from_html(`<p class="description svelte-1lfe2lv"> </p>`);
-    var root_2$4 = from_html(`<div class="card svelte-1lfe2lv"><div class="content svelte-1lfe2lv"><div><p class="label svelte-1lfe2lv"> </p> <!></div> <!></div></div>`);
+    var root_3$4 = from_html(`<p class="description svelte-1lfe2lv"> </p>`);
+    var root_2$3 = from_html(`<div class="card svelte-1lfe2lv"><div class="content svelte-1lfe2lv"><div><p class="label svelte-1lfe2lv"> </p> <!></div> <!></div></div>`);
 
     const $$css$8 = {
     	hash: 'svelte-1lfe2lv',
@@ -20493,7 +20513,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     			{
     				var consequent_1 = ($$anchor) => {
-    					var div = root_2$4();
+    					var div = root_2$3();
     					var div_1 = child(div);
     					var div_2 = child(div_1);
     					var p = child(div_2);
@@ -20505,7 +20525,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     					{
     						var consequent = ($$anchor) => {
-    							var p_1 = root_3$3();
+    							var p_1 = root_3$4();
     							var text_1 = child(p_1, true);
 
     							reset(p_1);
@@ -20640,7 +20660,7 @@ ${ANNOTATION_COLORS.map((c) => `
     ));
 
     var root_1$4 = from_svg(`<path d="M4 2v13l4-2.5L12 15V2H4z"></path>`);
-    var root_2$3 = from_svg(`<path d="M4 2v13l4-2.5L12 15V2H4zm1 1h6v10.5l-3-1.88L5 13.5V3z"></path>`);
+    var root_2$2 = from_svg(`<path d="M4 2v13l4-2.5L12 15V2H4zm1 1h6v10.5l-3-1.88L5 13.5V3z"></path>`);
     var root$3 = from_svg(`<svg><!></svg>`);
 
     function IconMark($$anchor, $$props) {
@@ -20672,7 +20692,7 @@ ${ANNOTATION_COLORS.map((c) => `
     		};
 
     		var alternate = ($$anchor) => {
-    			var path_1 = root_2$3();
+    			var path_1 = root_2$2();
 
     			append($$anchor, path_1);
     		};
@@ -20686,10 +20706,10 @@ ${ANNOTATION_COLORS.map((c) => `
     	append($$anchor, svg);
     }
 
-    var root_2$2 = from_html(`<li class="cv-tabgroup-item svelte-1ujqpe3"><div><a role="tab" title="Double-click a tab to 'mark' it in all similar tab groups."><span class="cv-tab-header-text svelte-1ujqpe3"></span></a> <button type="button"><!></button></div></li>`);
+    var root_2$1 = from_html(`<li class="cv-tabgroup-item svelte-1ujqpe3"><div><a role="tab" title="Double-click a tab to 'mark' it in all similar tab groups."><span class="cv-tab-header-text svelte-1ujqpe3"></span></a> <button type="button"><!></button></div></li>`);
     var root_1$3 = from_html(`<ul class="cv-tabgroup-nav svelte-1ujqpe3" role="tablist"></ul>`);
-    var root_3$2 = from_html(`<link rel="stylesheet"/>`);
-    var root_4 = from_html(`<div class="cv-tabgroup-bottom-border svelte-1ujqpe3"></div>`);
+    var root_3$3 = from_html(`<link rel="stylesheet"/>`);
+    var root_4$1 = from_html(`<div class="cv-tabgroup-bottom-border svelte-1ujqpe3"></div>`);
     var root$2 = from_html(`<div class="cv-tabgroup-container svelte-1ujqpe3"><!> <!> <div class="cv-tabgroup-content"><!></div> <!></div>`);
 
     const $$css$6 = {
@@ -20948,7 +20968,7 @@ ${ANNOTATION_COLORS.map((c) => `
     			var ul = root_1$3();
 
     			each(ul, 21, () => get(derivedTabs), (tab) => tab.id, ($$anchor, tab) => {
-    				var li = root_2$2();
+    				var li = root_2$1();
     				var div_1 = child(li);
     				let classes;
     				var a = child(div_1);
@@ -21010,7 +21030,7 @@ ${ANNOTATION_COLORS.map((c) => `
     	var node_2 = sibling(node, 2);
 
     	each(node_2, 16, () => Array.from(new Set(Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.href))), (href) => href, ($$anchor, href) => {
-    		var link = root_3$2();
+    		var link = root_3$3();
 
     		template_effect(() => set_attribute(link, 'href', href));
     		append($$anchor, link);
@@ -21027,7 +21047,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	{
     		var consequent_1 = ($$anchor) => {
-    			var div_3 = root_4();
+    			var div_3 = root_4$1();
 
     			append($$anchor, div_3);
     		};
@@ -21223,9 +21243,9 @@ ${ANNOTATION_COLORS.map((c) => `
     	{ mode: 'open' }
     ));
 
-    var root_2$1 = from_html(`<p class="placeholder-description svelte-dpk3ag"> </p>`);
+    var root_2 = from_html(`<p class="placeholder-description svelte-dpk3ag"> </p>`);
     var root_1$2 = from_html(`<div class="label-group svelte-dpk3ag"><label class="placeholder-label svelte-dpk3ag"> </label> <!></div>`);
-    var root_3$1 = from_html(`<label class="placeholder-label svelte-dpk3ag"> </label>`);
+    var root_3$2 = from_html(`<label class="placeholder-label svelte-dpk3ag"> </label>`);
     var root = from_html(`<div><!> <div class="input-container svelte-dpk3ag"><input type="text"/> <span class="edit-icon svelte-dpk3ag" aria-hidden="true"><!></span></div></div>`);
 
     const $$css$2 = {
@@ -21358,7 +21378,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     			{
     				var consequent = ($$anchor) => {
-    					var p = root_2$1();
+    					var p = root_2();
     					var text_1 = child(p, true);
 
     					reset(p);
@@ -21382,7 +21402,7 @@ ${ANNOTATION_COLORS.map((c) => `
     		};
 
     		var consequent_2 = ($$anchor) => {
-    			var label_2 = root_3$1();
+    			var label_2 = root_3$2();
     			var text_2 = child(label_2, true);
 
     			reset(label_2);
@@ -21501,7 +21521,7 @@ ${ANNOTATION_COLORS.map((c) => `
         return luminance > 0.5 ? '#000000' : '#ffffff';
     }
 
-    var root_3 = from_html(`<link rel="stylesheet"/>`);
+    var root_3$1 = from_html(`<link rel="stylesheet"/>`);
     var root_1$1 = from_html(`<!> <span class="cv-label svelte-10fc57e"><!></span>`, 1);
 
     const $$css$1 = {
@@ -21574,7 +21594,7 @@ ${ANNOTATION_COLORS.map((c) => `
     					var node_2 = first_child(fragment_2);
 
     					each(node_2, 16, () => Array.from(new Set(Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.href))), (href) => href, ($$anchor, href) => {
-    						var link = root_3();
+    						var link = root_3$1();
 
     						template_effect(() => set_attribute(link, 'href', href));
     						append($$anchor, link);
@@ -21648,12 +21668,14 @@ ${ANNOTATION_COLORS.map((c) => `
     	{ mode: 'open' }
     ));
 
-    var root_2 = from_html(`<div class="cv-insertion-header svelte-1tlqvu0"><span class="cv-insertion-label svelte-1tlqvu0"> </span></div>`);
-    var root_1 = from_html(`<aside class="cv-insertion-block svelte-1tlqvu0"><!> <div class="cv-insertion-content svelte-1tlqvu0"></div></aside>`);
+    var root_3 = from_html(`<div style="display: contents"><!></div>`);
+    var root_4 = from_html(`<div class="cv-insertion-badge svelte-1tlqvu0">inserted for version: <strong class="svelte-1tlqvu0"> </strong></div>`);
+    var root_5 = from_html(`<div class="cv-insertion-badge svelte-1tlqvu0"><strong class="svelte-1tlqvu0"> </strong></div>`);
+    var root_1 = from_html(`<div><div><!></div> <!></div>`);
 
     const $$css = {
     	hash: 'svelte-1tlqvu0',
-    	code: ':host {display:block;}\n\n  /* ------------------------------------------------------------------ */\n  /* Callout wrapper                                                      */\n  /* ------------------------------------------------------------------ */.cv-insertion-block.svelte-1tlqvu0 {display:block;position:relative;margin:1rem 0;padding:0.75rem 1rem 0.75rem 1.25rem;border-left:4px solid var(--cv-insertion-color, var(--cv-primary, #814c20));border-radius:0 6px 6px 0;background:color-mix(in srgb, var(--cv-insertion-color, var(--cv-primary, #814c20)) 8%, transparent);font-style:normal;box-sizing:border-box;}\n\n  /* ------------------------------------------------------------------ */\n  /* Header row (icon + label)                                           */\n  /* ------------------------------------------------------------------ */.cv-insertion-header.svelte-1tlqvu0 {display:flex;align-items:center;margin-bottom:0.5rem;}.cv-insertion-label.svelte-1tlqvu0 {font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--cv-insertion-color, var(--cv-primary, #814c20));line-height:1;}\n\n  /* ------------------------------------------------------------------ */\n  /* Injected content area                                               */\n  /* ------------------------------------------------------------------ */.cv-insertion-content.svelte-1tlqvu0 {font-size:0.95rem;line-height:1.6;\n    /* Collapse excess vertical whitespace from injected markup */overflow:hidden;}.cv-insertion-content.svelte-1tlqvu0 p:first-child {margin-top:0;}.cv-insertion-content.svelte-1tlqvu0 p:last-child {margin-bottom:0;}'
+    	code: ':host {display:block;}\n\n  /* ------------------------------------------------------------------ */\n  /* Callout wrapper                                                      */\n  /* ------------------------------------------------------------------ */.cv-insertion-block.svelte-1tlqvu0 {display:block;position:relative;margin:1.5rem 0;padding:1.25rem 1.5rem;border:1px dashed var(--cv-insertion-color, #a1a1aa);border-radius:8px;font-style:normal;box-sizing:border-box;}\n\n  /* ------------------------------------------------------------------ */\n  /* Injected content area                                               */\n  /* ------------------------------------------------------------------ */.cv-insertion-content.svelte-1tlqvu0 {font-size:0.95rem;line-height:1.6;\n    /* Allow text-align styles from user HTML to take effect properly */width:100%;}.cv-insertion-content.svelte-1tlqvu0 p:first-child {margin-top:0;}.cv-insertion-content.svelte-1tlqvu0 p:last-child {margin-bottom:0;}\n\n  /* ------------------------------------------------------------------ */\n  /* Badge                                                              */\n  /* ------------------------------------------------------------------ */.cv-insertion-badge.svelte-1tlqvu0 {position:absolute;bottom:0;right:1.5rem;transform:translateY(50%);background:var(--cv-insertion-bg, var(--bs-body-bg, #ffffff));border:1px solid var(--cv-insertion-color, #a1a1aa);padding:0.15rem 0.75rem;border-radius:9999px;font-size:0.75rem;color:var(--cv-insertion-color, #a1a1aa);line-height:1.4;white-space:nowrap;box-shadow:0 1px 2px rgba(0, 0, 0, 0.05);}.cv-insertion-badge.svelte-1tlqvu0 strong:where(.svelte-1tlqvu0) {color:var(--cv-insertion-color, #71717a);font-weight:600;}'
     };
 
     function Insertion($$anchor, $$props) {
@@ -21661,8 +21683,12 @@ ${ANNOTATION_COLORS.map((c) => `
     	append_styles$1($$anchor, $$css);
 
     	let insertionId = prop($$props, 'insertionId', 7, ''),
-    		label = prop($$props, 'label', 7, ''),
-    		color = prop($$props, 'color', 7, '');
+    		color = prop($$props, 'color', 7, ''),
+    		align = prop($$props, 'align', 7, ''),
+    		hideBadge = prop($$props, 'hideBadge', 7, false),
+    		outline = prop($$props, 'outline', 7),
+    		defaultStyle = prop($$props, 'defaultStyle', 7, 'callout'),
+    		defaultBadge = prop($$props, 'defaultBadge', 7, '');
 
     	/**
     	 * The HTML content to inject, resolved from the insertion store.
@@ -21681,14 +21707,8 @@ ${ANNOTATION_COLORS.map((c) => `
     		return entry !== undefined ? entry.content : null;
     	});
 
-    	/** Attribution label: per-tag `label` prop > per-insertion `label` from HTML > adaptation label > adaptation id */
+    	/** Attribution label: adaptation label > adaptation id */
     	let attributionLabel = user_derived(() => {
-    		if (label()?.trim()) return label().trim();
-
-    		const entry = insertionStore.map?.[insertionId()];
-
-    		if (entry?.label?.trim()) return entry.label.trim();
-
     		return insertionStore.adaptationLabel || null;
     	});
 
@@ -21703,7 +21723,59 @@ ${ANNOTATION_COLORS.map((c) => `
     		return null;
     	});
 
+    	/** Alignment: per-tag `align` prop > per-insertion `align` from HTML > null */
+    	let computedAlign = user_derived(() => {
+    		if (align()?.trim()) return align().trim();
+
+    		const entry = insertionStore.map?.[insertionId()];
+
+    		if (entry?.align?.trim()) return entry.align.trim();
+
+    		return null;
+    	});
+
+    	/** Outline: per-tag `outline` prop > per-insertion `outline` from HTML > 'dashed' */
+    	let computedOutline = user_derived(() => {
+    		if (outline()?.trim()) return outline().trim();
+
+    		const entry = insertionStore.map?.[insertionId()];
+
+    		if (entry?.outline?.trim()) return entry.outline.trim();
+
+    		return 'dashed';
+    	});
+
     	let hasInsertion = user_derived(() => get(insertedHtml) !== null);
+    	let hasDefaultContent = state(false);
+    	let showAsCallout = user_derived(() => get(hasInsertion) || defaultStyle() !== 'none' && get(hasDefaultContent));
+
+    	function updateHasDefaultContent(slot) {
+    		if (!slot) return;
+
+    		const nodes = slot.assignedNodes();
+
+    		set(hasDefaultContent, nodes.some((n) => n.nodeType === 1 || n.nodeType === 3 && n.textContent?.trim() !== ''), true);
+    	}
+
+    	const initSlotWrapper = (node) => {
+    		const slot = node.querySelector('slot');
+
+    		if (!slot) return;
+
+    		slot.addEventListener('slotchange', () => {
+    			updateHasDefaultContent(slot);
+    		});
+
+    		queueMicrotask(() => {
+    			updateHasDefaultContent(slot);
+    		});
+    	};
+
+    	/**
+    	 * If an adaptation is active but this specific insertion-id is not provided,
+    	 * the element should completely disappear (unless it's a pure UI element with no id).
+    	 */
+    	let shouldRender = user_derived(() => !insertionStore.isAdaptationActive || get(hasInsertion) || !insertionId());
 
     	var $$exports = {
     		get insertionId() {
@@ -21715,15 +21787,6 @@ ${ANNOTATION_COLORS.map((c) => `
     			flushSync();
     		},
 
-    		get label() {
-    			return label();
-    		},
-
-    		set label($$value = '') {
-    			label($$value);
-    			flushSync();
-    		},
-
     		get color() {
     			return color();
     		},
@@ -21731,61 +21794,157 @@ ${ANNOTATION_COLORS.map((c) => `
     		set color($$value = '') {
     			color($$value);
     			flushSync();
+    		},
+
+    		get align() {
+    			return align();
+    		},
+
+    		set align($$value = '') {
+    			align($$value);
+    			flushSync();
+    		},
+
+    		get hideBadge() {
+    			return hideBadge();
+    		},
+
+    		set hideBadge($$value = false) {
+    			hideBadge($$value);
+    			flushSync();
+    		},
+
+    		get outline() {
+    			return outline();
+    		},
+
+    		set outline($$value) {
+    			outline($$value);
+    			flushSync();
+    		},
+
+    		get defaultStyle() {
+    			return defaultStyle();
+    		},
+
+    		set defaultStyle($$value = 'callout') {
+    			defaultStyle($$value);
+    			flushSync();
+    		},
+
+    		get defaultBadge() {
+    			return defaultBadge();
+    		},
+
+    		set defaultBadge($$value = '') {
+    			defaultBadge($$value);
+    			flushSync();
     		}
     	};
 
     	var fragment = comment();
-    	var node = first_child(fragment);
+    	var node_1 = first_child(fragment);
 
     	{
-    		var consequent_1 = ($$anchor) => {
-    			var aside = root_1();
-    			var node_1 = child(aside);
+    		var consequent_3 = ($$anchor) => {
+    			var div = root_1();
+    			let styles;
+    			let classes;
+    			var div_1 = child(div);
+    			let classes_1;
+    			var node_2 = child(div_1);
 
     			{
     				var consequent = ($$anchor) => {
-    					var div = root_2();
-    					var span = child(div);
-    					var text = child(span, true);
+    					var fragment_1 = comment();
+    					var node_3 = first_child(fragment_1);
 
-    					reset(span);
-    					reset(div);
-    					template_effect(() => set_text(text, get(attributionLabel)));
-    					append($$anchor, div);
+    					html(node_3, () => get(insertedHtml));
+    					append($$anchor, fragment_1);
     				};
 
-    				if_block(node_1, ($$render) => {
-    					if (get(attributionLabel)) $$render(consequent);
+    				var alternate = ($$anchor) => {
+    					var div_2 = root_3();
+    					var node_4 = child(div_2);
+
+    					slot(node_4, $$props, 'default', {});
+    					reset(div_2);
+    					action(div_2, ($$node) => initSlotWrapper?.($$node));
+    					append($$anchor, div_2);
+    				};
+
+    				if_block(node_2, ($$render) => {
+    					if (get(hasInsertion)) $$render(consequent); else $$render(alternate, -1);
     				});
     			}
 
-    			var div_1 = sibling(node_1, 2);
-
-    			html(div_1, () => get(insertedHtml), true);
     			reset(div_1);
-    			reset(aside);
+
+    			var node_5 = sibling(div_1, 2);
+
+    			{
+    				var consequent_1 = ($$anchor) => {
+    					var div_3 = root_4();
+    					var strong = sibling(child(div_3));
+    					var text = child(strong, true);
+
+    					reset(strong);
+    					reset(div_3);
+    					template_effect(() => set_text(text, get(attributionLabel)));
+    					append($$anchor, div_3);
+    				};
+
+    				var consequent_2 = ($$anchor) => {
+    					var div_4 = root_5();
+    					var strong_1 = child(div_4);
+    					var text_1 = child(strong_1, true);
+
+    					reset(strong_1);
+    					reset(div_4);
+    					template_effect(() => set_text(text_1, defaultBadge()));
+    					append($$anchor, div_4);
+    				};
+
+    				if_block(node_5, ($$render) => {
+    					if (get(showAsCallout) && get(hasInsertion) && get(attributionLabel) && !hideBadge()) $$render(consequent_1); else if (get(showAsCallout) && !get(hasInsertion) && defaultBadge() && !hideBadge()) $$render(consequent_2, 1);
+    				});
+    			}
+
+    			reset(div);
 
     			template_effect(() => {
-    				set_attribute(aside, 'aria-label', get(attributionLabel) || 'Adopter note');
-
-    				set_style(aside, get(attributionColor)
-    					? `--cv-insertion-color: ${get(attributionColor)};`
+    				set_attribute(div, 'aria-label', get(showAsCallout)
+    					? get(hasInsertion)
+    						? get(attributionLabel) || 'Adopter note'
+    						: defaultBadge() || 'Note'
     					: undefined);
+
+    				styles = set_style(
+    					div,
+    					get(showAsCallout) && get(attributionColor)
+    						? `--cv-insertion-color: ${get(attributionColor)};`
+    						: undefined,
+    					styles,
+    					{
+    						'text-align': get(computedAlign) || undefined,
+    						'border-style': get(showAsCallout) ? get(computedOutline) : undefined,
+    						'border-width': get(showAsCallout) && get(computedOutline) === 'none' ? '0' : undefined
+    					}
+    				);
+
+    				classes = set_class(div, 1, 'svelte-1tlqvu0', null, classes, {
+    					'cv-insertion-block': get(showAsCallout),
+    					'cv-insertion-unstyled': !get(showAsCallout)
+    				});
+
+    				classes_1 = set_class(div_1, 1, 'svelte-1tlqvu0', null, classes_1, { 'cv-insertion-content': get(showAsCallout) });
     			});
 
-    			append($$anchor, aside);
+    			append($$anchor, div);
     		};
 
-    		var alternate = ($$anchor) => {
-    			var fragment_1 = comment();
-    			var node_2 = first_child(fragment_1);
-
-    			slot(node_2, $$props, 'default', {});
-    			append($$anchor, fragment_1);
-    		};
-
-    		if_block(node, ($$render) => {
-    			if (get(hasInsertion)) $$render(consequent_1); else $$render(alternate, -1);
+    		if_block(node_1, ($$render) => {
+    			if (get(shouldRender)) $$render(consequent_3);
     		});
     	}
 
@@ -21798,8 +21957,12 @@ ${ANNOTATION_COLORS.map((c) => `
     	Insertion,
     	{
     		insertionId: { attribute: 'insertion-id', type: 'String' },
-    		label: { attribute: 'label', type: 'String' },
-    		color: { attribute: 'color', type: 'String' }
+    		color: { attribute: 'color', type: 'String' },
+    		align: { attribute: 'align', type: 'String' },
+    		hideBadge: { attribute: 'hide-badge', type: 'Boolean' },
+    		outline: { attribute: 'outline', type: 'String' },
+    		defaultStyle: { attribute: 'default-style', type: 'String' },
+    		defaultBadge: { attribute: 'default-badge', type: 'String' }
     	},
     	['default'],
     	[],
