@@ -14540,7 +14540,6 @@
     	let dragStartY = 0;
     	let dragStartOffsetX = 0;
     	let dragStartOffsetY = 0;
-    	let containerEl;
 
     	function toggle() {
     		if (get(isShort)) return;
@@ -14552,29 +14551,6 @@
     		e.stopPropagation();
 
     		if (!isDragging) toggle();
-    	}
-
-    	// Hard clamp so the element can never leave the viewport.
-    	function clampToViewport(newX, newY) {
-    		if (!containerEl) return { x: newX, y: newY };
-
-    		const rect = containerEl.getBoundingClientRect();
-    		const pad = 8;
-    		const vw = window.innerWidth;
-    		const vh = window.innerHeight;
-    		const origLeft = rect.left - get(dragOffsetX);
-    		const origTop = rect.top - get(dragOffsetY);
-    		const newLeft = origLeft + newX;
-    		const newTop = origTop + newY;
-    		let x = newX;
-    		let y = newY;
-
-    		if (newLeft < pad) x += pad - newLeft;
-    		if (newLeft + rect.width > vw - pad) x -= newLeft + rect.width - (vw - pad);
-    		if (newTop < pad) y += pad - newTop;
-    		if (newTop + rect.height > vh - pad) y -= newTop + rect.height - (vh - pad);
-
-    		return { x, y };
     	}
 
     	function onPointerDown(e) {
@@ -14611,12 +14587,8 @@
     		}
 
     		if (isDragging) {
-    			const rawX = dragStartOffsetX + dx;
-    			const rawY = dragStartOffsetY + dy;
-    			const clamped = clampToViewport(rawX, rawY);
-
-    			set(dragOffsetX, clamped.x, true);
-    			set(dragOffsetY, clamped.y, true);
+    			set(dragOffsetX, dragStartOffsetX + dx);
+    			set(dragOffsetY, dragStartOffsetY + dy);
     		}
     	}
 
@@ -14662,20 +14634,6 @@
     			/* ignore */
     		}
     	}
-
-    	// Nudge annotation back in-bounds when the viewport shrinks.
-    	user_effect(() => {
-    		function onResize() {
-    			const clamped = clampToViewport(get(dragOffsetX), get(dragOffsetY));
-
-    			set(dragOffsetX, clamped.x, true);
-    			set(dragOffsetY, clamped.y, true);
-    		}
-
-    		window.addEventListener('resize', onResize);
-
-    		return () => window.removeEventListener('resize', onResize);
-    	});
 
     	/**
     	 * Returns CSS positioning based on the annotation corner.
@@ -14867,7 +14825,6 @@
     	}
 
     	reset(div);
-    	bind_this(div, ($$value) => containerEl = $$value, () => containerEl);
 
     	template_effect(
     		($0) => {
@@ -14971,20 +14928,41 @@ ${ANNOTATION_COLORS.map((c) => `
     	/** Tracks wrappers with their underlying range so they can be repositioned on resize/zoom */
     	activeAnnotations = [];
 
-    	_resizeListener = () => {
-    		requestAnimationFrame(() => this.repositionAnnotations());
-    	};
+    	rafId = null;
 
-    	repositionAnnotations() {
-    		if (!this.active) return;
+    	startTrackingPositions() {
+    		const track = () => {
+    			if (!this.active) return;
 
-    		for (const { range, wrapper } of this.activeAnnotations) {
-    			const rect = range.getBoundingClientRect();
+    			for (const item of this.activeAnnotations) {
+    				const rect = item.range.getBoundingClientRect();
+    				const newTop = rect.top + window.scrollY;
+    				const newLeft = rect.left + window.scrollX;
 
-    			wrapper.style.top = `${rect.top + window.scrollY}px`;
-    			wrapper.style.left = `${rect.left + window.scrollX}px`;
-    			wrapper.style.width = `${rect.width}px`;
-    			wrapper.style.height = `${rect.height}px`;
+    				if (item.cachedTop !== newTop || item.cachedLeft !== newLeft || item.cachedWidth !== rect.width || item.cachedHeight !== rect.height) {
+    					item.cachedTop = newTop;
+    					item.cachedLeft = newLeft;
+    					item.cachedWidth = rect.width;
+    					item.cachedHeight = rect.height;
+    					item.wrapper.style.top = `${newTop}px`;
+    					item.wrapper.style.left = `${newLeft}px`;
+    					item.wrapper.style.width = `${rect.width}px`;
+    					item.wrapper.style.height = `${rect.height}px`;
+    				}
+    			}
+
+    			this.rafId = requestAnimationFrame(track);
+    		};
+
+    		if (this.rafId) cancelAnimationFrame(this.rafId);
+
+    		this.rafId = requestAnimationFrame(track);
+    	}
+
+    	stopTrackingPositions() {
+    		if (this.rafId) {
+    			cancelAnimationFrame(this.rafId);
+    			this.rafId = null;
     		}
     	}
 
@@ -15056,7 +15034,7 @@ ${ANNOTATION_COLORS.map((c) => `
     		}
 
     		if (this.activeAnnotations.length > 0) {
-    			window.addEventListener('resize', this._resizeListener, { passive: true });
+    			this.startTrackingPositions();
     		}
 
     		this.active = true;
@@ -15123,7 +15101,7 @@ ${ANNOTATION_COLORS.map((c) => `
     		this.annotationComponents = [];
     		this.annotationWrappers = [];
     		this.activeAnnotations = [];
-    		window.removeEventListener('resize', this._resizeListener);
+    		this.stopTrackingPositions();
     		this.hlMap.clear();
     		this.marks = [];
     		this.resolvedRanges = [];
@@ -16233,11 +16211,11 @@ ${ANNOTATION_COLORS.map((c) => `
     var root_3$5 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
     var root_5 = from_html(`<button type="button"> </button>`);
     var root_4$2 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
-    var root$c = from_html(`<div class="cv-annotation-editor svelte-1r1spmr" role="none"><button type="button" aria-label="Annotation"><!></button> <!></div>`);
+    var root$c = from_html(`<div role="none"><button type="button" aria-label="Annotation"><!></button> <!></div>`);
 
     const $$css$g = {
     	hash: 'svelte-1r1spmr',
-    	code: '.cv-annotation-editor.svelte-1r1spmr {position:fixed;z-index:9400;pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}.cv-annotation-tab.svelte-1r1spmr {height:20px;padding:0 8px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;max-width:160px;overflow:hidden;}.cv-annotation-tab.svelte-1r1spmr:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-annotation-tab--has-text.svelte-1r1spmr {background:#fffbe6;border-color:rgba(180, 83, 9, 0.4);}.cv-annotation-tab-icon.svelte-1r1spmr {font-size:10px;line-height:1;color:#6b7280;}.cv-annotation-tab-preview.svelte-1r1spmr {font-size:9px;font-weight:600;color:#1a1a1a;font-family:ui-sans-serif, system-ui, sans-serif;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:130px;}.cv-annotation-tab-chevron.svelte-1r1spmr {font-size:12px;line-height:1;color:#6b7280;margin-left:2px;}.cv-annotation-panel.svelte-1r1spmr {background:white;border-radius:8px;border:1px solid rgba(0, 0, 0, 0.12);box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);padding:8px;width:220px;display:flex;flex-direction:column;gap:6px;}.cv-annotation-textarea.svelte-1r1spmr {width:100%;box-sizing:border-box;resize:vertical;border:1px solid rgba(0, 0, 0, 0.15);border-radius:4px;padding:5px 7px;font-size:11px;font-family:ui-sans-serif, system-ui, sans-serif;color:#1a1a1a;line-height:1.5;outline:none;min-height:56px;}.cv-annotation-textarea.svelte-1r1spmr:focus {border-color:#b45309;box-shadow:0 0 0 2px rgba(180, 83, 9, 0.15);}.cv-annotation-footer.svelte-1r1spmr {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;}.cv-corner-selector.svelte-1r1spmr {display:flex;gap:2px;}.cv-corner-btn.svelte-1r1spmr {height:20px;padding:0 5px;border-radius:4px;border:1px solid rgba(0, 0, 0, 0.12);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;transition:background 0.1s,\n      border-color 0.1s;}.cv-corner-btn.svelte-1r1spmr:hover {background:#fef3c7;border-color:#b45309;color:#1a1a1a;}.cv-corner-btn.active.svelte-1r1spmr {background:#fef3c7;border-color:#b45309;color:#92400e;font-weight:700;}.cv-char-counter.svelte-1r1spmr {font-size:9px;color:#9ca3af;font-family:ui-sans-serif, system-ui, sans-serif;font-variant-numeric:tabular-nums;margin-left:auto;}'
+    	code: '.cv-annotation-editor.svelte-1r1spmr {position:fixed;z-index:9400;pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}.cv-annotation-editor--expanded.svelte-1r1spmr {z-index:9500;}.cv-annotation-tab.svelte-1r1spmr {height:20px;padding:0 8px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;max-width:160px;overflow:hidden;}.cv-annotation-tab.svelte-1r1spmr:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-annotation-tab--has-text.svelte-1r1spmr {background:#fffbe6;border-color:rgba(180, 83, 9, 0.4);}.cv-annotation-tab-icon.svelte-1r1spmr {font-size:10px;line-height:1;color:#6b7280;}.cv-annotation-tab-preview.svelte-1r1spmr {font-size:9px;font-weight:600;color:#1a1a1a;font-family:ui-sans-serif, system-ui, sans-serif;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:130px;}.cv-annotation-tab-chevron.svelte-1r1spmr {font-size:12px;line-height:1;color:#6b7280;margin-left:2px;}.cv-annotation-panel.svelte-1r1spmr {background:white;border-radius:8px;border:1px solid rgba(0, 0, 0, 0.12);box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);padding:8px;width:220px;display:flex;flex-direction:column;gap:6px;}.cv-annotation-textarea.svelte-1r1spmr {width:100%;box-sizing:border-box;resize:vertical;border:1px solid rgba(0, 0, 0, 0.15);border-radius:4px;padding:5px 7px;font-size:11px;font-family:ui-sans-serif, system-ui, sans-serif;color:#1a1a1a;line-height:1.5;outline:none;min-height:56px;}.cv-annotation-textarea.svelte-1r1spmr:focus {border-color:#b45309;box-shadow:0 0 0 2px rgba(180, 83, 9, 0.15);}.cv-annotation-footer.svelte-1r1spmr {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;}.cv-corner-selector.svelte-1r1spmr {display:flex;gap:2px;}.cv-corner-btn.svelte-1r1spmr {height:20px;padding:0 5px;border-radius:4px;border:1px solid rgba(0, 0, 0, 0.12);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;transition:background 0.1s,\n      border-color 0.1s;}.cv-corner-btn.svelte-1r1spmr:hover {background:#fef3c7;border-color:#b45309;color:#1a1a1a;}.cv-corner-btn.active.svelte-1r1spmr {background:#fef3c7;border-color:#b45309;color:#92400e;font-weight:700;}.cv-char-counter.svelte-1r1spmr {font-size:9px;color:#9ca3af;font-family:ui-sans-serif, system-ui, sans-serif;font-variant-numeric:tabular-nums;margin-left:auto;}'
     };
 
     function HighlightAnnotationEditor($$anchor, $$props) {
@@ -16309,8 +16287,9 @@ ${ANNOTATION_COLORS.map((c) => `
     		: null);
 
     	var div = root$c();
-    	var button = child(div);
     	let classes;
+    	var button = child(div);
+    	let classes_1;
     	var node = child(button);
 
     	{
@@ -16371,13 +16350,13 @@ ${ANNOTATION_COLORS.map((c) => `
     				let key = () => get($$item).key;
     				let icon = () => get($$item).icon;
     				var button_1 = root_5();
-    				let classes_1;
+    				let classes_2;
     				var text_2 = child(button_1, true);
 
     				reset(button_1);
 
     				template_effect(() => {
-    					classes_1 = set_class(button_1, 1, 'cv-corner-btn svelte-1r1spmr', null, classes_1, { active: get(localCorner) === key() });
+    					classes_2 = set_class(button_1, 1, 'cv-corner-btn svelte-1r1spmr', null, classes_2, { active: get(localCorner) === key() });
     					set_attribute(button_1, 'title', `Corner ${key() ?? ''}`);
     					set_attribute(button_1, 'aria-label', `Corner ${key() ?? ''}`);
     					set_attribute(button_1, 'aria-pressed', get(localCorner) === key());
@@ -16419,8 +16398,9 @@ ${ANNOTATION_COLORS.map((c) => `
     	reset(div);
 
     	template_effect(() => {
+    		classes = set_class(div, 1, 'cv-annotation-editor svelte-1r1spmr', null, classes, { 'cv-annotation-editor--expanded': get(isExpanded) });
     		set_style(div, get(tabStyle));
-    		classes = set_class(button, 1, 'cv-annotation-tab svelte-1r1spmr', null, classes, { 'cv-annotation-tab--has-text': get(localText).length > 0 });
+    		classes_1 = set_class(button, 1, 'cv-annotation-tab svelte-1r1spmr', null, classes_1, { 'cv-annotation-tab--has-text': get(localText).length > 0 });
     		set_attribute(button, 'title', get(localText).length > 0 ? get(localText) : 'Add annotation');
     		set_attribute(button, 'aria-expanded', get(isExpanded));
     	});
@@ -18578,16 +18558,27 @@ ${ANNOTATION_COLORS.map((c) => `
     class BoxService {
     	overlayApp;
     	state = new BoxState();
-    	resizeObserver;
     	activeTargets = [];
     	activeColors = new Map();
     	activeAnnotations = new Map();
-    	onWindowResize = () => this.updatePositions();
+    	rafId = null;
 
-    	constructor() {
-    		this.resizeObserver = new ResizeObserver(() => {
+    	startTrackingPositions() {
+    		const track = () => {
     			this.updatePositions();
-    		});
+    			this.rafId = requestAnimationFrame(track);
+    		};
+
+    		if (this.rafId) cancelAnimationFrame(this.rafId);
+
+    		this.rafId = requestAnimationFrame(track);
+    	}
+
+    	stopTrackingPositions() {
+    		if (this.rafId) {
+    			cancelAnimationFrame(this.rafId);
+    			this.rafId = null;
+    		}
     	}
 
     	resolveTargets(encodedDescriptors) {
@@ -18657,10 +18648,8 @@ ${ANNOTATION_COLORS.map((c) => `
     		this.activeAnnotations = annotations;
 
     		// Start observing
-    		this.activeTargets.forEach((t) => this.resizeObserver.observe(t));
+    		this.startTrackingPositions();
 
-    		this.resizeObserver.observe(document.body); // Catch layout shifts
-    		window.addEventListener('resize', this.onWindowResize);
     		this.renderBoxOverlay();
 
     		// Scroll topmost box into view
@@ -18673,8 +18662,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	exit() {
     		document.body.classList.remove(BODY_BOX_CLASS);
-    		this.resizeObserver.disconnect();
-    		window.removeEventListener('resize', this.onWindowResize);
+    		this.stopTrackingPositions();
     		this.activeTargets = [];
     		this.activeColors.clear();
     		this.activeAnnotations.clear();
@@ -18753,7 +18741,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     	updatePositions() {
     		if (this.activeTargets.length === 0) {
-    			this.state.rects = [];
+    			if (this.state.rects.length !== 0) this.state.rects = [];
 
     			return;
     		}
@@ -18762,7 +18750,7 @@ ${ANNOTATION_COLORS.map((c) => `
     		const groups = groupSiblings(this.activeTargets);
 
     		// Calculate Union Rect for each group, sorted top-to-bottom
-    		this.state.rects = calculateMergedRects(
+    		const newRects = calculateMergedRects(
     			groups,
     			(el) => el.getBoundingClientRect(),
     			() => ({
@@ -18772,6 +18760,27 @@ ${ANNOTATION_COLORS.map((c) => `
     			this.activeColors,
     			this.activeAnnotations
     		).sort((a, b) => a.top - b.top);
+
+    		let changed = false;
+
+    		if (newRects.length !== this.state.rects.length) {
+    			changed = true;
+    		} else {
+    			for (let i = 0; i < newRects.length; i++) {
+    				const nr = newRects[i];
+    				const or = this.state.rects[i];
+
+    				if (nr.top !== or.top || nr.left !== or.left || nr.width !== or.width || nr.height !== or.height || nr.color !== or.color || nr.annotation !== or.annotation || nr.annotationCorner !== or.annotationCorner) {
+    					changed = true;
+
+    					break;
+    				}
+    			}
+    		}
+
+    		if (changed) {
+    			this.state.rects = newRects;
+    		}
     	}
     }
 
