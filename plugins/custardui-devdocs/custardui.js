@@ -13485,7 +13485,7 @@
     /** Maximum number of characters allowed in any annotation note. */
     const MAX_ANNOTATION_LENGTH = 280;
     /** Characters shown in the collapsed ribbon preview. */
-    const ANNOTATION_PREVIEW_LENGTH = 12;
+    const ANNOTATION_PREVIEW_LENGTH = 36;
 
     /**
      * Generates a simple hash code for a string.
@@ -14498,16 +14498,16 @@
     }
 
     var root_4$3 = from_html(`<span>▾</span>`);
-    var root_3$7 = from_html(`<span class="cv-ribbon-text cv-ribbon-text--right svelte-1ctem0h"> </span> <!> <span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span>`, 1);
+    var root_3$7 = from_html(`<span> </span> <!> <span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span>`, 1);
     var root_6$1 = from_html(`<span>▾</span>`);
-    var root_5$1 = from_html(`<span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span> <span class="cv-ribbon-text svelte-1ctem0h"> </span> <!>`, 1);
+    var root_5$1 = from_html(`<span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span> <span> </span> <!>`, 1);
     var root_1$e = from_html(`<div><div aria-hidden="true"></div> <button type="button"><!></button></div>`);
     var root_7 = from_html(`<div class="cv-annotation-card svelte-1ctem0h" role="region" aria-label="Annotation"><button type="button" class="cv-card-close svelte-1ctem0h" aria-label="Collapse annotation">✕</button> <span class="cv-card-text svelte-1ctem0h"> </span></div>`);
     var root$g = from_html(`<div role="presentation"><!></div>`);
 
     const $$css$l = {
     	hash: 'svelte-1ctem0h',
-    	code: '\n  /* ==============================\n     CONTAINER (position, drag, opacity)\n     ============================== */.cv-annotation-container.svelte-1ctem0h {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;cursor:default;opacity:0.88;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-1ctem0h:hover {opacity:1;z-index:110;}\n\n  /* ==============================\n     WRAPPER & SHADOW\n     ============================== */.cv-ribbon-wrapper.svelte-1ctem0h {position:relative;transform-origin:center center;}.cv-ribbon-wrapper--intro.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-ribbon-wrapper--periodic.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-ribbon-shadow.svelte-1ctem0h {position:absolute;top:0;left:0;width:140px;height:28px;background:rgba(0, 0, 0, 0.25);transform:translate(3px, 3px);pointer-events:none;z-index:-1;}.cv-ribbon-shadow--empty.svelte-1ctem0h {width:70px;}\n\n  /* ==============================\n     RIBBON (home-plate)\n     ============================== */.cv-annotation-ribbon.svelte-1ctem0h {border:none;padding:6px 20px 6px 8px;width:140px;height:28px;box-sizing:border-box;background:var(--cv-annotation-color, var(--cv-box-color));cursor:default;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);display:flex;align-items:center;justify-content:flex-start;gap:5px;}.cv-annotation-ribbon--right.svelte-1ctem0h {padding:6px 8px 6px 20px;justify-content:flex-end;}.cv-annotation-ribbon--empty.svelte-1ctem0h {width:70px;padding:6px 16px 6px 8px;}.cv-annotation-ribbon--expandable.svelte-1ctem0h {cursor:pointer;}.cv-annotation-ribbon--expandable.svelte-1ctem0h:hover {filter:brightness(1.1);}\n\n  /* ==============================\n     RIBBON TEXT (single line)\n     ============================== */.cv-ribbon-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;color:var(--cv-annotation-text-color, #2c2c2c);}.cv-ribbon-text--right.svelte-1ctem0h {text-align:right;}.cv-ribbon-chevron.svelte-1ctem0h {font-size:22px;opacity:1;flex-shrink:0;line-height:1;color:var(--cv-annotation-text-color, #2c2c2c);}.cv-ribbon-chevron--bounce.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-chevron-bounce 3s ease-in-out infinite;}\n\n  /* ==============================\n     DRAG GRIP (6-dot grid on flat side)\n     ============================== */.cv-ribbon-grip.svelte-1ctem0h {display:grid;grid-template-columns:repeat(2, 3px);gap:3px;flex-shrink:0;opacity:0.7;cursor:grab;padding:2px;}.cv-ribbon-grip.svelte-1ctem0h:active {cursor:grabbing;}.cv-ribbon-grip.svelte-1ctem0h > span:where(.svelte-1ctem0h) {width:3px;height:3px;border-radius:50%;background:var(--cv-annotation-text-color, #2c2c2c);}\n\n  /* ==============================\n     CARD (sticky note)\n     ============================== */.cv-annotation-card.svelte-1ctem0h {background:#fffdf5;border:1.5px solid var(--cv-annotation-color, var(--cv-box-color));border-radius:4px;padding:10px 12px;max-width:280px;min-width:120px;position:relative;z-index:1;box-shadow:3px 3px 0px rgba(0, 0, 0, 0.25);\n    animation: svelte-1ctem0h-cv-cardPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}.cv-card-close.svelte-1ctem0h {position:absolute;top:3px;right:5px;border:none;background:transparent;cursor:pointer;font-size:12px;color:#aaa;padding:2px 4px;line-height:1;font-family:sans-serif;}.cv-card-close.svelte-1ctem0h:hover {color:#555;}.cv-card-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:600;color:#333;line-height:1.45;word-break:break-word;white-space:pre-wrap;padding-right:15px;}\n\n  /* ==============================\n     ANIMATIONS\n     ============================== */\n  @keyframes svelte-1ctem0h-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-cardPop {\n    from {\n      opacity: 0;\n      transform: scale(0.9) translateY(5px);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) translateY(0);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-chevron-bounce {\n    0%,\n    70%,\n    100% {\n      transform: translateY(0);\n    }\n    78% {\n      transform: translateY(-3px);\n    }\n    86% {\n      transform: translateY(1px);\n    }\n    93% {\n      transform: translateY(-1.5px);\n    }\n  }'
+    	code: '\n  /* ==============================\n     CONTAINER (position, drag, opacity)\n     ============================== */.cv-annotation-container.svelte-1ctem0h {position:absolute;z-index:100;pointer-events:auto;touch-action:none;user-select:none;cursor:default;opacity:0.88;transition:opacity 0.2s ease,\n      z-index 0s;}.cv-annotation-container.svelte-1ctem0h:hover {opacity:1;z-index:110;}\n\n  /* ==============================\n     WRAPPER & SHADOW\n     ============================== */.cv-ribbon-wrapper.svelte-1ctem0h {position:relative;transform-origin:center center;width:max-content;}.cv-ribbon-wrapper--intro.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-intro 0.75s ease-in-out forwards;}.cv-ribbon-wrapper--periodic.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-wiggle-periodic 5s ease-in-out infinite;}.cv-ribbon-shadow.svelte-1ctem0h {position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0, 0, 0, 0.25);transform:translate(3px, 3px);pointer-events:none;z-index:-1;}.cv-ribbon-shadow--empty.svelte-1ctem0h {width:70px;}\n\n  /* ==============================\n     RIBBON (home-plate)\n     ============================== */.cv-annotation-ribbon.svelte-1ctem0h {border:none;padding:6px 20px 6px 8px;width:160px;min-height:28px;height:auto;box-sizing:border-box;background:var(--cv-annotation-color, var(--cv-box-color));cursor:default;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);display:flex;align-items:center;justify-content:flex-start;gap:4px;}.cv-annotation-ribbon--right.svelte-1ctem0h {padding:6px 8px 6px 20px;justify-content:flex-end;}.cv-annotation-ribbon--multiline.svelte-1ctem0h {padding:4px 18px 4px 6px;}.cv-annotation-ribbon--multiline.cv-annotation-ribbon--right.svelte-1ctem0h {padding:4px 6px 4px 18px;}.cv-annotation-ribbon--empty.svelte-1ctem0h {width:70px;min-height:28px;padding:6px 16px 6px 8px;}.cv-annotation-ribbon--expandable.svelte-1ctem0h {cursor:pointer;}.cv-annotation-ribbon--expandable.svelte-1ctem0h:hover {filter:brightness(1.1);}\n\n  /* ==============================\n     RIBBON TEXT (single line)\n     ============================== */.cv-ribbon-text.svelte-1ctem0h {display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:700;line-height:1.2;overflow:hidden;flex:1;min-width:0;color:var(--cv-annotation-text-color, #2c2c2c);text-align:left;word-break:break-word;}.cv-ribbon-text--multiline.svelte-1ctem0h {font-size:12px;line-height:1.15;}.cv-ribbon-text--right.svelte-1ctem0h {text-align:right;}.cv-ribbon-chevron.svelte-1ctem0h {font-size:22px;opacity:1;flex-shrink:0;line-height:1;color:var(--cv-annotation-text-color, #2c2c2c);}.cv-ribbon-chevron--bounce.svelte-1ctem0h {\n    animation: svelte-1ctem0h-cv-chevron-bounce 3s ease-in-out infinite;}\n\n  /* ==============================\n     DRAG GRIP (6-dot grid on flat side)\n     ============================== */.cv-ribbon-grip.svelte-1ctem0h {display:grid;grid-template-columns:repeat(2, 3px);gap:3px;flex-shrink:0;opacity:0.7;cursor:grab;padding:2px;}.cv-ribbon-grip.svelte-1ctem0h:active {cursor:grabbing;}.cv-ribbon-grip.svelte-1ctem0h > span:where(.svelte-1ctem0h) {width:3px;height:3px;border-radius:50%;background:var(--cv-annotation-text-color, #2c2c2c);}\n\n  /* ==============================\n     CARD (sticky note)\n     ============================== */.cv-annotation-card.svelte-1ctem0h {background:#fffdf5;border:1.5px solid var(--cv-annotation-color, var(--cv-box-color));border-radius:4px;padding:10px 12px;max-width:280px;min-width:120px;position:relative;z-index:1;box-shadow:3px 3px 0px rgba(0, 0, 0, 0.25);\n    animation: svelte-1ctem0h-cv-cardPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;}.cv-card-close.svelte-1ctem0h {position:absolute;top:3px;right:5px;border:none;background:transparent;cursor:pointer;font-size:12px;color:#aaa;padding:2px 4px;line-height:1;font-family:sans-serif;}.cv-card-close.svelte-1ctem0h:hover {color:#555;}.cv-card-text.svelte-1ctem0h {display:block;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;font-size:13px;font-weight:600;color:#333;line-height:1.45;word-break:break-word;white-space:pre-wrap;padding-right:15px;}\n\n  /* ==============================\n     ANIMATIONS\n     ============================== */\n  @keyframes svelte-1ctem0h-cv-wiggle-intro {\n    0% {\n      transform: rotate(0deg);\n    }\n    10% {\n      transform: rotate(-6deg);\n    }\n    25% {\n      transform: rotate(6deg);\n    }\n    40% {\n      transform: rotate(-5deg);\n    }\n    55% {\n      transform: rotate(5deg);\n    }\n    68% {\n      transform: rotate(-3deg);\n    }\n    80% {\n      transform: rotate(2.5deg);\n    }\n    90% {\n      transform: rotate(-1deg);\n    }\n    100% {\n      transform: rotate(0deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-wiggle-periodic {\n    0%,\n    85%,\n    100% {\n      transform: rotate(0deg);\n    }\n    87% {\n      transform: rotate(1.2deg);\n    }\n    90% {\n      transform: rotate(-1.2deg);\n    }\n    93% {\n      transform: rotate(0.8deg);\n    }\n    96% {\n      transform: rotate(-0.5deg);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-cardPop {\n    from {\n      opacity: 0;\n      transform: scale(0.9) translateY(5px);\n    }\n    to {\n      opacity: 1;\n      transform: scale(1) translateY(0);\n    }\n  }\n\n  @keyframes svelte-1ctem0h-cv-chevron-bounce {\n    0%,\n    70%,\n    100% {\n      transform: translateY(0);\n    }\n    78% {\n      transform: translateY(-3px);\n    }\n    86% {\n      transform: translateY(1px);\n    }\n    93% {\n      transform: translateY(-1.5px);\n    }\n  }'
     };
 
     function Annotation($$anchor, $$props) {
@@ -14518,6 +14518,7 @@
     	const corner = user_derived(() => $$props.annotationCorner ?? DEFAULT_ANNOTATION_CORNER);
     	const hasText = user_derived(() => $$props.annotation.length > 0);
     	const isShort = user_derived(() => $$props.annotation.length <= ANNOTATION_PREVIEW_LENGTH);
+    	const isMultiLine = user_derived(() => get(hasText) && $$props.annotation.length > 16);
     	const isRightCorner = user_derived(() => get(corner) === 'tr' || get(corner) === 'br');
     	let expanded = state(false);
 
@@ -14692,6 +14693,7 @@
     						var consequent_1 = ($$anchor) => {
     							var fragment_1 = root_3$7();
     							var span = first_child(fragment_1);
+    							let classes_4;
     							var text = child(span, true);
 
     							reset(span);
@@ -14701,9 +14703,9 @@
     							{
     								var consequent = ($$anchor) => {
     									var span_1 = root_4$3();
-    									let classes_4;
+    									let classes_5;
 
-    									template_effect(() => classes_4 = set_class(span_1, 1, 'cv-ribbon-chevron svelte-1ctem0h', null, classes_4, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
+    									template_effect(() => classes_5 = set_class(span_1, 1, 'cv-ribbon-chevron svelte-1ctem0h', null, classes_5, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
     									append($$anchor, span_1);
     								};
 
@@ -14714,11 +14716,17 @@
 
     							next(2);
 
-    							template_effect(($0) => set_text(text, $0), [
-    								() => get(isShort)
-    									? $$props.annotation
-    									: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH)
-    							]);
+    							template_effect(
+    								($0) => {
+    									classes_4 = set_class(span, 1, 'cv-ribbon-text cv-ribbon-text--right svelte-1ctem0h', null, classes_4, { 'cv-ribbon-text--multiline': get(isMultiLine) });
+    									set_text(text, $0);
+    								},
+    								[
+    									() => get(isShort)
+    										? $$props.annotation
+    										: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH)
+    								]
+    							);
 
     							append($$anchor, fragment_1);
     						};
@@ -14726,6 +14734,7 @@
     						var alternate = ($$anchor) => {
     							var fragment_2 = root_5$1();
     							var span_2 = sibling(first_child(fragment_2), 2);
+    							let classes_6;
     							var text_1 = child(span_2, true);
 
     							reset(span_2);
@@ -14735,9 +14744,9 @@
     							{
     								var consequent_2 = ($$anchor) => {
     									var span_3 = root_6$1();
-    									let classes_5;
+    									let classes_7;
 
-    									template_effect(() => classes_5 = set_class(span_3, 1, 'cv-ribbon-chevron svelte-1ctem0h', null, classes_5, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
+    									template_effect(() => classes_7 = set_class(span_3, 1, 'cv-ribbon-chevron svelte-1ctem0h', null, classes_7, { 'cv-ribbon-chevron--bounce': get(introAnimationDone) }));
     									append($$anchor, span_3);
     								};
 
@@ -14746,11 +14755,17 @@
     								});
     							}
 
-    							template_effect(($0) => set_text(text_1, $0), [
-    								() => get(isShort)
-    									? $$props.annotation
-    									: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH)
-    							]);
+    							template_effect(
+    								($0) => {
+    									classes_6 = set_class(span_2, 1, 'cv-ribbon-text svelte-1ctem0h', null, classes_6, { 'cv-ribbon-text--multiline': get(isMultiLine) });
+    									set_text(text_1, $0);
+    								},
+    								[
+    									() => get(isShort)
+    										? $$props.annotation
+    										: $$props.annotation.slice(0, ANNOTATION_PREVIEW_LENGTH)
+    								]
+    							);
 
     							append($$anchor, fragment_2);
     						};
@@ -14784,7 +14799,8 @@
     					classes_3 = set_class(button, 1, 'cv-annotation-ribbon svelte-1ctem0h', null, classes_3, {
     						'cv-annotation-ribbon--empty': !get(hasText),
     						'cv-annotation-ribbon--right': get(isRightCorner),
-    						'cv-annotation-ribbon--expandable': !get(isShort)
+    						'cv-annotation-ribbon--expandable': !get(isShort),
+    						'cv-annotation-ribbon--multiline': get(isMultiLine)
     					});
 
     					set_style(button, `clip-path: ${$1 ?? ''};`);
@@ -16217,7 +16233,7 @@ ${ANNOTATION_COLORS.map((c) => `
 
     const $$css$g = {
     	hash: 'svelte-1r1spmr',
-    	code: '.cv-annotation-editor.svelte-1r1spmr {position:fixed;z-index:9400;pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}.cv-annotation-editor--expanded.svelte-1r1spmr {z-index:9500;}.cv-annotation-tab.svelte-1r1spmr {height:20px;padding:0 8px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;max-width:160px;overflow:hidden;}.cv-annotation-tab.svelte-1r1spmr:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-annotation-tab--has-text.svelte-1r1spmr {background:#fffbe6;border-color:rgba(180, 83, 9, 0.4);}.cv-annotation-tab-icon.svelte-1r1spmr {font-size:10px;line-height:1;color:#6b7280;}.cv-annotation-tab-preview.svelte-1r1spmr {font-size:9px;font-weight:600;color:#1a1a1a;font-family:ui-sans-serif, system-ui, sans-serif;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:130px;}.cv-annotation-tab-chevron.svelte-1r1spmr {font-size:12px;line-height:1;color:#6b7280;margin-left:2px;}.cv-annotation-panel.svelte-1r1spmr {background:white;border-radius:8px;border:1px solid rgba(0, 0, 0, 0.12);box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);padding:8px;width:220px;display:flex;flex-direction:column;gap:6px;}.cv-annotation-textarea.svelte-1r1spmr {width:100%;box-sizing:border-box;resize:vertical;border:1px solid rgba(0, 0, 0, 0.15);border-radius:4px;padding:5px 7px;font-size:11px;font-family:ui-sans-serif, system-ui, sans-serif;color:#1a1a1a;line-height:1.5;outline:none;min-height:56px;}.cv-annotation-textarea.svelte-1r1spmr:focus {border-color:#b45309;box-shadow:0 0 0 2px rgba(180, 83, 9, 0.15);}.cv-annotation-footer.svelte-1r1spmr {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;}.cv-corner-selector.svelte-1r1spmr {display:flex;gap:2px;}.cv-corner-btn.svelte-1r1spmr {height:20px;padding:0 5px;border-radius:4px;border:1px solid rgba(0, 0, 0, 0.12);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;transition:background 0.1s,\n      border-color 0.1s;}.cv-corner-btn.svelte-1r1spmr:hover {background:#fef3c7;border-color:#b45309;color:#1a1a1a;}.cv-corner-btn.active.svelte-1r1spmr {background:#fef3c7;border-color:#b45309;color:#92400e;font-weight:700;}.cv-char-counter.svelte-1r1spmr {font-size:9px;color:#9ca3af;font-family:ui-sans-serif, system-ui, sans-serif;font-variant-numeric:tabular-nums;margin-left:auto;}'
+    	code: '.cv-annotation-editor.svelte-1r1spmr {position:fixed;z-index:9400;pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}.cv-annotation-editor--expanded.svelte-1r1spmr {z-index:9500;}.cv-annotation-tab.svelte-1r1spmr {height:auto;min-height:24px;padding:4px 10px;border-radius:12px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;max-width:160px;overflow:hidden;}.cv-annotation-tab.svelte-1r1spmr:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-annotation-tab--has-text.svelte-1r1spmr {background:#fffbe6;border-color:rgba(180, 83, 9, 0.4);}.cv-annotation-tab-icon.svelte-1r1spmr {font-size:10px;line-height:1;color:#6b7280;}.cv-annotation-tab-preview.svelte-1r1spmr {font-size:11px;font-weight:700;color:#2c2c2c;font-family:\'Segoe Print\', \'Bradley Hand\', \'Chilanka\', cursive;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow:hidden;word-break:break-word;line-height:1.15;text-align:left;flex:1;min-width:0;}.cv-annotation-tab-chevron.svelte-1r1spmr {font-size:14px;line-height:1;color:#6b7280;margin-left:2px;flex-shrink:0;}.cv-annotation-panel.svelte-1r1spmr {background:white;border-radius:8px;border:1px solid rgba(0, 0, 0, 0.12);box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);padding:8px;width:220px;display:flex;flex-direction:column;gap:6px;}.cv-annotation-textarea.svelte-1r1spmr {width:100%;box-sizing:border-box;resize:vertical;border:1px solid rgba(0, 0, 0, 0.15);border-radius:4px;padding:5px 7px;font-size:11px;font-family:ui-sans-serif, system-ui, sans-serif;color:#1a1a1a;line-height:1.5;outline:none;min-height:56px;}.cv-annotation-textarea.svelte-1r1spmr:focus {border-color:#b45309;box-shadow:0 0 0 2px rgba(180, 83, 9, 0.15);}.cv-annotation-footer.svelte-1r1spmr {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;}.cv-corner-selector.svelte-1r1spmr {display:flex;gap:2px;}.cv-corner-btn.svelte-1r1spmr {height:20px;padding:0 5px;border-radius:4px;border:1px solid rgba(0, 0, 0, 0.12);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;transition:background 0.1s,\n      border-color 0.1s;}.cv-corner-btn.svelte-1r1spmr:hover {background:#fef3c7;border-color:#b45309;color:#1a1a1a;}.cv-corner-btn.active.svelte-1r1spmr {background:#fef3c7;border-color:#b45309;color:#92400e;font-weight:700;}.cv-char-counter.svelte-1r1spmr {font-size:9px;color:#9ca3af;font-family:ui-sans-serif, system-ui, sans-serif;font-variant-numeric:tabular-nums;margin-left:auto;}'
     };
 
     function HighlightAnnotationEditor($$anchor, $$props) {
