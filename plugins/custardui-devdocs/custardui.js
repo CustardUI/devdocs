@@ -12894,7 +12894,7 @@
 
     var root_1$f = from_html(`<button type="button">Customize</button>`);
     var root_3$8 = from_html(`<p class="description svelte-16uy9h6"> </p>`);
-    var root_5$2 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Toggles</div> <div class="toggles-container svelte-16uy9h6"></div></div>`);
+    var root_5$3 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Toggles</div> <div class="toggles-container svelte-16uy9h6"></div></div>`);
     var root_7$1 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Placeholders</div> <div class="placeholders-container svelte-16uy9h6"></div></div>`);
     var root_9 = from_html(`<div class="section svelte-16uy9h6"><div class="section-heading svelte-16uy9h6">Tab Groups</div> <div class="tabgroups-container svelte-16uy9h6"><div class="tabgroup-card header-card svelte-16uy9h6" role="group"><div class="tabgroup-row svelte-16uy9h6"><div class="logo-box svelte-16uy9h6" id="cv-nav-icon-box"><div class="nav-icon svelte-16uy9h6"><!></div></div> <div class="tabgroup-info svelte-16uy9h6"><div class="tabgroup-title-container"><p class="tabgroup-title svelte-16uy9h6">Show only the selected tab</p></div> <p class="tabgroup-description svelte-16uy9h6">Hide the navigation headers</p></div> <label class="toggle-switch nav-toggle svelte-16uy9h6"><input class="nav-pref-input svelte-16uy9h6" type="checkbox" aria-label="Show only the selected tab"/> <span class="switch-bg svelte-16uy9h6"></span> <span class="switch-knob svelte-16uy9h6"></span></label></div></div> <div class="tab-groups-list svelte-16uy9h6"></div></div></div>`);
     var root_4$4 = from_html(`<!> <!> <!>`, 1);
@@ -13135,7 +13135,7 @@
 
     				{
     					var consequent_2 = ($$anchor) => {
-    						var div_7 = root_5$2();
+    						var div_7 = root_5$3();
     						var div_8 = sibling(child(div_7), 2);
 
     						each(div_8, 21, () => get(toggles), (toggle) => toggle.toggleId, ($$anchor, toggle) => {
@@ -14500,7 +14500,7 @@
     var root_4$3 = from_html(`<span>▾</span>`);
     var root_3$7 = from_html(`<span> </span> <!> <span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span>`, 1);
     var root_6$1 = from_html(`<span>▾</span>`);
-    var root_5$1 = from_html(`<span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span> <span> </span> <!>`, 1);
+    var root_5$2 = from_html(`<span class="cv-ribbon-grip svelte-1ctem0h" aria-hidden="true"><span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span> <span class="svelte-1ctem0h"></span><span class="svelte-1ctem0h"></span></span> <span> </span> <!>`, 1);
     var root_1$e = from_html(`<div><div aria-hidden="true"></div> <button type="button"><!></button></div>`);
     var root_7 = from_html(`<div class="cv-annotation-card svelte-1ctem0h" role="region" aria-label="Annotation"><button type="button" class="cv-card-close svelte-1ctem0h" aria-label="Collapse annotation">✕</button> <span class="cv-card-text svelte-1ctem0h"> </span></div>`);
     var root$g = from_html(`<div role="presentation"><!></div>`);
@@ -14732,7 +14732,7 @@
     						};
 
     						var alternate = ($$anchor) => {
-    							var fragment_2 = root_5$1();
+    							var fragment_2 = root_5$2();
     							var span_2 = sibling(first_child(fragment_2), 2);
     							let classes_6;
     							var text_1 = child(span_2, true);
@@ -15431,6 +15431,22 @@ ${ANNOTATION_COLORS.map((c) => `
     		textHighlightService.applyDescriptors(this.textHighlights, true);
     	}
 
+    	setTextHighlightColor(index, color) {
+    		const desc = this.textHighlights[index];
+
+    		if (!desc) return;
+
+    		const updated = { ...desc, color };
+
+    		this.textHighlights = this.textHighlights.map((d, i) => i === index ? updated : d);
+    		textHighlightService.applyDescriptors(this.textHighlights, true);
+    	}
+
+    	setAllTextHighlightColors(color) {
+    		this.textHighlights = this.textHighlights.map((desc) => ({ ...desc, color }));
+    		textHighlightService.applyDescriptors(this.textHighlights, true);
+    	}
+
     	setBoxColor(el, color) {
     		this.boxColors.set(el, color);
     	}
@@ -16101,25 +16117,26 @@ ${ANNOTATION_COLORS.map((c) => `
 
     var root_2$9 = from_html(`<button type="button"></button>`);
     var root_1$a = from_html(`<div class="cv-color-swatches svelte-1r78n4c" role="none"></div>`);
-    var root$d = from_html(`<div class="cv-color-picker svelte-1r78n4c" role="none"><button type="button" class="cv-color-trigger svelte-1r78n4c" title="Choose highlight color" aria-label="Choose highlight color"><span class="cv-color-dot svelte-1r78n4c"></span></button> <!></div>`);
+    var root$d = from_html(`<div role="none"><button type="button" class="cv-color-trigger svelte-1r78n4c" title="Choose highlight color" aria-label="Choose highlight color"><span class="cv-color-dot svelte-1r78n4c"></span></button> <!></div>`);
 
     const $$css$h = {
     	hash: 'svelte-1r78n4c',
-    	code: '.cv-color-picker.svelte-1r78n4c {position:fixed;transform:translateX(-50%) translateY(-100%);display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:auto;z-index:9500;\n    /* Nudge down so the trigger peeks above the element edge */margin-top:8px;}.cv-color-trigger.svelte-1r78n4c {width:22px;height:16px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;}.cv-color-trigger.svelte-1r78n4c:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-color-dot.svelte-1r78n4c {width:10px;height:10px;border-radius:50%;display:block;border:1px solid rgba(0, 0, 0, 0.12);}.cv-color-swatches.svelte-1r78n4c {display:grid;grid-template-columns:repeat(5, 16px);gap:6px;background:white;border-radius:12px;padding:8px;box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);border:1px solid rgba(0, 0, 0, 0.1);}.cv-color-swatch.svelte-1r78n4c {width:16px;height:16px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.1s,\n      border-color 0.1s;}.cv-color-swatch.svelte-1r78n4c:hover {transform:scale(1.2);border-color:rgba(0, 0, 0, 0.3);}.cv-color-swatch.active.svelte-1r78n4c {border-color:rgba(0, 0, 0, 0.5);transform:scale(1.15);}'
+    	code: '.cv-color-picker.svelte-1r78n4c {position:fixed;transform:translateX(-50%) translateY(-100%);display:flex;flex-direction:column;align-items:center;gap:4px;z-index:9500;\n    /* Nudge down so the trigger peeks above the element edge */margin-top:8px;opacity:0;pointer-events:none;transition:opacity 0.15s;}.cv-color-picker.visible.svelte-1r78n4c {opacity:1;pointer-events:auto;}.cv-color-trigger.svelte-1r78n4c {width:22px;height:16px;border-radius:100px;border:1.5px solid rgba(0, 0, 0, 0.18);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0, 0, 0, 0.15);transition:box-shadow 0.15s;}.cv-color-trigger.svelte-1r78n4c:hover {box-shadow:0 3px 12px rgba(0, 0, 0, 0.22);}.cv-color-dot.svelte-1r78n4c {width:10px;height:10px;border-radius:50%;display:block;border:1px solid rgba(0, 0, 0, 0.12);}.cv-color-swatches.svelte-1r78n4c {display:grid;grid-template-columns:repeat(5, 16px);gap:6px;background:white;border-radius:12px;padding:8px;box-shadow:0 4px 16px rgba(0, 0, 0, 0.18);border:1px solid rgba(0, 0, 0, 0.1);}.cv-color-swatch.svelte-1r78n4c {width:16px;height:16px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:transform 0.1s,\n      border-color 0.1s;}.cv-color-swatch.svelte-1r78n4c:hover {transform:scale(1.2);border-color:rgba(0, 0, 0, 0.3);}.cv-color-swatch.active.svelte-1r78n4c {border-color:rgba(0, 0, 0, 0.5);transform:scale(1.15);}'
     };
 
     function HighlightColorPicker($$anchor, $$props) {
     	push($$props, true);
     	append_styles$1($$anchor, $$css$h);
 
+    	let isVisible = prop($$props, 'isVisible', 3, true);
     	let isExpanded = state(false);
-    	let rect = state(proxy({ top: 0, left: 0, width: 0 }));
+    	let rect = state(proxy(new DOMRect()));
 
     	user_effect(() => {
-    		set(rect, $$props.element.getBoundingClientRect(), true);
+    		set(rect, $$props.getRect(), true);
 
     		const update = () => {
-    			set(rect, $$props.element.getBoundingClientRect(), true);
+    			set(rect, $$props.getRect(), true);
     		};
 
     		window.addEventListener('scroll', update, { capture: true, passive: true });
@@ -16133,8 +16150,7 @@ ${ANNOTATION_COLORS.map((c) => `
     		};
     	});
 
-    	let currentColorKey = user_derived(() => shareStore.boxColors.get($$props.element) ?? DEFAULT_ANNOTATION_COLOR_KEY);
-    	let currentHex = user_derived(() => ANNOTATION_COLORS.find((c) => c.key === get(currentColorKey))?.hex ?? ANNOTATION_COLORS[0].hex);
+    	let currentHex = user_derived(() => ANNOTATION_COLORS.find((c) => c.key === $$props.colorKey)?.hex ?? ANNOTATION_COLORS[0].hex);
     	let clickTimer = null;
 
     	function handleTriggerClick(e) {
@@ -16150,7 +16166,7 @@ ${ANNOTATION_COLORS.map((c) => `
     		clickTimer = setTimeout(
     			() => {
     				clickTimer = null;
-    				shareStore.setBoxColor($$props.element, key);
+    				$$props.onchange(key);
     				set(isExpanded, false);
     			},
     			220
@@ -16165,13 +16181,15 @@ ${ANNOTATION_COLORS.map((c) => `
     			clickTimer = null;
     		}
 
-    		shareStore.setAllBoxColors(key);
+    		if ($$props.ondblclick) $$props.ondblclick(key);
+
     		set(isExpanded, false);
     	}
 
     	let centerX = user_derived(() => get(rect).left + get(rect).width / 2);
     	let topY = user_derived(() => get(rect).top);
     	var div = root$d();
+    	let classes;
     	var button = child(div);
     	var span = child(button);
 
@@ -16185,14 +16203,14 @@ ${ANNOTATION_COLORS.map((c) => `
 
     			each(div_1, 21, () => ANNOTATION_COLORS, (color) => color.key, ($$anchor, color) => {
     				var button_1 = root_2$9();
-    				let classes;
+    				let classes_1;
 
     				template_effect(() => {
-    					classes = set_class(button_1, 1, 'cv-color-swatch svelte-1r78n4c', null, classes, { active: get(currentColorKey) === get(color).key });
+    					classes_1 = set_class(button_1, 1, 'cv-color-swatch svelte-1r78n4c', null, classes_1, { active: $$props.colorKey === get(color).key });
     					set_style(button_1, `background: ${get(color).hex ?? ''};`);
     					set_attribute(button_1, 'title', `${get(color).label ?? ''} · dbl-click to apply to all`);
     					set_attribute(button_1, 'aria-label', get(color).label);
-    					set_attribute(button_1, 'aria-pressed', get(currentColorKey) === get(color).key);
+    					set_attribute(button_1, 'aria-pressed', $$props.colorKey === get(color).key);
     				});
 
     				delegated('click', button_1, (e) => handleSwatchClick(e, get(color).key));
@@ -16212,6 +16230,7 @@ ${ANNOTATION_COLORS.map((c) => `
     	reset(div);
 
     	template_effect(() => {
+    		classes = set_class(div, 1, 'cv-color-picker svelte-1r78n4c', null, classes, { visible: isVisible() || get(isExpanded) });
     		set_style(div, `left: ${get(centerX) ?? ''}px; top: ${get(topY) ?? ''}px;`);
     		set_attribute(button, 'aria-expanded', get(isExpanded));
     		set_style(span, `background: ${get(currentHex) ?? ''};`);
@@ -16227,7 +16246,7 @@ ${ANNOTATION_COLORS.map((c) => `
     var root_2$8 = from_html(`<span class="cv-annotation-tab-chevron svelte-1r1spmr">▾</span>`);
     var root_1$9 = from_html(`<span class="cv-annotation-tab-preview svelte-1r1spmr"> </span> <!>`, 1);
     var root_3$5 = from_html(`<span class="cv-annotation-tab-icon svelte-1r1spmr"> </span>`);
-    var root_5 = from_html(`<button type="button"> </button>`);
+    var root_5$1 = from_html(`<button type="button"> </button>`);
     var root_4$2 = from_html(`<div class="cv-annotation-panel svelte-1r1spmr" role="none"><textarea class="cv-annotation-textarea svelte-1r1spmr" placeholder="Add a note…" rows="3"></textarea> <div class="cv-annotation-footer svelte-1r1spmr"><div class="cv-corner-selector svelte-1r1spmr" role="group" aria-label="Anchor corner"></div> <span class="cv-char-counter svelte-1r1spmr"> </span></div></div>`);
     var root$c = from_html(`<div role="none"><button type="button" aria-label="Annotation"><!></button> <!></div>`);
 
@@ -16367,7 +16386,7 @@ ${ANNOTATION_COLORS.map((c) => `
     			each(div_3, 21, () => CORNER_ICONS, ({ key, icon }) => key, ($$anchor, $$item) => {
     				let key = () => get($$item).key;
     				let icon = () => get($$item).icon;
-    				var button_1 = root_5();
+    				var button_1 = root_5$1();
     				let classes_2;
     				var text_2 = child(button_1, true);
 
@@ -16653,6 +16672,7 @@ ${ANNOTATION_COLORS.map((c) => `
     };
 
     var root_2$7 = from_html(`<!> <!>`, 1);
+    var root_5 = from_html(`<!> <!>`, 1);
     var root_6 = from_html(`<div><span class="selection-label svelte-1dbf58w"> </span></div>`);
     var root$b = from_html(`<div class="share-overlay-ui"><!> <!> <!> <!> <!></div>`);
 
@@ -16723,6 +16743,7 @@ ${ANNOTATION_COLORS.map((c) => `
     	let dragStart = state(null);
     	let dragCurrent = state(null);
     	let wasDragging = false;
+    	let hoveredHighlightIndex = state(null);
 
     	// Cache candidates when active to avoid repeated DOM queries
     	let cachedCandidates = [];
@@ -16769,20 +16790,12 @@ ${ANNOTATION_COLORS.map((c) => `
     		// Check ancestors selection (level up logic)
     		let parent = finalTarget.parentElement;
 
-    		let selectedAncestor = null;
-
-    		while (parent) {
-    			if (shareStore.selectedElements.has(parent)) {
-    				selectedAncestor = parent;
-
-    				break;
-    			}
-
+    		while (parent && !shareStore.selectedElements.has(parent)) {
     			parent = parent.parentElement;
     		}
 
-    		if (selectedAncestor) {
-    			shareStore.setHoverTarget(selectedAncestor);
+    		if (parent) {
+    			shareStore.setHoverTarget(parent);
 
     			return;
     		}
@@ -16830,8 +16843,38 @@ ${ANNOTATION_COLORS.map((c) => `
     		wasDragging = false; // Ensure clean state
     	}
 
+    	function getHoveredHighlightIndex(clientX, clientY) {
+    		for (let i = 0; i < shareStore.textHighlights.length; i++) {
+    			const range = textHighlightService.getRange(i);
+
+    			if (!range) continue;
+
+    			const rects = range.getClientRects();
+
+    			for (let j = 0; j < rects.length; j++) {
+    				const r = rects[j];
+
+    				if (clientX >= r.left - 5 && clientX <= r.right + 5 && clientY >= r.top - 5 && clientY <= r.bottom + 5) {
+    					return i;
+    				}
+    			}
+    		}
+
+    		return null;
+    	}
+
     	function handleMouseMove(e) {
-    		if (!get(dragStart)) return;
+    		if (!get(dragStart)) {
+    			if (shareStore.selectionMode === 'highlight') {
+    				const target = e.target;
+
+    				if (target.closest('.cv-color-picker')) return;
+
+    				set(hoveredHighlightIndex, getHoveredHighlightIndex(e.clientX, e.clientY), true);
+    			}
+
+    			return;
+    		}
 
     		set(dragCurrent, { x: e.clientX, y: e.clientY }, true);
 
@@ -16991,11 +17034,19 @@ ${ANNOTATION_COLORS.map((c) => `
     				var fragment_1 = root_2$7();
     				var node_5 = first_child(fragment_1);
 
-    				HighlightColorPicker(node_5, {
-    					get element() {
-    						return el;
-    					}
-    				});
+    				{
+    					let $0 = user_derived(() => shareStore.boxColors.get(el) ?? DEFAULT_ANNOTATION_COLOR_KEY);
+
+    					HighlightColorPicker(node_5, {
+    						getRect: () => el.getBoundingClientRect(),
+    						get colorKey() {
+    							return get($0);
+    						},
+    						onchange: (key) => shareStore.setBoxColor(el, key),
+    						ondblclick: (key) => shareStore.setAllBoxColors(key),
+    						isVisible: true
+    					});
+    				}
 
     				var node_6 = sibling(node_5, 2);
 
@@ -17041,11 +17092,33 @@ ${ANNOTATION_COLORS.map((c) => `
 
     				{
     					var consequent_1 = ($$anchor) => {
+    						var fragment_4 = root_5();
+    						var node_10 = first_child(fragment_4);
+
+    						{
+    							let $0 = user_derived(() => get(desc).color ?? DEFAULT_ANNOTATION_COLOR_KEY);
+    							let $1 = user_derived(() => get(hoveredHighlightIndex) === i);
+
+    							HighlightColorPicker(node_10, {
+    								getRect: () => textHighlightService.getAnchorRect(i) ?? new DOMRect(),
+    								get colorKey() {
+    									return get($0);
+    								},
+    								onchange: (key) => shareStore.setTextHighlightColor(i, key),
+    								ondblclick: (key) => shareStore.setAllTextHighlightColors(key),
+    								get isVisible() {
+    									return get($1);
+    								}
+    							});
+    						}
+
+    						var node_11 = sibling(node_10, 2);
+
     						{
     							let $0 = user_derived(() => get(desc).annotation ?? '');
     							let $1 = user_derived(() => get(desc).annotationCorner ?? DEFAULT_ANNOTATION_CORNER);
 
-    							HighlightAnnotationEditor($$anchor, {
+    							HighlightAnnotationEditor(node_11, {
     								getRect: () => textHighlightService.getAnchorRect(i) ?? new DOMRect(),
     								get annotation() {
     									return get($0);
@@ -17057,6 +17130,8 @@ ${ANNOTATION_COLORS.map((c) => `
     								onchange: (text, corner) => shareStore.setTextHighlightAnnotation(i, text, corner)
     							});
     						}
+
+    						append($$anchor, fragment_4);
     					};
 
     					if_block(node_9, ($$render) => {
@@ -17075,7 +17150,7 @@ ${ANNOTATION_COLORS.map((c) => `
     		});
     	}
 
-    	var node_10 = sibling(node_7, 2);
+    	var node_12 = sibling(node_7, 2);
 
     	{
     		var consequent_3 = ($$anchor) => {
@@ -17106,7 +17181,7 @@ ${ANNOTATION_COLORS.map((c) => `
     			append($$anchor, div_1);
     		};
 
-    		if_block(node_10, ($$render) => {
+    		if_block(node_12, ($$render) => {
     			if (get(selectionBox) && shareStore.selectionMode !== 'highlight') $$render(consequent_3);
     		});
     	}
